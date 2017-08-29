@@ -1,0 +1,300 @@
+require 'spec_helper'
+require 'aws/templates/utils/parametrized'
+require 'aws/templates/utils/parametrized/transformations'
+require 'aws/templates/utils/parametrized/constraints'
+require 'aws/templates/utils/parametrized/getters'
+require 'aws/templates/render'
+
+describe Aws::Templates::Utils::Parametrized::Transformation do
+  let(:parametrized_class) do
+    Class.new do
+      include Aws::Templates::Utils::Parametrized
+
+      def self.getter
+        as_is
+      end
+
+      attr_reader :options
+
+      def initialize(options)
+        @options = options
+      end
+    end
+  end
+
+  describe 'as_object' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something,
+                  transform: as_object {
+                    parameter :a, description: 'Parameter A'
+                    parameter :b, description: 'Parameter B'
+                    parameter :c, description: 'Parameter C', constraint: not_nil
+                  }
+      end
+    end
+
+    it 'transforms hash into object correctly' do
+      i = test_class.new(something: { a: 1, b: 2, c: 3 })
+      expect([i.something.a, i.something.b, i.something.c])
+        .to be == [1, 2, 3]
+    end
+
+    it 'allows nil values in sub-fields if no constraint is specified' do
+      i = test_class.new(something: { a: 1, b: nil, c: 3 })
+      expect([i.something.a, i.something.b, i.something.c])
+        .to be == [1, nil, 3]
+    end
+
+    it 'throws an error if sub-parameter constraint is not satisfied' do
+      i = test_class.new(something: { a: 1, b: 2, c: nil })
+      expect { [i.something.a, i.something.b, i.something.c] }
+        .to raise_error Aws::Templates::ParameterValueInvalid
+    end
+  end
+
+  describe 'as_list' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something,
+                  description: 'Something misterious',
+                  transform: as_list(
+                    name: :element,
+                    description: 'Force of nature'
+                  )
+        parameter :something_else,
+                  description: 'Absolutely incomprehensible',
+                  transform: as_list(
+                    name: :element,
+                    description: 'Celestial image',
+                    constraint: not_nil
+                  )
+      end
+    end
+
+    it 'handles nil values' do
+      expect(test_class.new({}).something).to be_nil
+    end
+
+    it 'handles list value' do
+      expect(test_class.new(something: [1, 2, 3]).something).to be == [1, 2, 3]
+    end
+
+    it 'allows nil values if no constraints are specified' do
+      expect(test_class.new(something: [1, nil, 3]).something).to be == [1, nil, 3]
+    end
+
+    it 'works with any kind of object' do
+      expect(test_class.new(something: 'abc'.each_char).something).to be == %w(a b c)
+    end
+
+    it 'fails if the value can be transformed to an array' do
+      expect { test_class.new(something: 'abc').something }
+        .to raise_error Aws::Templates::NestedParameterException
+    end
+
+    it 'returns correct value if sub-constraints are satisfied' do
+      expect(test_class.new(something_else: [1, 2, 3]).something_else).to be == [1, 2, 3]
+    end
+
+    it 'throws an exception if one or more elements don\'t satisfy sub-constraint' do
+      expect { test_class.new(something_else: [1, nil, 3]).something_else }
+        .to raise_error(/Celestial image/)
+    end
+  end
+
+  describe 'as_rendered' do
+    let(:render) do
+      Module.new do
+        extend Aws::Templates::Render
+        StringView = Class.new(Aws::Templates::Render::BasicView) do
+          def to_rendered
+            _stringify(instance)
+          end
+
+          def _stringify(obj)
+            return obj.to_s unless obj.respond_to?(:to_hash)
+            obj.to_hash.map { |k, v| [_stringify(k), _stringify(v)] }.to_h
+          end
+        end
+        StringView.register_in self
+        StringView.artifact ::Object
+      end
+    end
+
+    let(:test_class) do
+      klass = Class.new(parametrized_class)
+      klass.parameter :something, transform: klass.as_rendered(render)
+      klass
+    end
+
+    it 'transforms hash into stringified hash correctly' do
+      i = test_class.new(something: { a: 1, b: 2, c: 3 })
+      expect(i.something).to be == { 'a' => '1', 'b' => '2', 'c' => '3' }
+    end
+
+    it 'allows nil value' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+  end
+
+  describe 'as_integer' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_integer
+      end
+    end
+
+    it 'transforms string into integer correctly' do
+      i = test_class.new(something: '23')
+      expect(i.something).to be == 23
+    end
+
+    it 'allows nil value' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+
+    it 'fails on wrong value' do
+      i = test_class.new(something: [])
+      expect { i.something }.to raise_error
+    end
+  end
+
+  describe 'as_string' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_string
+      end
+    end
+
+    it 'transforms integer into string correctly' do
+      i = test_class.new(something: 23)
+      expect(i.something).to be == '23'
+    end
+
+    it 'allows nil value' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+  end
+
+  describe 'as_boolean' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_boolean
+      end
+    end
+
+    it 'transforms string into boolean correctly' do
+      i = test_class.new(something: 23)
+      expect(i.something).to be == true
+    end
+
+    it 'transforms false correctly' do
+      i = test_class.new(something: false)
+      expect(i.something).to be == false
+    end
+
+    it 'transforms true correctly' do
+      i = test_class.new(something: true)
+      expect(i.something).to be == true
+    end
+
+    it 'transforms false string correctly' do
+      i = test_class.new(something: 'false')
+      expect(i.something).to be == false
+    end
+
+    it 'allows nil value' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+  end
+
+  describe 'as_hash' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_hash
+        parameter :something2,
+                  transform: as_hash {
+                    key name: :key,
+                        description: 'String key',
+                        constraint: not_nil,
+                        transform: as_string
+                    value name: :number,
+                          description: 'Just a number',
+                          constraint: not_nil,
+                          transform: as_integer
+                  }
+      end
+    end
+
+    let(:hashable) do
+      Class.new do
+        def to_hash
+          { w: 'qwe' }
+        end
+      end
+    end
+
+    it 'transforms hash correctly' do
+      i = test_class.new(something: { q: 3 })
+      expect(i.something).to be == { q: 3 }
+    end
+
+    it 'transforms array into hash correctly' do
+      i = test_class.new(something: [[:q, 3]])
+      expect(i.something).to be == { q: 3 }
+    end
+
+    it 'transforms an object into hash correctly' do
+      i = test_class.new(something: hashable.new)
+      expect(i.something).to be == { w: 'qwe' }
+    end
+
+    it 'allows nil value' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+
+    it 'understands internal structure' do
+      i = test_class.new(something2: { q: '3' })
+      expect(i.something2).to be == { 'q' => 3 }
+    end
+
+    it 'performs internal constraint check' do
+      i = test_class.new(something2: { q: nil })
+      expect { i.something2 }.to raise_error(/Just a number/)
+    end
+  end
+
+  describe 'as_class' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_module
+      end
+    end
+
+    it 'passes a class as is' do
+      i = test_class.new(something: Object)
+      expect(i.something).to be == Object
+    end
+
+    it 'looks up class name' do
+      i = test_class.new(something: 'Object')
+      expect(i.something).to be == Object
+    end
+
+    it 'is able to work with paths' do
+      i = test_class.new(something: 'Object::Object::Object::Array')
+      expect(i.something).to be == Array
+    end
+
+    it 'accepts different path specifications' do
+      i = test_class.new(something: 'Object/Object/Object/Array')
+      expect(i.something).to be == Array
+    end
+  end
+end
