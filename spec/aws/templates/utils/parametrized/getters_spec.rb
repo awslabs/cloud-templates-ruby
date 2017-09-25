@@ -31,6 +31,26 @@ describe Aws::Templates::Utils::Parametrized::Getter do
 
   let(:instance) { test_class.new(options_hash) }
 
+  describe 'as_instance_variable' do
+    let(:parametrized_class) do
+      Class.new do
+        include Aws::Templates::Utils::Parametrized
+
+        def initialize(something)
+          @something = something
+        end
+      end
+    end
+
+    let(:options_hash) { 'a' }
+
+    let(:getter) { Getters.as_instance_variable }
+
+    it 'returns the value from hash by parameter name' do
+      expect(instance.something).to be == 'a'
+    end
+  end
+
   describe 'as_is' do
     let(:options_hash) { { something: 'a' } }
 
@@ -67,7 +87,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
     end
 
     context 'dynamic path is specified' do
-      let(:getter) { Getters.path { [:object, :something] } }
+      let(:getter) { Getters.path { %i[object something] } }
 
       it 'returns value correctly' do
         expect(instance.something).to be == 'a'

@@ -1,10 +1,11 @@
 require 'aws/templates/exceptions'
+require 'aws/templates/utils/parametrized'
 require 'singleton'
 
 module Aws
   module Templates
     module Utils
-      module Parametrized
+      module Parametrized #:nodoc:
         ##
         # Getter functor class
         #
@@ -20,6 +21,36 @@ module Aws
         # It provides protected method get which should be overriden in
         # all concrete getter classes.
         class Getter
+          ##
+          # Get parameter from instance variables as is
+          #
+          # Gets value from instance variable by parameter's name without
+          # any other operations performed.
+          #
+          # === Example
+          #
+          #    class Piece
+          #      include Aws::Templates::Utils::Parametrized
+          #
+          #      parameter :param1, getter: as_instance_variable
+          #
+          #      def initialize(x)
+          #        @param1 = x
+          #      end
+          #    end
+          #
+          #    i = Piece.new(3)
+          #    i.param1 # => 3
+          class AsInstanceVariable < Getter
+            include Singleton
+
+            protected
+
+            def get(parameter, instance)
+              instance.instance_variable_get("@#{parameter.name}")
+            end
+          end
+
           ##
           # Get options value "as is"
           #
@@ -117,7 +148,9 @@ module Aws
             protected
 
             def get(_, instance)
-              if calculation.respond_to?(:to_proc)
+              if calculation.respond_to?(:to_hash)
+                calculation
+              elsif calculation.respond_to?(:to_proc)
                 instance.instance_eval(&calculation)
               else
                 calculation
@@ -192,7 +225,7 @@ module Aws
           # * +instance+ - the instance value is taken from
           def get_wrapper(parameter, instance)
             get(parameter, instance)
-          rescue
+          rescue StandardError
             raise NestedParameterException.new(parameter)
           end
 
@@ -211,9 +244,13 @@ module Aws
         #
         # It injects the methods as class-scope methods into mixing classes.
         # The methods are factories to create particular type of getter
-        module ClassMethods
-          def delegation
-            Getter::Delegate.new
+        class_scope do
+          ##
+          # Get parameter from instance variables as is
+          #
+          # alias for AsInstanceVariable class
+          def as_instance_variable
+            Getter::AsInstanceVariable.instance
           end
 
           ##

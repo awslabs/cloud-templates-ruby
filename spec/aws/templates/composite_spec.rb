@@ -12,16 +12,16 @@ class A
     @params = p
   end
 
-  def ==(other)
+  def eql?(other)
     (self.class == other.class) && (params.to_hash == other.params.to_hash)
   end
 
-  def eql?(other)
-    self == other
+  def ==(other)
+    eql?(other)
   end
 
   def !=(other)
-    !(self == other)
+    !eql?(other)
   end
 end
 
@@ -138,7 +138,7 @@ describe Aws::Templates::Composite do
     end
 
     it 'throws exception when unknown artifact is being extracted' do
-      expect { instance['w'] }.to raise_error
+      expect { instance['w'] }.to raise_error RuntimeError, /There is no artifact/
     end
 
     it 'has all expected artifacts' do
@@ -191,7 +191,7 @@ describe Aws::Templates::Composite do
       end
 
       it 'finds correct artifacts' do
-        expect(found_artifacts.map(&:label).sort).to be == %w(a b c x y z)
+        expect(found_artifacts.map(&:label).sort).to be == %w[a b c x y z]
       end
     end
 
@@ -203,18 +203,23 @@ describe Aws::Templates::Composite do
       end
 
       it 'finds correct artifacts' do
-        expect(found_artifacts.map(&:label).sort).to be == %w(a a b b c c x x y y z z)
+        expect(found_artifacts.map(&:label).sort).to be == %w[a a b b c c x x y y z z]
       end
     end
   end
 
   describe 'adding artifacts' do
-    before { parameters[:postfix] = 'X' }
+    shared_examples 'an artifact storage' do
+      it 'contains artifact t' do
+        expect(instance['t'].params.to_hash).to be == result['t']
+      end
 
-    after do
-      expect(instance['t'].params.to_hash).to be == result['t']
-      expect(artifacts).to be == result
+      it 'contains expected artifacts' do
+        expect(artifacts).to be == result
+      end
     end
+
+    before { parameters[:postfix] = 'X' }
 
     let(:result) do
       {
@@ -318,7 +323,7 @@ describe Aws::Templates::Composite do
         end
       end
 
-      it('has predictable parameters distribution') {}
+      it_behaves_like 'an artifact storage'
     end
 
     context 'using instance components method' do
@@ -332,7 +337,7 @@ describe Aws::Templates::Composite do
         end
       end
 
-      it('has predictable parameters distribution') {}
+      it_behaves_like 'an artifact storage'
     end
 
     context 'using subclass' do
@@ -350,7 +355,7 @@ describe Aws::Templates::Composite do
 
       let(:instance) { subclass.new(parameters) }
 
-      it('has predictable parameters distribution') {}
+      it_behaves_like 'an artifact storage'
     end
   end
 end

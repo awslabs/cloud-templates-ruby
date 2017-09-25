@@ -12,8 +12,8 @@ module UserDirectory
     include IDed
     include Catalogized
 
-    default dn: -> { "cn=#{cn},#{unit.dn}" },
-            home_directory: -> { { path: "/home/#{login}" } },
+    default dn: proc { "cn=#{cn},#{unit.dn}" },
+            home_directory: proc { { path: "/home/#{login}" } },
             shell: { path: '/bin/sh' }
 
     parameter :cn, description: 'Object canonical name', constraint: not_nil

@@ -247,25 +247,25 @@ describe UserDirectory do
       [
         {
           dn: 'o=example.com',
-          objectClass: %w(top organization),
+          objectClass: %w[top organization],
           o: 'example.com'
         }, {
           dn: 'ou=Business,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'Business'
         }, {
           dn: 'ou=Sales,ou=Business,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'Sales'
         }, {
           dn: 'cn=sales,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'sales',
           gidNumber: 120,
-          memberUid: %w(ptsmth joshrx helbuck wcorner)
+          memberUid: %w[ptsmth joshrx helbuck wcorner]
         }, {
           dn: 'cn=Will Corner (wcorner),ou=Sales,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Will Corner (wcorner)',
           uid: 'wcorner',
           uidNumber: 1000,
@@ -277,7 +277,7 @@ describe UserDirectory do
           sn: 'Corner'
         }, {
           dn: 'cn=Peter Smith (ptsmth),ou=Sales,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Peter Smith (ptsmth)',
           uid: 'ptsmth',
           uidNumber: 1001,
@@ -290,7 +290,7 @@ describe UserDirectory do
           manager: 'cn=Will Corner (wcorner),ou=Sales,ou=Business,o=example.com'
         }, {
           dn: 'cn=Joshua Revoux (joshrx),ou=Sales,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Joshua Revoux (joshrx)',
           uid: 'joshrx',
           uidNumber: 1002,
@@ -303,7 +303,7 @@ describe UserDirectory do
           manager: 'cn=Will Corner (wcorner),ou=Sales,ou=Business,o=example.com'
         }, {
           dn: 'cn=Helmut Prust (helbuck),ou=Sales,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Helmut Prust (helbuck)',
           uid: 'helbuck',
           uidNumber: 1003,
@@ -316,17 +316,17 @@ describe UserDirectory do
           manager: 'cn=Will Corner (wcorner),ou=Sales,ou=Business,o=example.com'
         }, {
           dn: 'ou=Finances,ou=Business,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'Finances'
         }, {
           dn: 'cn=finances,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'finances',
           gidNumber: 110,
-          memberUid: %w(rickk jjohn lcorner)
+          memberUid: %w[rickk jjohn lcorner]
         }, {
           dn: 'cn=Lisa Corner (lcorner),ou=Finances,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Lisa Corner (lcorner)',
           uid: 'lcorner',
           uidNumber: 1010,
@@ -338,7 +338,7 @@ describe UserDirectory do
           sn: 'Corner'
         }, {
           dn: 'cn=Rick Kim (rickk),ou=Finances,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Rick Kim (rickk)',
           uid: 'rickk',
           uidNumber: 1011,
@@ -351,7 +351,7 @@ describe UserDirectory do
           manager: 'cn=Lisa Corner (lcorner),ou=Finances,ou=Business,o=example.com'
         }, {
           dn: 'cn=Jay John (jjohn),ou=Finances,ou=Business,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Jay John (jjohn)',
           uid: 'jjohn',
           uidNumber: 1012,
@@ -364,27 +364,27 @@ describe UserDirectory do
           manager: 'cn=Lisa Corner (lcorner),ou=Finances,ou=Business,o=example.com'
         }, {
           dn: 'cn=business,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'business',
           gidNumber: 100,
-          memberUid: %w(wcorner ptsmth joshrx helbuck lcorner rickk jjohn)
+          memberUid: %w[wcorner ptsmth joshrx helbuck lcorner rickk jjohn]
         }, {
           dn: 'ou=Engineering,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'Engineering'
         }, {
           dn: 'ou=Production,ou=Engineering,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'Production'
         }, {
           dn: 'cn=production,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'production',
           gidNumber: 210,
-          memberUid: %w(bmillen xxor wiknoz)
+          memberUid: %w[bmillen xxor wiknoz]
         }, {
           dn: 'cn=Wik Nozer (wiknoz),ou=Production,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Wik Nozer (wiknoz)',
           uid: 'wiknoz',
           uidNumber: 2000,
@@ -396,7 +396,7 @@ describe UserDirectory do
           sn: 'Nozer'
         }, {
           dn: 'cn=Robert Millen (bmillen),ou=Production,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Robert Millen (bmillen)',
           uid: 'bmillen',
           uidNumber: 2001,
@@ -409,7 +409,7 @@ describe UserDirectory do
           manager: 'cn=Wik Nozer (wiknoz),ou=Production,ou=Engineering,o=example.com'
         }, {
           dn: 'cn=Xavier Xordoux (xxor),ou=Production,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Xavier Xordoux (xxor)',
           uid: 'xxor',
           uidNumber: 2002,
@@ -422,17 +422,17 @@ describe UserDirectory do
           manager: 'cn=Wik Nozer (wiknoz),ou=Production,ou=Engineering,o=example.com'
         }, {
           dn: 'ou=Development,ou=Engineering,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'Development'
         }, {
           dn: 'cn=development,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'development',
           gidNumber: 220,
-          memberUid: %w(dxrelk mi5 uran reztrant)
+          memberUid: %w[dxrelk mi5 uran reztrant]
         }, {
           dn: 'cn=Trant Reezner (reztrant),ou=Development,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Trant Reezner (reztrant)',
           uid: 'reztrant',
           uidNumber: 2020,
@@ -444,7 +444,7 @@ describe UserDirectory do
           sn: 'Reezner'
         }, {
           dn: 'cn=Dexter Relk (dxrelk),ou=Development,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Dexter Relk (dxrelk)',
           uid: 'dxrelk',
           uidNumber: 2021,
@@ -457,7 +457,7 @@ describe UserDirectory do
           manager: 'cn=Trant Reezner (reztrant),ou=Development,ou=Engineering,o=example.com'
         }, {
           dn: 'cn=Michael Five (mi5),ou=Development,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Michael Five (mi5)',
           uid: 'mi5',
           uidNumber: 2022,
@@ -470,7 +470,7 @@ describe UserDirectory do
           manager: 'cn=Trant Reezner (reztrant),ou=Development,ou=Engineering,o=example.com'
         }, {
           dn: 'cn=Ulrich Randel (uran),ou=Development,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Ulrich Randel (uran)',
           uid: 'uran',
           uidNumber: 2023,
@@ -483,17 +483,17 @@ describe UserDirectory do
           manager: 'cn=Trant Reezner (reztrant),ou=Development,ou=Engineering,o=example.com'
         }, {
           dn: 'ou=QA,ou=Engineering,o=example.com',
-          objectClass: %w(top organizationalUnit),
+          objectClass: %w[top organizationalUnit],
           ou: 'QA'
         }, {
           dn: 'cn=qa,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'qa',
           gidNumber: 230,
-          memberUid: %w(rrich jojo predate qwerty)
+          memberUid: %w[rrich jojo predate qwerty]
         }, {
           dn: 'cn=Q Werty (qwerty),ou=QA,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Q Werty (qwerty)',
           uid: 'qwerty',
           uidNumber: 2030,
@@ -505,7 +505,7 @@ describe UserDirectory do
           sn: 'Werty'
         }, {
           dn: 'cn=Rick Richards (rrich),ou=QA,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Rick Richards (rrich)',
           uid: 'rrich',
           uidNumber: 2031,
@@ -518,7 +518,7 @@ describe UserDirectory do
           manager: 'cn=Q Werty (qwerty),ou=QA,ou=Engineering,o=example.com'
         }, {
           dn: 'cn=John Joque (jojo),ou=QA,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'John Joque (jojo)',
           uid: 'jojo',
           uidNumber: 2032,
@@ -531,7 +531,7 @@ describe UserDirectory do
           manager: 'cn=Q Werty (qwerty),ou=QA,ou=Engineering,o=example.com'
         }, {
           dn: 'cn=Patrick Redate (predate),ou=QA,ou=Engineering,o=example.com',
-          objectClass: %w(top posixAccount inetOrgPerson person),
+          objectClass: %w[top posixAccount inetOrgPerson person],
           cn: 'Patrick Redate (predate)',
           uid: 'predate',
           uidNumber: 2033,
@@ -544,19 +544,19 @@ describe UserDirectory do
           manager: 'cn=Q Werty (qwerty),ou=QA,ou=Engineering,o=example.com'
         }, {
           dn: 'cn=engineering,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'engineering',
           gidNumber: 200,
-          memberUid: %w(
+          memberUid: %w[
             wiknoz bmillen xxor reztrant dxrelk mi5 uran qwerty rrich
             jojo predate
-          )
+          ]
         }, {
           dn: 'cn=managers,ou=System,o=example.com',
-          objectClass: %w(top posixGroup),
+          objectClass: %w[top posixGroup],
           cn: 'managers',
           gidNumber: 300,
-          memberUid: %w(wcorner lcorner wiknoz reztrant qwerty)
+          memberUid: %w[wcorner lcorner wiknoz reztrant qwerty]
         }
       ]
     end

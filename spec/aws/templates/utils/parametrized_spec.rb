@@ -141,7 +141,7 @@ describe Aws::Templates::Utils::Parametrized do
         end
 
         it 'raises an exception' do
-          expect { instance.all_properties_parameter }.to raise_error
+          expect { instance.all_properties_parameter }.to raise_error RuntimeError
         end
       end
     end
@@ -155,7 +155,7 @@ describe Aws::Templates::Utils::Parametrized do
         end
       end
 
-      [:just_addition, :all_properties_parameter, :bare_minimum].each do |name|
+      %i[just_addition all_properties_parameter bare_minimum].each do |name|
         it "has accessor #{name} inherited from parent" do
           expect(extending_class.method_defined?(name)).to be == true
         end
@@ -196,7 +196,7 @@ describe Aws::Templates::Utils::Parametrized do
           k
         end
 
-        [:just_addition, :all_properties_parameter, :bare_minimum].each do |name|
+        %i[just_addition all_properties_parameter bare_minimum].each do |name|
           it "has accessor #{name} inherited from parent" do
             expect(mixing_class.method_defined?(name)).to be == true
           end

@@ -17,15 +17,9 @@ module Aws
         # of all dependencies automatically. If some dependency is not logical/parametrical but
         # purely chronological, it can be introduced into the dependency list with this method.
         def depends_on(*depends)
-          depends
-            .flatten
-            .each do |d|
-              if d.dependency?
-                dependencies.merge(d.dependencies)
-              else
-                dependencies << d
-              end
-            end
+          new_dependencies = depends.dependencies
+          new_dependencies.select! { |obj| obj.root == root } unless root.nil?
+          dependencies.merge(new_dependencies)
           self
         end
       end

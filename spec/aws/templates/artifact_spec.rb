@@ -1,11 +1,19 @@
 require 'spec_helper'
 require 'aws/templates/artifact'
 
+module TestTest
+  module A; end
+  module B; end
+end
+
 describe Aws::Templates::Artifact do
   let(:artifact_class) do
     Class.new(Aws::Templates::Artifact) do
       default a: 'b',
-              b: ->() { options[:c].upcase }
+              b: proc { options[:c].upcase }
+
+      parameter :c
+      parameter :d
     end
   end
 
@@ -15,6 +23,14 @@ describe Aws::Templates::Artifact do
 
   let(:just_object) do
     Struct.new(:root)
+  end
+
+  context 'featuring class is created' do
+    let(:featuring_class) { artifact_class.featuring(TestTest::A, TestTest::B) }
+
+    it 'returns correct class name' do
+      expect(featuring_class.to_s).to match(/Subclass.*TestTest..B.*TestTest..A/)
+    end
   end
 
   context 'instance created' do
@@ -29,12 +45,15 @@ describe Aws::Templates::Artifact do
         }
       }
     end
+
     let(:instance) { artifact_class.new(params) }
+
     context 'label is not specified' do
       it 'contains auto-generated label' do
         expect(instance.label).not_to be_nil
       end
     end
+
     context 'root is not specified' do
       it 'root is not empty' do
         expect(instance.root).not_to be_nil
@@ -66,6 +85,7 @@ describe Aws::Templates::Artifact do
     end
     context 'no overrides specified' do
       before { params.merge!(root: 3, label: 'thing') }
+
       let(:expected) do
         {
           label: 'thing',
@@ -81,12 +101,14 @@ describe Aws::Templates::Artifact do
           root: 3
         }
       end
+
       it 'calculates with defaults' do
         expect(instance.options.to_hash).to be == expected
       end
     end
     context 'override is present in input hash' do
       before { params.merge!(root: 3, label: 'thing', a: 'rty') }
+
       let(:expected) do
         {
           label: 'thing',
@@ -102,6 +124,7 @@ describe Aws::Templates::Artifact do
           root: 3
         }
       end
+
       it 'calculates with defaults' do
         expect(instance.options.to_hash).to be == expected
       end
@@ -112,11 +135,14 @@ describe Aws::Templates::Artifact do
     let(:child_class) do
       Class.new(artifact_class) do
         default a: 'c',
-                c: ->() { options[:d].tr(' ', '.') }
+                c: proc { options[:d].tr(' ', '.') }
       end
     end
+
     let(:params) { { root: 3, label: 'thing', d: 'q w e' } }
+
     let(:child_instance) { child_class.new(params) }
+
     let(:expected) do
       {
         root: 3,
@@ -127,6 +153,7 @@ describe Aws::Templates::Artifact do
         d: 'q w e'
       }
     end
+
     it 'overlays overrides' do
       expect(child_instance.options.to_hash).to be == expected
     end

@@ -1,4 +1,5 @@
 require 'aws/templates/artifact'
+require 'set'
 
 module Aws
   module Templates
@@ -6,13 +7,15 @@ module Aws
       ##
       # Arifact storage
       #
-      # It's a type of Hash providing additional ability to search
+      # It mimics behavior of Hash providing additional ability to search
       # through elements checking for different types of matches:
       # * labels
       # * classes
       # * parameters
-      # It is also able to perform recursive deep search.
+      # It is also able to perform recursive deep search and de-duplication of artifact objects
       class ArtifactStorage < Hash
+        include Enumerable
+
         ##
         # Find artifacts by criteria
         #
@@ -36,6 +39,68 @@ module Aws
           end
 
           found
+        end
+
+        ##
+        # Artifacts list
+        def artifacts
+          @set.to_a
+        end
+
+        ##
+        # Artifacts' labels list
+        def labels
+          @map.keys
+        end
+
+        ##
+        # If the label is present
+        def label?(l)
+          @map.key?(l)
+        end
+
+        ##
+        # Extract object by label
+        def [](k)
+          @map[k]
+        end
+
+        ##
+        # Associate label to the object
+        def []=(k, v)
+          raise 'nil artifacts are not supported' if v.nil?
+          @set << v unless @set.include?(v)
+          @map[k] = v
+        end
+
+        alias values artifacts
+        alias keys labels
+        alias key? label?
+        alias include? label?
+
+        def each(&blk)
+          @map.each(&blk)
+        end
+
+        def each_pair(&blk)
+          @map.each_pair(&blk)
+        end
+
+        def map(&blk)
+          @map.map(&blk)
+        end
+
+        def select(&blk)
+          @map.select(&blk)
+        end
+
+        def reject(&blk)
+          @map.reject(&blk)
+        end
+
+        def initialize
+          @map = {}
+          @set = Set.new
         end
 
         private

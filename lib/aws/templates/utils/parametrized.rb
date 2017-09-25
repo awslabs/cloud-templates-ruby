@@ -1,5 +1,7 @@
 require 'aws/templates/exceptions'
 require 'aws/templates/utils/parametrized/guarded'
+require 'aws/templates/utils/inheritable'
+require 'aws/templates/utils/dependent'
 require 'set'
 
 module Aws
@@ -14,31 +16,8 @@ module Aws
       # it's domain-specific extended implementation of attr_reader.
       module Parametrized
         include Guarded
-
-        ##
-        # To add class methods also while including the module
-        def self.included(base)
-          super(base)
-          base.extend(ClassMethods)
-        end
-
-        ##
-        # Parameter names list
-        #
-        # Instance-level alias for list_all_parameter_names
-        def parameter_names
-          self.class.list_all_parameter_names
-        end
-
-        ##
-        # Validate all parameters
-        #
-        # Performs calculation of all specified parameters to check options validity
-        def validate
-          parameter_names.each { |name| send(name) }
-        end
-
-        attr_reader :getter
+        include Inheritable
+        include Dependent
 
         ##
         # Parameter object
@@ -121,16 +100,16 @@ module Aws
           end
 
           def execute_getter(instance, getter)
-            if getter.respond_to?(:to_proc)
+            if getter.respond_to?(:to_hash)
+              getter
+            elsif getter.respond_to?(:to_proc)
               instance.instance_exec(self, &getter)
             else
               getter
             end
           end
 
-          ALLOWED_SPECIFICATION_ENTRIES = Set.new(
-            [:description, :getter, :transform, :constraint]
-          )
+          ALLOWED_SPECIFICATION_ENTRIES = Set.new %i[description getter transform constraint]
 
           def set_specification(enclosing_class, specification) # :nodoc:
             @klass = enclosing_class
@@ -156,11 +135,42 @@ module Aws
           end
         end
 
+        instance_scope do
+          ##
+          # Lazy initializer
+          def dependencies
+            if @dependencies.nil?
+              @dependencies = Set.new
+              depends_on(parameter_names.map { |name| send(name) })
+            end
+
+            @dependencies
+          end
+
+          ##
+          # Parameter names list
+          #
+          # Instance-level alias for list_all_parameter_names
+          def parameter_names
+            self.class.list_all_parameter_names
+          end
+
+          ##
+          # Validate all parameters
+          #
+          # Performs calculation of all specified parameters to check options validity
+          def validate
+            parameter_names.each { |name| send(name) }
+          end
+
+          attr_reader :getter
+        end
+
         ##
         # Class-level mixins
         #
         # It's a DSL extension to declaratively define parameters.
-        module ClassMethods
+        class_scope do
           ##
           # List all defined parameter names
           #

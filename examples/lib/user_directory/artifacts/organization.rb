@@ -9,7 +9,7 @@ module UserDirectory
   class Organization < Aws::Templates::Composite
     include Catalogized
 
-    default dn: -> { "o=#{name}" }
+    default dn: proc { "o=#{name}" }
     parameter :name, description: 'Organization name', constraint: not_nil
 
     contextualize filter(:override) { { organization: self, unit: self } }

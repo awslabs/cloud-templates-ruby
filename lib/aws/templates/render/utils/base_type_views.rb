@@ -1,5 +1,8 @@
 require 'aws/templates/render'
 require 'aws/templates/render/view'
+require 'aws/templates/utils'
+require 'aws/templates/utils/dependency'
+require 'aws/templates/utils/options'
 
 module Aws
   module Templates
@@ -17,7 +20,7 @@ module Aws
           # Pass-through render
           class AsIs < BasicView
             def to_rendered
-              instance
+              instance.object
             end
           end
 
@@ -97,6 +100,7 @@ module Aws
             ::FalseClass => AsIs,
             ::NilClass => AsIs,
             ::Symbol => AsIs,
+            Templates::Utils::Dependency => AsIs,
             ::Array => ToArray,
             ::Hash => ToHash,
             Templates::Utils::Options => ToHash

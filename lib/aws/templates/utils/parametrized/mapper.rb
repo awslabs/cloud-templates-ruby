@@ -12,6 +12,8 @@ module Aws
         class Mapper
           attr_reader :delegate
 
+          SPECIAL_CASE = [:root].freeze
+
           def [](key)
             @delegate.public_send(key) if @parameter_names.include?(key)
           end
@@ -45,7 +47,7 @@ module Aws
           def initialize(obj)
             obj.parameter_names.each { |pname| _check_parameter(obj, pname) }
             @delegate = obj
-            @parameter_names = Set.new(@delegate.parameter_names)
+            @parameter_names = Set.new(@delegate.parameter_names).merge(SPECIAL_CASE)
           end
 
           private

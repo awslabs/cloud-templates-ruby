@@ -1,3 +1,5 @@
+require 'aws/templates/utils/inheritable'
+
 module Aws
   module Templates
     module Utils
@@ -10,10 +12,7 @@ module Aws
       #
       # The module provides DSL for creating late binding points known as References.
       module LateBound
-        def self.included(base)
-          super
-          base.extend(ClassMethods)
-        end
+        include Inheritable
 
         ##
         # Reference
@@ -59,18 +58,20 @@ module Aws
           end
         end
 
-        ##
-        # Create reference
-        #
-        # Create and return Reference object attached to the current instance with specified path
-        # and arguments
-        def reference(path = nil, *args)
-          Reference.new(self, path, args)
+        instance_scope do
+          ##
+          # Create reference
+          #
+          # Create and return Reference object attached to the current instance with specified path
+          # and arguments
+          def reference(path = nil, *args)
+            Reference.new(self, path, args)
+          end
         end
 
         ##
         # Class-level DSL
-        module ClassMethods
+        class_scope do
           ##
           # Wrap reference for postponed instantiation
           #
@@ -79,7 +80,7 @@ module Aws
           # you need to specify a proc/lambda object for the option. This method makes the wrappin
           # unnecessary.
           def reference(path = nil, *args)
-            ->() { reference(path, *args) }
+            -> { reference(path, *args) }
           end
         end
       end

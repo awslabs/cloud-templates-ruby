@@ -2,6 +2,7 @@ require 'aws/templates/utils/contextualized/filters'
 require 'aws/templates/utils/contextualized/proc'
 require 'aws/templates/utils/contextualized/hash'
 require 'aws/templates/utils/contextualized/nil'
+require 'aws/templates/utils/inheritable'
 
 module Aws
   module Templates
@@ -21,55 +22,49 @@ module Aws
       # by "filter" mixed method is a functor. No operations are performed
       # on options.
       module Contextualized
-        ##
-        # When included adds class methods to the target also
-        #
-        # When the mixin is included it modifies methods available in the
-        # target class also to provide class-based syntax sugar.
-        def self.included(base)
-          super(base)
-          base.extend(ClassMethods)
-        end
+        include Inheritable
 
-        ##
-        # Context functor
-        #
-        # It's a mixin method returning resulting context filter functor with all
-        # contexts appropriatelly processed. The algorithm is to walk down
-        # the hierarchy of the class and aggregate all context filters from its
-        # ancestors prioritizing the ones defined earlier in the class hierarchy.
-        # The method is working correctly with both parent classes and all
-        # Contextualized mixins used in between.
-        def context
-          @context ||= filter(:scoped, self.class.context, self)
-        end
-
-        ##
-        # Enclose block into local context
-        #
-        # You can apply additional filters for the block and make it
-        # the context of the block so only code in this closure will
-        # have defined filter alterations.
-        def contextualize(arg, &blk)
-          if blk
-            clone._set_context(context.scoped_filter & arg).instance_exec(&blk)
-          else
-            filter(:scoped, context.scoped_filter & arg, self)
+        instance_scope do
+          ##
+          # Context functor
+          #
+          # It's a mixin method returning resulting context filter functor with all
+          # contexts appropriatelly processed. The algorithm is to walk down
+          # the hierarchy of the class and aggregate all context filters from its
+          # ancestors prioritizing the ones defined earlier in the class hierarchy.
+          # The method is working correctly with both parent classes and all
+          # Contextualized mixins used in between.
+          def context
+            @context ||= filter(:scoped, self.class.context, self)
           end
-        end
 
-        protected
+          ##
+          # Enclose block into local context
+          #
+          # You can apply additional filters for the block and make it
+          # the context of the block so only code in this closure will
+          # have defined filter alterations.
+          def contextualize(arg, &blk)
+            if blk
+              clone._set_context(context.scoped_filter & arg).instance_exec(&blk)
+            else
+              filter(:scoped, context.scoped_filter & arg, self)
+            end
+          end
 
-        def _set_context(new_context)
-          @context = filter(:scoped, new_context, self)
-          self
+          protected
+
+          def _set_context(new_context)
+            @context = filter(:scoped, new_context, self)
+            self
+          end
         end
 
         ##
         # Class-level mixins
         #
         # It's a DSL extension to declaratively define context filters
-        module ClassMethods
+        class_scope do
           ##
           # Context filter assigned to the module
           #

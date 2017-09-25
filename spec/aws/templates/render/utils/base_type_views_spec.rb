@@ -42,7 +42,7 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
     end
 
     it 'renders array' do
-      expect(render.view_for([[1, 2, 3], '123']).to_rendered).to be == [%w(1 2 3), '123']
+      expect(render.view_for([[1, 2, 3], '123']).to_rendered).to be == [%w[1 2 3], '123']
     end
   end
 

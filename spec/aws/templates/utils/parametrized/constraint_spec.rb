@@ -155,4 +155,21 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         .to raise_error Aws::Templates::ParameterValueInvalid
     end
   end
+
+  describe 'matches' do
+    let(:constraint) { Constraints.matches('[Tt]$') }
+
+    it 'passes when nil' do
+      expect(test_class.new({}).something).to be_nil
+    end
+
+    it 'passes when condition is satisfied' do
+      expect(test_class.new(something: 'rest').something).to be == 'rest'
+    end
+
+    it 'throws an error when condition is not satisfied' do
+      expect { test_class.new(something: 'rooster').something }
+        .to raise_error Aws::Templates::ParameterValueInvalid
+    end
+  end
 end

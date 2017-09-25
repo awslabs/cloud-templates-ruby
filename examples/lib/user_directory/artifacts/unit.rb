@@ -10,8 +10,8 @@ module UserDirectory
   class Unit < Aws::Templates::Composite
     include Catalogized
 
-    default label: -> { name },
-            dn: -> { "ou=#{name},#{unit.dn}" }
+    default label: proc { name },
+            dn: proc { "ou=#{name},#{unit.dn}" }
 
     parameter :unit,
               description: 'Hierarchical parent of the unit',

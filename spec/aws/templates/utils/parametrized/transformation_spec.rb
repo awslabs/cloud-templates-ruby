@@ -5,6 +5,22 @@ require 'aws/templates/utils/parametrized/constraints'
 require 'aws/templates/utils/parametrized/getters'
 require 'aws/templates/render'
 
+module TestRender
+  extend Aws::Templates::Render
+  StringView = Class.new(Aws::Templates::Render::BasicView) do
+    def to_rendered
+      _stringify(instance)
+    end
+
+    def _stringify(obj)
+      return obj.to_s unless obj.respond_to?(:to_hash)
+      obj.to_hash.map { |k, v| [_stringify(k), _stringify(v)] }.to_h
+    end
+  end
+  StringView.register_in self
+  StringView.artifact ::Object
+end
+
 describe Aws::Templates::Utils::Parametrized::Transformation do
   let(:parametrized_class) do
     Class.new do
@@ -85,7 +101,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     end
 
     it 'works with any kind of object' do
-      expect(test_class.new(something: 'abc'.each_char).something).to be == %w(a b c)
+      expect(test_class.new(something: 'abc'.each_char).something).to be == %w[a b c]
     end
 
     it 'fails if the value can be transformed to an array' do
@@ -104,23 +120,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
   end
 
   describe 'as_rendered' do
-    let(:render) do
-      Module.new do
-        extend Aws::Templates::Render
-        StringView = Class.new(Aws::Templates::Render::BasicView) do
-          def to_rendered
-            _stringify(instance)
-          end
-
-          def _stringify(obj)
-            return obj.to_s unless obj.respond_to?(:to_hash)
-            obj.to_hash.map { |k, v| [_stringify(k), _stringify(v)] }.to_h
-          end
-        end
-        StringView.register_in self
-        StringView.artifact ::Object
-      end
-    end
+    let(:render) { TestRender }
 
     let(:test_class) do
       klass = Class.new(parametrized_class)
@@ -158,7 +158,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
     it 'fails on wrong value' do
       i = test_class.new(something: [])
-      expect { i.something }.to raise_error
+      expect { i.something }.to raise_error Aws::Templates::NestedParameterException
     end
   end
 
@@ -270,7 +270,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     end
   end
 
-  describe 'as_class' do
+  describe 'as_module' do
     let(:test_class) do
       Class.new(parametrized_class) do
         parameter :something, transform: as_module
@@ -295,6 +295,20 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'accepts different path specifications' do
       i = test_class.new(something: 'Object/Object/Object/Array')
       expect(i.something).to be == Array
+    end
+  end
+
+  describe 'as_chain' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something,
+                  transform: as_chain(as_hash, as_object { parameter :rule })
+      end
+    end
+
+    it 'applies all transformations' do
+      i = test_class.new(something: [[:rule, 1]])
+      expect(i.something.rule).to be == 1
     end
   end
 end

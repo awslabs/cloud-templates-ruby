@@ -51,7 +51,20 @@ module Aws
             " in composite #{label}"
         end
 
-        Aws::Templates::Utils::Dependency.new(artifacts[artifact_label])
+        artifacts[artifact_label].as_a_dependency.to_self
+      end
+
+      def []=(artifact_label, artifact_object)
+        if artifacts.key?(artifact_label)
+          if artifacts[artifact_label] != artifact_object.object
+            raise "Artifact #{artifact_label} is already present " \
+              "in composite #{label}"
+          end
+        else
+          artifacts[artifact_label] = artifact_object.object
+        end
+
+        artifact_object.as_a_dependency.to_self
       end
 
       ##
@@ -106,8 +119,8 @@ module Aws
       #           artifacts into composite during instantiation
       def artifact(type, params = nil, &blk)
         artifact_object = create_artifact_object(type, params, &blk)
-        label_as(artifact_object, artifact_object.label)
-        Aws::Templates::Utils::Dependency.new(artifact_object)
+        self[artifact_object.label] = artifact_object
+        artifact_object.as_a_dependency.to_self
       end
 
       ##
@@ -118,13 +131,10 @@ module Aws
       # * +artifact_object+ - artifact object to put
       # * +labels+ - labels to assign to the artifact
       def label_as(artifact_object, *labels)
-        labels.each do |artifact_label|
-          if artifacts.key?(artifact_label)
-            raise "Artifact #{artifact_label} is already present " \
-              "in composite #{label}"
-          end
-          artifacts[artifact_label] = artifact_object
+        labels.flatten.each do |artifact_label|
+          self[artifact_label] = artifact_object
         end
+
         artifact_object
       end
 
@@ -161,11 +171,7 @@ module Aws
       private
 
       def create_artifact_object(type, params, &blk)
-        if params
-          type.new(options.filter(&contextualize(params.to_filter)), &blk)
-        else
-          type.new(options, &blk)
-        end
+        type.new(options.filter(&contextualize(params.to_filter)), &blk)
       end
     end
   end

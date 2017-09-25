@@ -1,10 +1,10 @@
 require: rubocop-rspec
 
 RSpec/NestedGroups:
-  MaxNesting: 4
+  Max: 4
 
 Lint/EndAlignment:
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
 
 Lint/InheritException:
   EnforcedStyle: standard_error
@@ -13,9 +13,17 @@ Style/Documentation:
   Exclude:
     - 'spec/**/*'
     - 'test/**/*'
-
+Metrics/BlockLength:
+  ExcludedMethods:
+    - class_scope
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
 Style/RaiseArgs:
   EnforcedStyle: compact
 
 Metrics/LineLength:
   Max: 100
+
+Performance/HashEachMethods:
+  Enabled: false

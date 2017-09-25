@@ -1,5 +1,6 @@
 require 'aws/templates/utils'
 require 'aws/templates/utils/options'
+require 'aws/templates/utils/inheritable'
 
 module Aws
   module Templates
@@ -15,6 +16,8 @@ module Aws
       # object which have common traits organized as an arbitrary graph
       # with many-to-many relationship.
       module Default
+        include Inheritable
+
         ##
         # Hash wrapper
         #
@@ -70,8 +73,10 @@ module Aws
           private
 
           def _process_value(value)
-            if value.respond_to?(:to_proc)
-              @context.instance_exec(&value)
+            if value.respond_to?(:to_hash)
+              value
+            elsif value.respond_to?(:to_proc)
+              @context.instance_eval(&value)
             else
               value
             end
@@ -86,57 +91,49 @@ module Aws
           end
         end
 
-        ##
-        # When included adds class methods to the target also
-        #
-        # When the mixin is included it modifies methods available in the
-        # target class also to provide class-based syntax sugar.
-        def self.included(base)
-          super(base)
-          base.extend(ClassMethods)
-        end
-
-        ##
-        # Apply specified defaults to options
-        #
-        # It's a mixin method which depends on presence of options accessor
-        # methods in the consuming class. The options property should contain
-        # an object implementing to_hash method. The method is mutating for
-        # options. The algorithm is to walk down the hierarchy of the
-        # class and collect and merge all defaults from its ancestors
-        # prioritizing the ones made later in the class hierarchy. The method
-        # is working correctly with both parent classes and all Default
-        # mixins used in between.
-        def process_options(params = nil)
-          # iterating through all ancestors with defaults
-          ancestors_with_defaults.reverse_each do |mod|
-            # ... through all defaults of particular ancestor
-            mod.defaults.each do |defaults_definition|
-              # merge the default definition with options
-              options.merge!(Definition.new(defaults_definition, self))
+        instance_scope do
+          ##
+          # Apply specified defaults to options
+          #
+          # It's a mixin method which depends on presence of options accessor
+          # methods in the consuming class. The options property should contain
+          # an object implementing to_hash method. The method is mutating for
+          # options. The algorithm is to walk down the hierarchy of the
+          # class and collect and merge all defaults from its ancestors
+          # prioritizing the ones made later in the class hierarchy. The method
+          # is working correctly with both parent classes and all Default
+          # mixins used in between.
+          def process_options(params = nil)
+            # iterating through all ancestors with defaults
+            ancestors_with_defaults.reverse_each do |mod|
+              # ... through all defaults of particular ancestor
+              mod.defaults.each do |defaults_definition|
+                # merge the default definition with options
+                options.merge!(Definition.new(defaults_definition, self))
+              end
             end
+
+            # re-inforce caller-specified overrides
+            options.merge!(params) if params
           end
 
-          # re-inforce caller-specified overrides
-          options.merge!(params) if params
-        end
+          private
 
-        private
-
-        def ancestors_with_defaults
-          self
-            .class
-            .ancestors
-            .select do |mod|
-              (mod != Default) && mod.ancestors.include?(Default)
-            end
+          def ancestors_with_defaults
+            self
+              .class
+              .ancestors
+              .select do |mod|
+                (mod != Default) && mod.ancestors.include?(Default)
+              end
+          end
         end
 
         ##
         # Class-level mixins
         #
         # It's a DSL extension to declaratively define defaults
-        module ClassMethods
+        class_scope do
           ##
           # Defaults for the input hash
           #

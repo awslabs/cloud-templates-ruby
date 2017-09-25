@@ -22,7 +22,7 @@ describe Aws::Templates::Utils::LateBound do
 
   describe 'behavior' do
     context 'class' do
-      let(:reference) { including_class.reference([:a, :b, :c], explosive: true) }
+      let(:reference) { including_class.reference(%i[a b c], explosive: true) }
 
       let(:evaluated) { instance.instance_exec(&reference) }
 
@@ -34,18 +34,18 @@ describe Aws::Templates::Utils::LateBound do
         expect(evaluated).to be_a Aws::Templates::Utils::LateBound::Reference
       end
 
-      it 'is evaluated into normal reference' do
+      it 'contains assigned attributes' do
         expect([evaluated.path, evaluated.arguments, evaluated.instance])
-          .to be == [[:a, :b, :c], [{ explosive: true }], instance]
+          .to be == [%i[a b c], [{ explosive: true }], instance]
       end
     end
 
     context 'instance' do
-      let(:reference) { instance.reference([:a, :b, :c], explosive: true) }
+      let(:reference) { instance.reference(%i[a b c], explosive: true) }
 
       it 'is evaluated into normal reference' do
         expect([reference.path, reference.arguments, reference.instance])
-          .to be == [[:a, :b, :c], [{ explosive: true }], instance]
+          .to be == [%i[a b c], [{ explosive: true }], instance]
       end
     end
   end

@@ -59,18 +59,17 @@ module Aws
 
       attr_accessor :options
 
-      ##
-      # Dependencies list accessor
-      #
-      # The list is lazily initialized. The initializer scan options structure for all nodes
-      # which are dependencies (dependency? returns true) and selects all dependencies which have
-      # the same root as the object.
-      def dependencies
-        @dependencies ||= Set.new(options.dependencies.select { |o| o.root == root })
-      end
-
       def self.getter
         as_is
+      end
+
+      def self.to_s
+        return super unless name.nil?
+        "<Subclass of (#{superclass}) with features #{features}>"
+      end
+
+      def self.features
+        @features ||= ancestors.take_while { |mod| mod != superclass }
       end
 
       # Create new child class with mixins
@@ -79,6 +78,8 @@ module Aws
       # without creating a new named class. For instance when you want to mix-in
       # some defaults into class and instantiate a few instances out of that.
       def self.featuring(*modules)
+        return self if modules.empty?
+
         modules.inject(Class.new(self)) do |klass, mod|
           klass.send(:include, mod)
         end
@@ -90,7 +91,7 @@ module Aws
       # All artifacts have labels assigned to them to simplify reverse
       # look-up while linking dependencies. Interpretation of this field is purely
       # application-specific.
-      default label: -> { object_id }
+      default label: proc { object_id }
 
       parameter :label, description: 'Artifact\'s label', constraint: not_nil
 
@@ -100,9 +101,11 @@ module Aws
       # A root is an object which bundles artifacts into common rendering group helping to find
       # disconnected pieces of dependency graph. If two artifacts have different roots they
       # definitelly belong to different graphs.
-      default root: ->() { Object.new }
+      default root: proc { object_id }
 
-      parameter :root, description: 'Artifact fabric', constraint: not_nil
+      def root
+        options[:root]
+      end
 
       ##
       # Artifact's parent

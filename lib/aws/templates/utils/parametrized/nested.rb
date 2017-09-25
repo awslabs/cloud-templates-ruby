@@ -24,8 +24,10 @@ module Aws
             as_is
           end
 
-          def self.create_class
-            ::Class.new(self)
+          def self.create_class(scope)
+            klass = ::Class.new(self)
+            klass.singleton_class.send(:define_method, :scope) { scope }
+            klass
           end
 
           def self.with(mod)
@@ -37,13 +39,19 @@ module Aws
             to_s
           end
 
+          def self.scope
+            ::Object
+          end
+
           def self.to_s
-            '<Nested object definition>'
+            "<Nested object definition in #{scope}>"
           end
 
           def dependency?
-            !dependencies.empty?
+            true
           end
+
+          attr_reader :root
 
           def dependencies
             @dependencies ||= Set.new
@@ -51,7 +59,8 @@ module Aws
 
           protected
 
-          def initialize(obj)
+          def initialize(root_link, obj)
+            @root = root_link
             depends_on(obj) if obj.dependency?
             @options = Options.new(obj)
             process_options(obj)

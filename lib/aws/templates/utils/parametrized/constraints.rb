@@ -1,11 +1,12 @@
 require 'aws/templates/exceptions'
+require 'aws/templates/utils/parametrized'
 require 'set'
 require 'singleton'
 
 module Aws
   module Templates
     module Utils
-      module Parametrized
+      module Parametrized #:nodoc:
         ##
         # Constraint functor class
         #
@@ -234,6 +235,39 @@ module Aws
           end
 
           ##
+          # Check if value matches the regular expression
+          #
+          # Checks if value matches the regular expression. If value doesn't match, an exception
+          # will be thrown with attached description of regular expression and value converted to
+          # string.
+          #
+          # === Example
+          #
+          #    class Piece
+          #      include Aws::Templates::Utils::Parametrized
+          #      parameter :param1, constraint: matches('A+')
+          #    end
+          #
+          #    i = Piece.new(:param1 => 'Ask')
+          #    i.param1 # => 'Ask'
+          #    i = Piece.new(:param1 => 'Bar')
+          #    i.param1 # raise ParameterValueInvalid
+          class Matches < Constraint
+            attr_reader :expression
+
+            def initialize(rex)
+              @expression = Regexp.new(rex)
+            end
+
+            protected
+
+            def check(parameter, value, _)
+              return if value.nil? || (expression =~ value.to_s)
+              raise "#{value} doesn't match #{expression} for parameter #{parameter.name}"
+            end
+          end
+
+          ##
           # Aggregate constraint
           #
           # It is used to perform checks against a list of constraints-functors
@@ -305,7 +339,7 @@ module Aws
           # * +instance+ - the instance value is checked for
           def check_wrapper(parameter, value, instance)
             check(parameter, value, instance)
-          rescue
+          rescue StandardError
             raise ParameterValueInvalid.new(parameter, instance, value)
           end
 
@@ -326,7 +360,7 @@ module Aws
         #
         # It injects the methods as class-scope methods into mixing classes.
         # The methods are factories to create particular type of constraint
-        module ClassMethods
+        class_scope do
           ##
           # Parameter shouldn't be nil
           #
@@ -373,6 +407,14 @@ module Aws
           # alias for SatisfiesCondition class
           def satisfies(description, &cond_block)
             Constraint::SatisfiesCondition.new(description, &cond_block)
+          end
+
+          ##
+          # Value should match the regular experession
+          #
+          # alias for Matches
+          def matches(rex)
+            Constraint::Matches.new(rex)
           end
         end
       end

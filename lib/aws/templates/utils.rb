@@ -5,7 +5,7 @@ module Aws
     ##
     # Variable utility functions used through the code
     module Utils
-      RECURSIVE_METHODS = [:keys, :[], :include?].freeze
+      RECURSIVE_METHODS = %i[keys [] include?].freeze
 
       ##
       # If the object is "recursive"

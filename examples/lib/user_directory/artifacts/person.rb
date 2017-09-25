@@ -8,7 +8,7 @@ module UserDirectory
   # Represents UNIX user who is a real person. Contains all related
   # attributes.
   class Person < User
-    default cn: -> { "#{given_name} #{last_name} (#{login})" }
+    default cn: proc { "#{given_name} #{last_name} (#{login})" }
 
     parameter :given_name, description: 'Person\'s given name', constraint: not_nil
     parameter :middle_name, description: 'Person\'s middle name'

@@ -24,7 +24,7 @@ module UserDirectory
         end
 
         def object_class
-          %w(top)
+          %w[top]
         end
       end
     end

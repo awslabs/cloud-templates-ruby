@@ -31,7 +31,7 @@ module UserDirectory
         protected
 
         def object_class
-          super().concat(%w(inetOrgPerson person))
+          super().concat(%w[inetOrgPerson person])
         end
       end
     end

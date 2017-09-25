@@ -12,8 +12,8 @@ module UserDirectory
     include IDed
     include Catalogized
 
-    default dn: -> { "cn=#{name},ou=System,#{organization.dn}" },
-            cn: -> { name }
+    default dn: proc { "cn=#{name},ou=System,#{organization.dn}" },
+            cn: proc { name }
 
     parameter :cn, description: 'Group canonical name', constraint: not_nil
     parameter :name, description: 'Group name'

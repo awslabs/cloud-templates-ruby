@@ -1,6 +1,7 @@
 require 'aws/templates/exceptions'
 require 'aws/templates/utils'
 require 'aws/templates/utils/options'
+require 'aws/templates/utils/inheritable'
 
 module Aws
   module Templates
@@ -20,6 +21,8 @@ module Aws
       # are performed on a copy of options returned by a separate "filtered"
       # accessor and not in place.
       module Contextualized
+        include Inheritable
+
         ##
         # Filter functor class
         #
@@ -128,7 +131,7 @@ module Aws
           #    opts = Options.new(a: { q: 1 }, b: 2, c: { d: { r: 5 }, e: 1 })
           #    opts.filter(i.filter) # => { a: { q: 1 }, b: 2, c: { d: { r: 5 }, e: 1 } }
           class Copy < Filter
-            PRE_FILTER = [:label].freeze
+            PRE_FILTER = %i[label root parent].freeze
 
             def filter(opts, memo, _)
               result = Utils.deep_dup(opts.to_hash)
@@ -306,10 +309,10 @@ module Aws
             def filter(_, memo, instance)
               Utils.merge(
                 memo,
-                if override.respond_to?(:to_proc)
-                  instance.instance_exec(&override)
-                else
+                if override.respond_to?(:to_hash)
                   override
+                elsif override.respond_to?(:to_proc)
+                  instance.instance_eval(&override)
                 end
               )
             end
@@ -421,11 +424,13 @@ module Aws
         # Class-level mixins
         #
         # It's a DSL extension to declaratively define context filters
-        module ClassMethods
+        class_scope do
           include FilterFactory
         end
 
-        include FilterFactory
+        instance_scope do
+          include FilterFactory
+        end
       end
     end
   end

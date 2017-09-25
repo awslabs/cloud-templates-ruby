@@ -7,7 +7,7 @@ require 'singleton'
 module Aws
   module Templates
     module Utils
-      module Parametrized
+      module Parametrized #:nodoc:
         ##
         # Transformation functor class
         #
@@ -23,6 +23,52 @@ module Aws
         # It provides protected method transform which should be overriden in
         # all concrete transformation classes.
         class Transformation
+          ##
+          # Apply several transformation sequentially
+          #
+          # Useful when a few transformations need to be applied to a single value to get
+          # the final result
+          #
+          # === Example
+          #
+          #    class Piece
+          #      include Aws::Templates::Utils::Parametrized
+          #
+          #      parameter :param,
+          #        transform: as_chain(
+          #                     as_hash,
+          #                     as_object(Aws::Templates::Utils::AsNamed)
+          #                   )
+          #    end
+          #
+          #    i = Piece.new(param: [:name, 'Rex'])
+          #    i.param.name # => 'Rex'
+          class AsChain < Transformation
+            attr_reader :components
+
+            def initialize(components)
+              @components = _check_components(components)
+            end
+
+            protected
+
+            def transform(parameter, value, instance)
+              return if value.nil?
+              components.inject(value) { |acc, elem| instance.instance_exec(parameter, acc, &elem) }
+            end
+
+            private
+
+            def _check_components(components)
+              result = components.to_a
+
+              invalid_components = result.reject { |component| component.respond_to?(:to_proc) }
+              raise "Invalid components: #{invalid_components}" unless invalid_components.empty?
+
+              result
+            end
+          end
+
           ##
           # Transform input value into the object
           #
@@ -66,33 +112,32 @@ module Aws
           class AsObject < Transformation
             attr_reader :klass
 
-            def initialize(klass = nil, &definition)
+            def initialize(scope, klass = nil, &definition)
               @klass = if klass.nil?
-                Nested.create_class
+                Nested.create_class(scope)
               elsif klass.is_a?(Class)
                 klass
               elsif klass.is_a?(Module)
-                Nested.create_class.with(klass)
+                Nested.create_class(scope).with(klass)
               else
                 raise "#{klass} is neither a class nor a module"
               end
 
-              @klass.instance_eval(&definition) unless definition.nil?
+              @klass.class_eval(&definition) unless definition.nil?
             end
 
             protected
 
-            def transform(_, value, _)
+            def transform(_, value, instance)
               return if value.nil?
-              klass.new(
-                if Utils.hashable?(value)
-                  value
-                elsif Utils.parametrized?(value)
-                  Mapper.new(value)
-                else
-                  raise "Value #{value} doesn't have parameters"
-                end
-              )
+              klass.new instance.root,
+                        if Utils.hashable?(value)
+                          value
+                        elsif Utils.parametrized?(value)
+                          Mapper.new(value)
+                        else
+                          raise "Value #{value} doesn't have parameters"
+                        end
             end
           end
 
@@ -261,7 +306,9 @@ module Aws
             def _compute_render_parameters(instance)
               return if parameters.nil?
 
-              if parameters.respond_to?(:to_proc)
+              if parameters.respond_to?(:to_hash)
+                parameters
+              elsif parameters.respond_to?(:to_proc)
                 instance.instance_exec(&parameters)
               else
                 parameters
@@ -383,7 +430,7 @@ module Aws
           #    i = Piece.new(:param2 => [[1,'3']])
           #    i.param # => {1=>3}
           class AsHash < Transformation
-            include ClassMethods
+            include Parametrized.class_scope
 
             def key(opts)
               @key_parameter = _create_parameter(opts)
@@ -509,7 +556,7 @@ module Aws
           # * +instance+ - the instance value is transform
           def transform_wrapper(parameter, value, instance)
             transform(parameter, value, instance)
-          rescue
+          rescue StandardError
             raise NestedParameterException.new(parameter)
           end
 
@@ -518,7 +565,7 @@ module Aws
           ##
           # Transform method
           #
-          # * +parameter+ - the Parameter object which the transformatio is
+          # * +parameter+ - the Parameter object which the transformation is
           #                 performed for
           # * +value+ - parameter value to be transformed
           # * +instance+ - the instance value is transform
@@ -530,13 +577,21 @@ module Aws
         #
         # It injects the methods as class-scope methods into mixing classes.
         # The methods are factories to create particular type of transformation
-        module ClassMethods
+        class_scope do
+          ##
+          # Chain a few transformations into a single one
+          #
+          # alias for AsChain class
+          def as_chain(*components)
+            Transformation::AsChain.new(components)
+          end
+
           ##
           # Transform the value into an object
           #
           # alias for AsObject class
           def as_object(klass = nil, &definition)
-            Transformation::AsObject.new(klass, &definition)
+            Transformation::AsObject.new(self, klass, &definition)
           end
 
           ##
@@ -594,6 +649,10 @@ module Aws
           def as_module
             Transformation::AsModule.instance
           end
+        end
+
+        class Nested #:nodoc:
+          include Parametrized
         end
       end
     end
