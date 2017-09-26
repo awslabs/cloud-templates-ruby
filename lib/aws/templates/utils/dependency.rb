@@ -46,7 +46,7 @@ module Aws
         end
 
         # mark the object as dependency
-        def as_dependency
+        def as_a_dependency
           self
         end
 
