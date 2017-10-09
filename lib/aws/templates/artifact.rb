@@ -107,6 +107,20 @@ module Aws
         options[:root]
       end
 
+      # Artifact's look-up path through all ancestors
+      def lookup_path
+        acc = [label]
+        ancestor = parent
+
+        until ancestor.nil?
+          acc << ancestor.label
+          ancestor = ancestor.parent
+        end
+
+        acc << root
+        acc.reverse!
+      end
+
       ##
       # Artifact's parent
       #

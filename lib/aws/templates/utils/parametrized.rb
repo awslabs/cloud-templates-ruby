@@ -2,6 +2,7 @@ require 'aws/templates/exceptions'
 require 'aws/templates/utils/parametrized/guarded'
 require 'aws/templates/utils/inheritable'
 require 'aws/templates/utils/dependent'
+require 'aws/templates/utils/inspectable'
 require 'set'
 
 module Aws
@@ -16,8 +17,9 @@ module Aws
       # it's domain-specific extended implementation of attr_reader.
       module Parametrized
         include Guarded
-        include Inheritable
         include Dependent
+        include Inheritable
+        include Inspectable
 
         ##
         # Parameter object
@@ -161,6 +163,14 @@ module Aws
           # Performs calculation of all specified parameters to check options validity
           def validate
             parameter_names.each { |name| send(name) }
+          end
+
+          ##
+          # Evaluate all parameters
+          #
+          # Return parameters as a hash
+          def parameters_map
+            parameter_names.each_with_object({}) { |name, obj| obj[name] = send(name) }
           end
 
           attr_reader :getter

@@ -130,7 +130,7 @@ module Aws
 
             def transform(_, value, instance)
               return if value.nil?
-              klass.new instance.root,
+              klass.new instance,
                         if Utils.hashable?(value)
                           value
                         elsif Utils.parametrized?(value)

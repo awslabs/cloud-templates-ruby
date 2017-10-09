@@ -51,7 +51,11 @@ module Aws
             true
           end
 
-          attr_reader :root
+          def root
+            parent.root
+          end
+
+          attr_reader :parent
 
           def dependencies
             @dependencies ||= Set.new
@@ -59,8 +63,8 @@ module Aws
 
           protected
 
-          def initialize(root_link, obj)
-            @root = root_link
+          def initialize(parent, obj)
+            @parent = parent
             depends_on(obj) if obj.dependency?
             @options = Options.new(obj)
             process_options(obj)

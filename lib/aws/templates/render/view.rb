@@ -86,8 +86,9 @@ module Aws
         # Render the object
         #
         # Renders passed object with the view default render
-        def rendered_for(obj)
-          render.view_for(obj, parameters).to_rendered
+        def rendered_for(obj, parameters_override = nil)
+          render.view_for(obj, parameters_override.nil? ? parameters : parameters_override)
+                .to_rendered
         end
 
         ##

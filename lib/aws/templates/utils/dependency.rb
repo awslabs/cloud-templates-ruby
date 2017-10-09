@@ -1,6 +1,7 @@
 require 'set'
 require 'aws/templates/utils/dependency/object'
 require 'aws/templates/utils/dependency/enumerable'
+require 'aws/templates/utils/inspectable'
 
 module Aws
   module Templates
@@ -15,6 +16,8 @@ module Aws
       # * Dependecy can be applied case-by-case basis whereas singleton is attached to the object
       #   itself
       class Dependency < BasicObject
+        include Inspectable
+
         ##
         # Equality
         #
