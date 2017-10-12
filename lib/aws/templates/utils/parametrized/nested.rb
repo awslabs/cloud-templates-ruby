@@ -66,8 +66,7 @@ module Aws
           def initialize(parent, obj)
             @parent = parent
             depends_on(obj) if obj.dependency?
-            @options = Options.new(obj)
-            process_options(obj)
+            @options = Options.new(defaults, obj)
           end
         end
       end

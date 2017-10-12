@@ -103,18 +103,13 @@ module Aws
           # prioritizing the ones made later in the class hierarchy. The method
           # is working correctly with both parent classes and all Default
           # mixins used in between.
-          def process_options(params = nil)
+          def defaults
             # iterating through all ancestors with defaults
-            ancestors_with_defaults.reverse_each do |mod|
-              # ... through all defaults of particular ancestor
-              mod.defaults.each do |defaults_definition|
-                # merge the default definition with options
-                options.merge!(Definition.new(defaults_definition, self))
+            ancestors_with_defaults.inject(Options.new) do |opts, mod|
+              mod.defaults.inject(opts) do |acc, defaults_definition|
+                acc.merge!(Definition.new(defaults_definition, self))
               end
             end
-
-            # re-inforce caller-specified overrides
-            options.merge!(params) if params
           end
 
           private
@@ -123,9 +118,8 @@ module Aws
             self
               .class
               .ancestors
-              .select do |mod|
-                (mod != Default) && mod.ancestors.include?(Default)
-              end
+              .select { |mod| (mod != Default) && mod.ancestors.include?(Default) }
+              .reverse!
           end
         end
 

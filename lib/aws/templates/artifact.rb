@@ -146,8 +146,7 @@ module Aws
       # * +params+ - input parameters hash to be used during following
       #              hash transformations and expansions.
       def initialize(params)
-        @options = Utils::Options.new(params)
-        process_options(params)
+        @options = Utils::Options.new(defaults, params)
       end
     end
   end
