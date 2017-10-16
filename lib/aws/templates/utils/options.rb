@@ -137,6 +137,11 @@ module Aws
           end
         end
 
+        # The class already supports recursive concept so return self
+        def to_recursive
+          self
+        end
+
         ##
         # Create filter
         #

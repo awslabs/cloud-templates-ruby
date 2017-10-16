@@ -31,7 +31,7 @@ module Aws
           # introspection.
           class InspectView < BasicView
             def depth
-              (Integer(parameters) || Inspect.recursion_depth) - 1
+              (parameters.nil? ? Inspect.recursion_depth : Integer(parameters)) - 1
             end
           end
 

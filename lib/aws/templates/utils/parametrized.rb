@@ -137,6 +137,38 @@ module Aws
           end
         end
 
+        ##
+        # Makes parametrized accessible as recursive concept
+        class RecursiveAdapter
+          attr_reader :target
+
+          ##
+          # Defined hash keys
+          def keys
+            target.parameter_names.merge(target.options.keys)
+          end
+
+          ##
+          # Index operator
+          #
+          # Performs intermediate transformation of value if needed (if value is a lambda) and
+          # returns it wrapping into Definition instance with the same context if needed
+          # (if value is a map)
+          def [](k)
+            target.parameter_names.include?(k) ? target.send(k) : target.options[k]
+          end
+
+          ##
+          # Check if the key is present in the hash
+          def include?(k)
+            target.parameter_names.include?(k) || target.options.include?(k)
+          end
+
+          def initialize(target)
+            @target = target
+          end
+        end
+
         instance_scope do
           ##
           # Lazy initializer
@@ -171,6 +203,12 @@ module Aws
           # Return parameters as a hash
           def parameters_map
             parameter_names.each_with_object({}) { |name, obj| obj[name] = send(name) }
+          end
+
+          ##
+          # Transforms parametrized into an instance of recursive concept
+          def to_recursive
+            RecursiveAdapter.new(self)
           end
 
           attr_reader :getter

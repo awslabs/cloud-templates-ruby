@@ -1,7 +1,6 @@
 require 'aws/templates/exceptions'
 require 'aws/templates/utils/parametrized'
 require 'aws/templates/utils/parametrized/nested'
-require 'aws/templates/utils/parametrized/mapper'
 require 'singleton'
 
 module Aws
@@ -130,14 +129,7 @@ module Aws
 
             def transform(_, value, instance)
               return if value.nil?
-              klass.new instance,
-                        if Utils.hashable?(value)
-                          value
-                        elsif Utils.parametrized?(value)
-                          Mapper.new(value)
-                        else
-                          raise "Value #{value} doesn't have parameters"
-                        end
+              klass.new(instance, value)
             end
           end
 

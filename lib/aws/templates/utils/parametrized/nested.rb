@@ -64,9 +64,14 @@ module Aws
           protected
 
           def initialize(parent, obj)
+            unless obj.respond_to?(:to_recursive)
+              raise "Value #{obj} can't be transformed " \
+                    'into a recursive container'
+            end
+
             @parent = parent
             depends_on(obj) if obj.dependency?
-            @options = Options.new(defaults, obj)
+            @options = Options.new(defaults, obj.to_recursive)
           end
         end
       end

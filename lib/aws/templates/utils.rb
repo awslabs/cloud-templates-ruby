@@ -1,5 +1,13 @@
 require 'aws/templates/exceptions'
 
+##
+# Hash implements resursive concept
+class Hash
+  def to_recursive
+    self
+  end
+end
+
 module Aws
   module Templates
     ##
