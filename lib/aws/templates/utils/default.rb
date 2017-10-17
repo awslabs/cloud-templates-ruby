@@ -134,6 +134,12 @@ module Aws
         # It's a DSL extension to declaratively define defaults
         class_scope do
           ##
+          # To mark hash branch as deleted
+          def deleted
+            Aws::Templates::Utils::DELETED_MARKER
+          end
+
+          ##
           # Defaults for the input hash
           #
           # Class-level accessor of a hash which will be merged into input

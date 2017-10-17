@@ -134,7 +134,7 @@ describe Aws::Templates::Artifact do
   context 'instance of child class created' do
     let(:child_class) do
       Class.new(artifact_class) do
-        default a: 'c',
+        default a: deleted,
                 c: proc { options[:d].tr(' ', '.') }
       end
     end
@@ -147,7 +147,6 @@ describe Aws::Templates::Artifact do
       {
         root: 3,
         label: 'thing',
-        a: 'c',
         b: 'Q.W.E',
         c: 'q.w.e',
         d: 'q w e'
