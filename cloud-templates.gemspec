@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'cloud-templates'
-  s.version     = '0.1.0'
+  s.version     = '0.2.0'
   s.license     = 'Apache 2.0'
   s.summary     = 'Hierarchical data templates'
   s.description = 'MVC-based templating framework for hierarchical data structures. ' \
