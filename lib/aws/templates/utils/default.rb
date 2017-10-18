@@ -25,15 +25,21 @@ module Aws
         # context as they are encountered
         class Definition
           ##
+          # Definition entry point
+          def entry
+            _process_value(@entry)
+          end
+
+          ##
           # Defined hash keys
           def keys
-            @hash.keys
+            entry.keys
           end
 
           ##
           # Transform to hash
           def to_hash
-            _recurse_into(@hash)
+            _recurse_into(entry)
           end
 
           def dependency?
@@ -51,14 +57,14 @@ module Aws
           # returns it wrapping into Definition instance with the same context if needed
           # (if value is a map)
           def [](k)
-            result = _process_value(@hash[k])
-            result.respond_to?(:to_hash) ? self.class.new(result, @context) : result
+            result = _process_value(entry[k])
+            result.respond_to?(:to_proc) ? self.class.new(result, @context) : result
           end
 
           ##
           # Check if the key is present in the hash
           def include?(k)
-            @hash.include?(k)
+            entry.include?(k)
           end
 
           # The class already supports recursive concept so return self
@@ -70,8 +76,8 @@ module Aws
           # Create wrapper object
           #
           # Creates wrapper object with attached hash and context to evaluate lambdas in
-          def initialize(hsh, ctx)
-            @hash = hsh
+          def initialize(ent, ctx)
+            @entry = ent
             @context = ctx
           end
 
@@ -169,11 +175,16 @@ module Aws
           #
           # If the parameter you passed is neither a hash nor callable or
           # no parameters are passed at all, ArgumentError will be thrown.
-          def default(defaults_hash = nil)
-            raise_defaults_is_nil unless defaults_hash
-            raise_default_type_mismatch(defaults_hash) unless defaults_hash.respond_to?(:to_hash)
+          def default(param)
+            raise_defaults_is_nil unless param
 
-            defaults << defaults_hash.to_hash
+            unless param.respond_to?(:to_hash) || param.respond_to?(:to_proc)
+              raise_default_type_mismatch(
+                param
+              )
+            end
+
+            defaults << param
           end
 
           def raise_defaults_is_nil
@@ -181,7 +192,7 @@ module Aws
           end
 
           def raise_default_type_mismatch(defaults_hash)
-            raise ArgumentError.new("#{defaults_hash.inspect} is not a hash")
+            raise ArgumentError.new("#{defaults_hash.inspect} is not a hash or a proc")
           end
         end
       end
