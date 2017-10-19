@@ -17,7 +17,7 @@ module Aws
 
           define_view(::Object) do
             def to_rendered
-              instance.to_s
+              instance.class.name
             end
           end
 
