@@ -209,7 +209,7 @@ module Aws
         ##
         # Initialize Options with list of recursive structures (See Options#recursive?)
         def initialize(*structures)
-          @structures = structures.map do |container|
+          @structures = structures.reject(&:nil?).map do |container|
             if Utils.recursive?(container)
               container
             elsif Utils.hashable?(container)

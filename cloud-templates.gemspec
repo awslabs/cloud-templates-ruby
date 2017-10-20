@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
                     'LICENSE', 'Gemfile', 'NOTICE', 'README.md', 'Rakefile',
                     '.rubocop.yml', '.simplecov', 'cloud-templates.gemspec'
                   ]
+  s.executables << 'cloud-templates-runner.rb'
   s.test_files = Dir['spec/**/*'] + Dir['examples/spec/**/*']
   s.homepage    = 'https://rubygems.org/gems/cloud-templates'
   s.required_ruby_version = Gem::Requirement.new(">= 2.1.0")
