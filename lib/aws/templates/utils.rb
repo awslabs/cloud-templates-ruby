@@ -222,6 +222,21 @@ module Aws
           end
         end
       end
+
+      PATH_REGEXP = Regexp.compile('::|[.]|/')
+
+      def self.lookup_module(str)
+        path = str.split(PATH_REGEXP)
+
+        target = path.inject(::Kernel) do |acc, elem|
+          require path.map(&:downcase).join('/') unless acc.const_defined?(elem)
+          acc.const_get(elem)
+        end
+
+        raise "#{str} == #{target} which is not a class" unless target.is_a?(Module)
+
+        target
+      end
     end
   end
 end

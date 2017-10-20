@@ -1,6 +1,7 @@
 require 'json'
 require 'optparse'
 require 'aws/templates/runner/formatter'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -51,7 +52,7 @@ module Aws
         end
 
         opts.on('-rNAME', '--render=NAME', 'Class name of the render to use') do |name|
-          store(:render, Runner.lookup_module(name))
+          store(:render, Utils.lookup_module(name))
         end
 
         opts.on('-fNAME', '--format=NAME', 'Formatter used for final output') do |name|
@@ -59,7 +60,7 @@ module Aws
         end
 
         opts.on('-aNAME', '--artifact=NAME', 'Artifact class name') do |name|
-          store(:artifact, Runner.lookup_module(name))
+          store(:artifact, Utils.lookup_module(name))
         end
 
         opts.on('-oOPTS', '--options=OPTS', 'JSON string for artifact options') do |str|
@@ -98,14 +99,6 @@ module Aws
           obj.read
         else
           obj.to_s
-        end
-      end
-
-      def self.lookup_module(str)
-        path = str.split('::')
-        path.inject(::Kernel) do |acc, elem|
-          require path.map(&:downcase).join('/') unless acc.const_defined?(elem)
-          acc.const_get(elem)
         end
       end
     end
