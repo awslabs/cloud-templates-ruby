@@ -1,7 +1,6 @@
 require 'aws/templates/exceptions'
 require 'aws/templates/utils/parametrized'
 require 'set'
-require 'singleton'
 
 module Aws
   module Templates
@@ -37,7 +36,9 @@ module Aws
           #    i = Piece.new
           #    i.param1 # throws ParameterValueInvalid
           class NotNil < Constraint
-            include Singleton
+            def initialize
+              self.if(nil)
+            end
 
             protected
 
@@ -71,7 +72,7 @@ module Aws
             protected
 
             def check(_, value, _)
-              return if value.nil? || set.include?(value)
+              return if set.include?(value)
 
               raise(
                 "Value #{value.inspect} is not in the set of allowed " \
@@ -113,6 +114,7 @@ module Aws
 
             def initialize(selector)
               @selector = selector
+              self.if(Parametrized.any)
             end
 
             protected
@@ -156,29 +158,11 @@ module Aws
 
             def initialize(dependencies)
               @dependencies = dependencies
-              @condition = method(:not_nil?)
-            end
-
-            def if(*params, &blk)
-              if params.empty?
-                @condition = blk
-              else
-                test = params.first
-                @condition = ->(v) { v == test }
-              end
-
-              self
             end
 
             protected
 
-            def not_nil?(value)
-              !value.nil?
-            end
-
             def check(parameter, value, instance)
-              return unless instance.instance_exec(value, &condition)
-
               dependencies.each do |pname|
                 next unless instance.send(pname).nil?
 
@@ -225,7 +209,7 @@ module Aws
             protected
 
             def check(parameter, value, instance)
-              return if value.nil? || instance.instance_exec(value, &condition)
+              return if instance.instance_exec(value, &condition)
 
               raise(
                 "#{value.inspect} doesn't satisfy the condition " \
@@ -262,7 +246,7 @@ module Aws
             protected
 
             def check(parameter, value, _)
-              return if value.nil? || (expression =~ value.to_s)
+              return if expression =~ value.to_s
               raise "#{value} doesn't match #{expression} for parameter #{parameter.name}"
             end
           end
@@ -295,6 +279,7 @@ module Aws
 
             def initialize(constraints)
               @constraints = constraints
+              self.if(Parametrized.any)
             end
 
             protected
@@ -338,9 +323,26 @@ module Aws
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
           def check_wrapper(parameter, value, instance)
-            check(parameter, value, instance)
+            check(parameter, value, instance) if pre_condition(value, instance)
           rescue StandardError
             raise ParameterValueInvalid.new(parameter, instance, value)
+          end
+
+          ##
+          # Change precondition of the constraint
+          #
+          # Pre-condition is a modifier to the main constraint. The constraint won't be evaluated
+          # if pre-condition is not met. Default condition is that value should be not nil meaning
+          # that if the value is nil then the constraint will be ignored.
+          def if(*params, &blk)
+            @pre_condition = if params.empty?
+              blk
+            else
+              test = params.first
+              test.respond_to?(:to_proc) ? test : ->(v) { v == test }
+            end
+
+            self
           end
 
           protected
@@ -353,6 +355,11 @@ module Aws
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
           def check(parameter, value, instance); end
+
+          def pre_condition(value, instance)
+            return !value.nil? if @pre_condition.nil?
+            instance.instance_exec(value, &@pre_condition)
+          end
         end
 
         ##
@@ -362,11 +369,19 @@ module Aws
         # The methods are factories to create particular type of constraint
         class_scope do
           ##
+          # Match-all precondition
+          #
+          # Any constraint with this precondition will process any value
+          def any
+            ->(_) { true }
+          end
+
+          ##
           # Parameter shouldn't be nil
           #
           # alias for NotNil class
           def not_nil
-            Constraint::NotNil.instance
+            Constraint::NotNil.new
           end
 
           ##
