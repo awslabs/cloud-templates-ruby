@@ -96,16 +96,28 @@ module Aws
       parameter :label, description: 'Artifact\'s label', constraint: not_nil
 
       ##
+      # Meta field
+      #
+      # The field is used to attach arbitrary information to artifacts which is not directly
+      # relevant to artifact properties. This attribute can be used for tagginng, for instance.
+      def meta
+        return @meta if @meta
+
+        meta_option = options[:meta]
+        @meta = meta_option.nil? ? {} : meta_option.to_h
+      end
+
+      ##
       # Artifact's root
       #
       # A root is an object which bundles artifacts into common rendering group helping to find
       # disconnected pieces of dependency graph. If two artifacts have different roots they
       # definitelly belong to different graphs.
-      default root: proc { object_id }
-
       def root
         options[:root]
       end
+
+      default root: proc { object_id }
 
       # Artifact's look-up path through all ancestors
       def lookup_path
