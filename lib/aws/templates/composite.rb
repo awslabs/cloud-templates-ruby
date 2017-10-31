@@ -168,9 +168,7 @@ module Aws
 
       def create_components; end
 
-      private
-
-      def create_artifact_object(type, params, &blk)
+      def create_artifact_object(type, params = nil, &blk)
         type.new(options.filter(&contextualize(params.to_filter)), &blk)
       end
     end
