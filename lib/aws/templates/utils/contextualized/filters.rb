@@ -131,7 +131,7 @@ module Aws
           #    opts = Options.new(a: { q: 1 }, b: 2, c: { d: { r: 5 }, e: 1 })
           #    opts.filter(i.filter) # => { a: { q: 1 }, b: 2, c: { d: { r: 5 }, e: 1 } }
           class Copy < Filter
-            PRE_FILTER = %i[label root parent].freeze
+            PRE_FILTER = %i[label root parent meta].freeze
 
             def filter(opts, memo, _)
               result = Utils.deep_dup(opts.to_hash)
