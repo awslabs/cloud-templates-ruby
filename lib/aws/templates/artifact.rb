@@ -104,7 +104,7 @@ module Aws
         return @meta if @meta
 
         meta_option = options[:meta]
-        @meta = meta_option.nil? ? {} : meta_option.to_h
+        @meta = meta_option.nil? ? {} : meta_option.to_hash
       end
 
       ##
