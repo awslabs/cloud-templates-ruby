@@ -1,11 +1,12 @@
-require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/constraints'
+require 'aws/templates/utils'
 
 module UserDirectory
-  ##
-  # Parameter mixin containing universal catalog entry fields
-  module Catalogized
-    include Aws::Templates::Utils::Parametrized
-    parameter :dn, description: 'Object distinguished name', constraint: not_nil
+  module Artifacts
+    ##
+    # Parameter mixin containing universal catalog entry fields
+    module Catalogized
+      include Aws::Templates::Utils::Parametrized
+      parameter :dn, description: 'Object distinguished name', constraint: not_nil
+    end
   end
 end

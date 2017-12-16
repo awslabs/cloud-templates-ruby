@@ -1,6 +1,4 @@
 require 'aws/templates/utils'
-require 'aws/templates/utils/options'
-require 'aws/templates/utils/inheritable'
 
 module Aws
   module Templates
@@ -16,7 +14,7 @@ module Aws
       # object which have common traits organized as an arbitrary graph
       # with many-to-many relationship.
       module Default
-        include Inheritable
+        include Aws::Templates::Utils::Inheritable
 
         ##
         # Hash wrapper
@@ -116,7 +114,7 @@ module Aws
           # mixins used in between.
           def defaults
             # iterating through all ancestors with defaults
-            ancestors_with_defaults.inject(Options.new) do |opts, mod|
+            ancestors_with_defaults.inject(Utils::Options.new) do |opts, mod|
               mod.defaults.inject(opts) do |acc, defaults_definition|
                 acc.merge!(Definition.new(defaults_definition, self))
               end

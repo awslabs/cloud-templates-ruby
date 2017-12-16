@@ -1,6 +1,4 @@
-require 'aws/templates/render'
-require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/dependency'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -29,7 +27,7 @@ module Aws
           #
           # Defines "depth" property which is used to control recursion depth during object
           # introspection.
-          class InspectView < BasicView
+          class InspectView < Render::BasicView
             def depth
               (parameters.nil? ? Inspect.recursion_depth : Integer(parameters)) - 1
             end

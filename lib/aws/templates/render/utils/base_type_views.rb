@@ -1,8 +1,4 @@
-require 'aws/templates/render'
-require 'aws/templates/render/view'
 require 'aws/templates/utils'
-require 'aws/templates/utils/dependency'
-require 'aws/templates/utils/options'
 
 module Aws
   module Templates
@@ -15,10 +11,11 @@ module Aws
         # specific types.
         module BaseTypeViews
           include Render
+          using Templates::Utils::Dependency::Refinements
 
           ##
           # Pass-through render
-          class AsIs < BasicView
+          class AsIs < Render::BasicView
             def to_rendered
               instance.object
             end
@@ -26,7 +23,7 @@ module Aws
 
           ##
           # Convert to string
-          class ToString < BasicView
+          class ToString < Render::BasicView
             def to_rendered
               instance.to_s
             end
@@ -36,7 +33,7 @@ module Aws
           # Convert to array
           #
           # Converts value to array and iteratively renders every element in it.
-          class ToArray < BasicView
+          class ToArray < Render::BasicView
             def to_rendered
               instance
                 .to_a
@@ -48,7 +45,7 @@ module Aws
           # Convert to hash
           #
           # Converts value to hash and iteratively renders each key and value in it.
-          class ToHash < BasicView
+          class ToHash < Render::BasicView
             def to_rendered
               _from(instance).map { |k, v| [_to_rendered(k), _to_rendered(v)] }.to_h
             end
@@ -70,7 +67,7 @@ module Aws
 
           ##
           # Convert to float
-          class ToFloat < BasicView
+          class ToFloat < Render::BasicView
             def to_rendered
               instance.to_f
             end
@@ -78,7 +75,7 @@ module Aws
 
           ##
           # Convert to integer
-          class ToInteger < BasicView
+          class ToInteger < Render::BasicView
             def to_rendered
               instance.to_i
             end
@@ -86,7 +83,7 @@ module Aws
 
           ##
           # Convert to boolean
-          class ToBoolean < BasicView
+          class ToBoolean < Render::BasicView
             def to_rendered
               !instance.to_s.casecmp('false').zero?
             end
@@ -100,10 +97,10 @@ module Aws
             ::FalseClass => AsIs,
             ::NilClass => AsIs,
             ::Symbol => AsIs,
-            Templates::Utils::Dependency => AsIs,
+            Aws::Templates::Utils::Dependency => AsIs,
             ::Array => ToArray,
             ::Hash => ToHash,
-            Templates::Utils::Options => ToHash
+            Aws::Templates::Utils::Options => ToHash
           }.freeze
 
           ##

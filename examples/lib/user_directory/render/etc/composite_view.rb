@@ -1,5 +1,4 @@
-require 'aws/templates/composite'
-require 'user_directory/render/etc/artifact_view'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render

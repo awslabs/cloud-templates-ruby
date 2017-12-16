@@ -1,5 +1,4 @@
-require 'aws/templates/utils/dependency/object'
-require 'set'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -10,6 +9,8 @@ module Aws
       # Introduces methods needed to track dependencies of an object. The object needs to implement
       # options method and root method.
       module Dependent
+        using Utils::Dependency::Refinements
+
         ##
         # Introduce dependencies manually
         #

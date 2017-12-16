@@ -1,7 +1,5 @@
 require 'spec_helper'
-require 'aws/templates/runner'
-require 'aws/templates/render'
-require 'aws/templates/artifact'
+require 'aws/templates/utils'
 
 module DummyRender
   extend Aws::Templates::Render

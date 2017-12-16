@@ -1,4 +1,4 @@
-require 'user_directory/render/etc/user_view'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
@@ -8,7 +8,7 @@ module UserDirectory
       #
       # The same as POSIX user but with customized GECOS field.
       class PersonView < UserView
-        artifact UserDirectory::Person
+        artifact UserDirectory::Artifacts::Person
 
         def user_info
           in_instance { "#{cn},,#{phone}" }

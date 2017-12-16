@@ -4,3 +4,4 @@ coverage
 doc
 rubocop.html
 pkg
+.byebug_history

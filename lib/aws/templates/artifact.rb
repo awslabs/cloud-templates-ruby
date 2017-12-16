@@ -1,9 +1,4 @@
-require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/getters'
-require 'aws/templates/utils/parametrized/constraints'
-require 'aws/templates/utils/default'
-require 'aws/templates/utils/options'
-require 'aws/templates/utils/dependent'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -53,9 +48,9 @@ module Aws
     # any auto-generated parameter with input hash if they have the same
     # name/path.
     class Artifact
-      include Utils::Default
-      include Utils::Parametrized
-      include Utils::Dependent
+      include Templates::Utils::Default
+      include Templates::Utils::Parametrized
+      include Templates::Utils::Dependent
 
       attr_accessor :options
 
@@ -158,7 +153,7 @@ module Aws
       # * +params+ - input parameters hash to be used during following
       #              hash transformations and expansions.
       def initialize(params)
-        @options = Utils::Options.new(defaults, params)
+        @options = Templates::Utils::Options.new(defaults, params)
       end
     end
   end

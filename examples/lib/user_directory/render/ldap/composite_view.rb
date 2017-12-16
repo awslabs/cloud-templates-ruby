@@ -1,16 +1,15 @@
-require 'aws/templates/composite'
-require 'user_directory/render/ldap/registry'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
-    module LDAP
+    module Ldap
       ##
       # Composite render
       #
       # It aggregates LDIF entries from the children into a single list
       # putting composite's own LDIF entry into the list head.
       class CompositeView < Aws::Templates::Render::View
-        register_in Render::LDAP
+        register_in Render::Ldap
         artifact Aws::Templates::Composite
 
         def prepare

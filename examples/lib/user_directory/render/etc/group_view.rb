@@ -1,4 +1,4 @@
-require 'user_directory/render/etc/artifact_view'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
@@ -8,10 +8,10 @@ module UserDirectory
       #
       # Creates group file entry.
       class GroupView < ArtifactView
-        artifact UserDirectory::Group
+        artifact UserDirectory::Artifacts::Group
 
         def prepare
-          Diff.new [], [group_record.join(':')]
+          Render::Etc::Diff.new [], [group_record.join(':')]
         end
 
         def group_record

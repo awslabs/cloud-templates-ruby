@@ -1,9 +1,4 @@
-require 'aws/templates/exceptions'
-require 'aws/templates/utils/parametrized/guarded'
-require 'aws/templates/utils/inheritable'
-require 'aws/templates/utils/dependent'
-require 'aws/templates/utils/inspectable'
-require 'set'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -17,9 +12,12 @@ module Aws
       # it's domain-specific extended implementation of attr_reader.
       module Parametrized
         include Guarded
-        include Dependent
-        include Inheritable
-        include Inspectable
+        include Utils::Dependent
+        include Utils::Inheritable
+        include Utils::Inspectable
+        include Getter::Dsl
+        include Constraint::Dsl
+        include Transformation::Dsl
 
         ##
         # Parameter object
@@ -97,7 +95,12 @@ module Aws
           private
 
           def extract_value(instance)
-            raise ParameterGetterIsNotDefined.new(self) unless getter(instance)
+            unless getter(instance)
+              raise(
+                Templates::Exception::ParameterGetterIsNotDefined.new(self)
+              )
+            end
+
             execute_getter(instance, getter(instance))
           end
 
@@ -111,7 +114,7 @@ module Aws
             end
           end
 
-          ALLOWED_SPECIFICATION_ENTRIES = Set.new %i[description getter transform constraint]
+          ALLOWED_SPECIFICATION_ENTRIES = ::Set.new %i[description getter transform constraint]
 
           def set_specification(enclosing_class, specification) # :nodoc:
             @klass = enclosing_class
@@ -126,7 +129,7 @@ module Aws
           end
 
           def raise_wrong_options(wrong_options)
-            raise ParameterSpecificationIsInvalid.new(self, wrong_options)
+            raise Templates::Exception::ParameterSpecificationIsInvalid.new(self, wrong_options)
           end
 
           def process_specification(spec)
@@ -174,7 +177,7 @@ module Aws
           # Lazy initializer
           def dependencies
             if @dependencies.nil?
-              @dependencies = Set.new
+              @dependencies = ::Set.new
               depends_on(parameter_names.map { |name| send(name) })
             end
 
@@ -227,7 +230,7 @@ module Aws
           def list_all_parameter_names
             ancestors
               .select { |mod| mod.include?(Parametrized) }
-              .inject(Set.new) do |parameter_collection, mod|
+              .inject(::Set.new) do |parameter_collection, mod|
                 parameter_collection.merge(mod.parameters.keys)
               end
           end
@@ -277,9 +280,13 @@ module Aws
           def raise_already_exists(name)
             parameter_object = get_parameter(name)
 
-            raise(ParameterAlreadyExist.new(parameter_object)) if parameter_object
+            if parameter_object
+              raise(
+                Templates::Exception::ParameterAlreadyExist.new(parameter_object)
+              )
+            end
 
-            raise ParameterMethodNameConflict.new(instance_method(name))
+            raise Aws::Templates::Exception::ParameterMethodNameConflict.new(instance_method(name))
           end
         end
       end

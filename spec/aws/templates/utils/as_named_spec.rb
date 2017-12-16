@@ -1,6 +1,4 @@
 require 'spec_helper'
-require 'aws/templates/utils/named'
-require 'aws/templates/utils/parametrized/getters'
 
 describe Aws::Templates::Utils::AsNamed do
   let(:named_class) do

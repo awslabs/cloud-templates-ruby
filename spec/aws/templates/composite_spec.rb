@@ -1,6 +1,8 @@
 require 'spec_helper'
 require 'aws/templates/composite'
 
+using Aws::Templates::Utils::Dependency::Refinements
+
 class A
   attr_reader :params
 

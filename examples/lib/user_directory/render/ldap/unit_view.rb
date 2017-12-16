@@ -1,15 +1,14 @@
-require 'user_directory/render/ldap/composite_view'
-require 'user_directory/artifacts/unit'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
-    module LDAP
+    module Ldap
       ##
       # Catalog's org unit render
       #
       # It renders into unit's LDIF entry with merged list of children.
       class UnitView < CompositeView
-        artifact UserDirectory::Unit
+        artifact UserDirectory::Artifacts::Unit
 
         protected
 

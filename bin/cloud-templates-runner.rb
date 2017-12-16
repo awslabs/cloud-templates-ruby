@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'aws/templates/runner'
+require 'aws/templates/utils'
 
 begin
   puts Aws::Templates::Runner.with(ARGV, STDIN).run!

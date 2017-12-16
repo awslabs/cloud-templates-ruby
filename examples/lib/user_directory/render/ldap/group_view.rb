@@ -1,15 +1,14 @@
-require 'user_directory/render/ldap/artifact_view'
-require 'user_directory/artifacts/group'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
-    module LDAP
+    module Ldap
       ##
       # POSIX group render
       #
       # Creates group LDIF entry.
       class GroupView < ArtifactView
-        artifact UserDirectory::Group
+        artifact UserDirectory::Artifacts::Group
 
         def prepare
           super().merge(

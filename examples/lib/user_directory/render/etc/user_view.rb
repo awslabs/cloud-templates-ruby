@@ -1,5 +1,4 @@
-require 'user_directory/render/etc/artifact_view'
-require 'user_directory/artifacts/user'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
@@ -9,7 +8,7 @@ module UserDirectory
       #
       # It creates passwd file entry
       class UserView < ArtifactView
-        artifact UserDirectory::User
+        artifact UserDirectory::Artifacts::User
 
         def prepare
           Diff.new [user_record.join(':')], []

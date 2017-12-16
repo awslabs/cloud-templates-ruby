@@ -1,4 +1,5 @@
 require 'json'
+require 'aws/templates/utils'
 
 module Aws
   module Templates

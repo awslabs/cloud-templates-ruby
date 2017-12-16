@@ -1,13 +1,10 @@
-require 'set'
-require 'aws/templates/exceptions'
 require 'aws/templates/utils'
-require 'aws/templates/utils/memoized'
+
+# rubocop:disable Metrics/ClassLength
 
 module Aws
   module Templates
     module Utils
-      # rubocop:disable Metrics/ClassLength
-
       ##
       # Options hash-like class
       #
@@ -19,7 +16,10 @@ module Aws
       # select the best combination if it doesn't see the exact match
       # during lookup.
       class Options
-        include Memoized
+        using Utils::Contextualized::Refinements
+        using Utils::Dependency::Refinements
+
+        include Utils::Memoized
 
         ##
         # Get a parameter from resulting hash or any nested part of it
@@ -54,7 +54,7 @@ module Aws
           @structures.reverse_each.inject(nil) do |memo, container|
             ret = begin
               Utils.lookup(container, path.dup)
-            rescue OptionValueDeleted, OptionScalarOnTheWay
+            rescue Exception::OptionValueDeleted, Exception::OptionScalarOnTheWay
               # we discovered that this layer either have value deleted or parent was overriden
               # by a scalar. Either way we just return what we have in the memo
               break memo
@@ -77,9 +77,11 @@ module Aws
         end
 
         def dependencies
+          # rubocop:disable Style/SymbolProc
+          # Refinements don't support dynamic dispatch yet. So, symbolic methods don't work
           memoize(:dependencies) do
-            select_recursively(&:dependency?)
-              .inject(Set.new) { |acc, elem| acc.merge(elem.dependencies) }
+            select_recursively { |obj| obj.dependency? }
+              .inject(::Set.new) { |acc, elem| acc.merge(elem.dependencies) }
           end
         end
 
@@ -123,7 +125,7 @@ module Aws
         # with special marker that it was deleted. It helps avoid hash recalculation leading to
         # memory thrashing simultaneously maintaining semantics close to Hash#delete
         def delete(*path)
-          self[*path] = DELETED_MARKER
+          self[*path] = Utils::DELETED_MARKER
         end
 
         ##
@@ -157,9 +159,9 @@ module Aws
         def keys
           memoize(:keys) do
             @structures
-              .each_with_object(Set.new) do |container, keyset|
+              .each_with_object(::Set.new) do |container, keyset|
                 container.keys.each do |k|
-                  container[k] == DELETED_MARKER ? keyset.delete(k) : keyset.add(k)
+                  container[k] == Utils::DELETED_MARKER ? keyset.delete(k) : keyset.add(k)
                 end
               end
               .to_a
@@ -172,7 +174,7 @@ module Aws
         # Checks if top-level key exists. Deleted branches are excluded.
         def include?(k)
           found = @structures.reverse_each.find { |container| container.include?(k) }
-          !found.nil? && (found[k] != DELETED_MARKER)
+          !found.nil? && (found[k] != Utils::DELETED_MARKER)
         end
 
         ##
@@ -192,7 +194,7 @@ module Aws
         # The object must be "recursive" meaning it should satisfy minimum contract for
         # "recursive". See Utils::recursive? for details
         def merge!(other)
-          raise OptionShouldBeRecursive.new(other) unless Utils.recursive?(other)
+          raise Exception::OptionShouldBeRecursive.new(other) unless Utils.recursive?(other)
           @structures << other
           dirty!
         end
@@ -215,7 +217,7 @@ module Aws
             elsif Utils.hashable?(container)
               container.to_hash
             else
-              raise OptionShouldBeRecursive.new(container)
+              raise Exception::OptionShouldBeRecursive.new(container)
             end
           end
         end
@@ -250,7 +252,7 @@ module Aws
         # from ActiveSupport. It puts the "recursive" object passed to the bottom of the layer
         # stack of the Options instance effectively making it the least prioritized layer.
         def unshift_layer!(layer)
-          raise OptionShouldBeRecursive.new(layer) unless Utils.recursive?(layer)
+          raise Exception::OptionShouldBeRecursive.new(layer) unless Utils.recursive?(layer)
           @structures.unshift(layer)
           dirty!
         end
@@ -269,7 +271,7 @@ module Aws
         # :nodoc: process hashable recursively removing all keys marked as deleted
         def _process_hashed(hashed)
           hashed.each_pair do |key, value|
-            if value == DELETED_MARKER
+            if value == Utils::DELETED_MARKER
               hashed.delete(key)
             elsif Utils.hashable?(value)
               _process_hashed(value.to_hash).freeze

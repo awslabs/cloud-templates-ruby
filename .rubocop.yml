@@ -13,6 +13,7 @@ Style/Documentation:
   Exclude:
     - 'spec/**/*'
     - 'test/**/*'
+
 Metrics/BlockLength:
   ExcludedMethods:
     - class_scope

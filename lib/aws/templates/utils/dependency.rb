@@ -1,7 +1,4 @@
-require 'set'
-require 'aws/templates/utils/dependency/object'
-require 'aws/templates/utils/dependency/enumerable'
-require 'aws/templates/utils/inspectable'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -16,7 +13,9 @@ module Aws
       # * Dependecy can be applied case-by-case basis whereas singleton is attached to the object
       #   itself
       class Dependency < BasicObject
-        include Inspectable
+        using Refinements
+
+        include ::Aws::Templates::Utils::Inspectable
 
         ##
         # Equality
@@ -56,6 +55,8 @@ module Aws
         attr_reader :object
         attr_reader :dependencies
 
+        alias not_a_dependency object
+
         ##
         # Redirect every method call to the proxied object if the object supports it
         def method_missing(name, *args, &block)
@@ -65,7 +66,7 @@ module Aws
         ##
         # It supports every method proxied object supports
         def respond_to_missing?(name, include_private = false)
-          object.respond_to?(name, include_private) || super(name, include_private)
+          object.respond_to?(name, include_private)
         end
 
         ##

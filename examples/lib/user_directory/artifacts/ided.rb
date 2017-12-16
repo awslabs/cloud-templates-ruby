@@ -1,11 +1,12 @@
-require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/constraints'
+require 'aws/templates/utils'
 
 module UserDirectory
-  ##
-  # Parameter mixin containing universal parameters for indexed objects
-  module IDed
-    include Aws::Templates::Utils::Parametrized
-    parameter :id, description: 'Object ID', constraint: not_nil
+  module Artifacts
+    ##
+    # Parameter mixin containing universal parameters for indexed objects
+    module Ided
+      include Aws::Templates::Utils::Parametrized
+      parameter :id, description: 'Object ID', constraint: not_nil
+    end
   end
 end

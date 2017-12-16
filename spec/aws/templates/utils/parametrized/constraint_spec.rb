@@ -1,7 +1,5 @@
 require 'spec_helper'
 require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/constraints'
-require 'aws/templates/utils/parametrized/getters'
 
 module Constraints
   include Aws::Templates::Utils::Parametrized
@@ -41,7 +39,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws error when parameter is not specified' do
       expect { test_class.new(something_else: 1).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 
@@ -58,7 +56,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when a value is specified which is not a member of the enumeration' do
       expect { test_class.new(something: 5).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 
@@ -71,12 +69,12 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error if one of the constraints are failed (not_nil)' do
       expect { test_class.new(something_else: 2).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
 
     it 'throws an error if one of the constraints are failed (enum)' do
       expect { test_class.new(something: 5).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 
@@ -98,7 +96,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when requirement is not satisfied' do
       expect { test_class.new(something: 5).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 
@@ -130,7 +128,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when conditional constraint is not met' do
       expect { test_class.new(something: :condition, requirement: 2).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
 
     it 'passes when other conditional constraint is met' do
@@ -152,7 +150,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when condition is not satisfied' do
       expect { test_class.new(something: 1).something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 
@@ -169,7 +167,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when condition is not satisfied' do
       expect { test_class.new(something: 'rooster').something }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 end

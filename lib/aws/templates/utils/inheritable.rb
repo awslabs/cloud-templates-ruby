@@ -1,3 +1,5 @@
+require 'aws/templates/utils'
+
 module Aws
   module Templates
     module Utils
@@ -11,14 +13,20 @@ module Aws
         # in every including module/class to expose appropriate module-level primitives for
         # handling inheritance of class-scope methods.
         module ClassMethods
-          DEFAULT_MODULE = Module.new.freeze
+          ##
+          # Empty class scope
+          #
+          # Identity class scope which contains nothing. Used as base case for class scope
+          # inheritance hierarchy.
+          module ClassScope
+          end
 
           ##
           # To add class methods also while including the module
           def included(base)
             super(base)
-            base.extend(Inheritable::ClassMethods)
-            base._merge_class_scope(class_scope || DEFAULT_MODULE)
+            base.extend(ClassMethods)
+            base.extend(ClassScope)
           end
 
           def instance_scope(&blk)
@@ -26,22 +34,19 @@ module Aws
           end
 
           def class_scope(&blk)
-            if blk
-              @class_scope.module_eval(&blk)
-              extend @class_scope
-            end
-
-            @class_scope
+            raise ScriptError.new('class_scope should have a block') if blk.nil?
+            _define_class_scope unless _class_scope_defined?
+            ClassScope.module_eval(&blk)
+            extend ClassScope
           end
 
-          def _merge_class_scope(mod)
-            if @class_scope.nil?
-              @class_scope = mod.dup
-            else
-              @class_scope.include(mod)
-            end
+          def _class_scope_defined?
+            @class_scope_defined || false
+          end
 
-            extend @class_scope
+          def _define_class_scope
+            const_set(:ClassScope, ClassScope.dup)
+            @class_scope_defined = true
           end
         end
 

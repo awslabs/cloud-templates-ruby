@@ -1,16 +1,15 @@
-require 'user_directory/render/ldap/user_view'
-require 'user_directory/artifacts/person'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
-    module LDAP
+    module Ldap
       ##
       # Person render
       #
       # It merges POSIX user entry with additional fields and object
       # types valid for a real person.
       class PersonView < UserView
-        artifact UserDirectory::Person
+        artifact UserDirectory::Artifacts::Person
 
         def prepare
           hsh = in_instance do

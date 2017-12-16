@@ -2,8 +2,6 @@ require 'spec_helper'
 require 'aws/templates/render/utils/base_type_views'
 require 'aws/templates/render'
 
-include Aws::Templates::Render::Utils::BaseTypeViews
-
 describe Aws::Templates::Render::Utils::BaseTypeViews do
   let(:render) do
     Module.new do
@@ -12,7 +10,7 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
   end
 
   describe 'AsIs' do
-    before { render.define_view(Object, AsIs) }
+    before { render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::AsIs) }
 
     it 'renders string' do
       expect(render.view_for('123').to_rendered).to be == '123'
@@ -24,7 +22,7 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
   end
 
   describe 'ToString' do
-    before { render.define_view(Object, ToString) }
+    before { render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::ToString) }
 
     it 'renders string' do
       expect(render.view_for('123').to_rendered).to be == '123'
@@ -37,8 +35,8 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
 
   describe 'ToArray' do
     before do
-      render.define_view(Array, ToArray)
-      render.define_view(Object, ToString)
+      render.define_view(Array, Aws::Templates::Render::Utils::BaseTypeViews::ToArray)
+      render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::ToString)
     end
 
     it 'renders array' do
@@ -48,8 +46,8 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
 
   describe 'ToHash' do
     before do
-      render.define_view(Object, ToString)
-      render.define_view(Hash, ToHash)
+      render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::ToString)
+      render.define_view(Hash, Aws::Templates::Render::Utils::BaseTypeViews::ToHash)
     end
 
     it 'renders hash' do
@@ -59,7 +57,7 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
   end
 
   describe 'ToFloat' do
-    before { render.define_view(Object, ToFloat) }
+    before { render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::ToFloat) }
 
     it 'renders integer' do
       expect(render.view_for(1).to_rendered).to be == 1.0
@@ -71,7 +69,7 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
   end
 
   describe 'ToInteger' do
-    before { render.define_view(Object, ToInteger) }
+    before { render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::ToInteger) }
 
     it 'renders float' do
       expect(render.view_for(1.3).to_rendered).to be == 1
@@ -83,7 +81,7 @@ describe Aws::Templates::Render::Utils::BaseTypeViews do
   end
 
   describe 'ToBoolean' do
-    before { render.define_view(Object, ToBoolean) }
+    before { render.define_view(Object, Aws::Templates::Render::Utils::BaseTypeViews::ToBoolean) }
 
     it 'renders random object' do
       expect(render.view_for([]).to_rendered).to be == true

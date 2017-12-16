@@ -1,4 +1,5 @@
-require 'aws/templates/exceptions'
+require 'aws/templates/utils'
+require 'concurrent/map'
 
 module Aws
   module Templates
@@ -13,7 +14,7 @@ module Aws
       class Registry
         # View registry accessor
         def registry
-          @registry ||= {}
+          @registry ||= Concurrent::Map.new
         end
 
         ##
@@ -24,7 +25,7 @@ module Aws
         # * +artifact+ - artifact class the view claims to be able to render
         # * +render+ - view class
         def register(artifact, view)
-          registry[artifact] = view
+          registry.put_if_absent(artifact.name || artifact.reduce, view)
         end
 
         ##
@@ -32,7 +33,9 @@ module Aws
         #
         # Returns true if the object passed can be rendered by one of the views in the registry
         def can_render?(instance)
-          instance.class.ancestors.any? { |ancestor| registry.include?(ancestor) }
+          instance.class.ancestors.any? do |ancestor|
+            registry[ancestor.name] || registry[ancestor]
+          end
         end
 
         ##
@@ -46,13 +49,14 @@ module Aws
         def view_for(instance, params = nil)
           return instance if instance.respond_to?(:to_rendered)
 
-          mod = instance.class.ancestors.find do |ancestor|
-            registry.include?(ancestor)
+          view = instance.class.ancestors.find do |ancestor|
+            view = registry[ancestor.name] || registry[ancestor]
+            break view unless view.nil?
           end
 
-          raise ViewNotFound.new(instance) unless mod
+          raise Templates::Exception::ViewNotFound.new(instance) unless view
 
-          registry[mod].new(instance, params)
+          view.reduce.new(instance, params)
         end
       end
     end

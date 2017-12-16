@@ -1,17 +1,16 @@
-require 'aws/templates/composite'
-require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/constraints'
-require 'user_directory/artifacts/catalogized'
+require 'aws/templates/utils'
 
 module UserDirectory
-  ##
-  # Catalog's organization
-  class Organization < Aws::Templates::Composite
-    include Catalogized
+  module Artifacts
+    ##
+    # Catalog's organization
+    class Organization < Aws::Templates::Composite
+      include Artifacts::Catalogized
 
-    default dn: proc { "o=#{name}" }
-    parameter :name, description: 'Organization name', constraint: not_nil
+      default dn: proc { "o=#{name}" }
+      parameter :name, description: 'Organization name', constraint: not_nil
 
-    contextualize filter(:override) { { organization: self, unit: self } }
+      contextualize filter(:override) { { organization: self, unit: self } }
+    end
   end
 end

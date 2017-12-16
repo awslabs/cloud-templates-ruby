@@ -1,24 +1,13 @@
 require 'spec_helper'
-
-require 'user_directory/artifacts/user'
-require 'user_directory/artifacts/person'
-require 'user_directory/artifacts/group'
-require 'user_directory/artifacts/unit'
-require 'user_directory/artifacts/team'
-require 'user_directory/artifacts/organization'
-
-require 'user_directory/render/etc'
-require 'user_directory/render/ldap'
-
-include UserDirectory
+require 'aws/templates/utils'
 
 # rubocop:disable Metrics/BlockLength
 describe UserDirectory do
   let(:directory) do
-    Organization.new(name: 'example.com', root: Object.new) do
-      artifact(Unit, name: 'Business') do
+    UserDirectory::Artifacts::Organization.new(name: 'example.com', root: Object.new) do
+      artifact(UserDirectory::Artifacts::Unit, name: 'Business') do
         artifact(
-          Team,
+          UserDirectory::Artifacts::Team,
           name: 'Sales',
           group_id: 120,
           manager: {
@@ -57,7 +46,7 @@ describe UserDirectory do
         )
 
         artifact(
-          Team,
+          UserDirectory::Artifacts::Team,
           name: 'Finances',
           group_id: 110,
           manager: {
@@ -85,12 +74,15 @@ describe UserDirectory do
           ]
         )
 
-        artifact Group, name: 'business', id: 100, members: search(klass: User, recursive: true)
+        artifact UserDirectory::Artifacts::Group,
+                 name: 'business',
+                 id: 100,
+                 members: search(klass: UserDirectory::Artifacts::User, recursive: true)
       end
 
-      artifact(Unit, name: 'Engineering', shell: { path: '/bin/zsh' }) do
+      artifact(UserDirectory::Artifacts::Unit, name: 'Engineering', shell: { path: '/bin/zsh' }) do
         artifact(
-          Team,
+          UserDirectory::Artifacts::Team,
           name: 'Production',
           group_id: 210,
           manager: {
@@ -119,7 +111,7 @@ describe UserDirectory do
         )
 
         artifact(
-          Team,
+          UserDirectory::Artifacts::Team,
           name: 'Development',
           group_id: 220,
           manager: {
@@ -155,7 +147,7 @@ describe UserDirectory do
         )
 
         artifact(
-          Team,
+          UserDirectory::Artifacts::Team,
           name: 'QA',
           group_id: 230,
           manager: {
@@ -190,15 +182,21 @@ describe UserDirectory do
           ]
         )
 
-        artifact Group, name: 'engineering', id: 200, members: search(klass: User, recursive: true)
+        artifact UserDirectory::Artifacts::Group,
+                 name: 'engineering',
+                 id: 200,
+                 members: search(klass: UserDirectory::Artifacts::User, recursive: true)
       end
 
-      artifact Group, name: 'managers', id: 300, members: search(label: 'manager', recursive: true)
+      artifact UserDirectory::Artifacts::Group,
+               name: 'managers',
+               id: 300,
+               members: search(label: 'manager', recursive: true)
     end
   end
 
   describe 'etc render' do
-    let(:rendered) { Render::Etc.view_for(directory).to_rendered }
+    let(:rendered) { UserDirectory::Render::Etc.view_for(directory).to_rendered }
 
     let(:expected) do
       UserDirectory::Render::Etc::Diff.new(
@@ -241,7 +239,7 @@ describe UserDirectory do
   end
 
   describe 'ldap render' do
-    let(:rendered) { Render::LDAP.view_for(directory).to_rendered }
+    let(:rendered) { UserDirectory::Render::Ldap.view_for(directory).to_rendered }
 
     let(:expected) do
       [

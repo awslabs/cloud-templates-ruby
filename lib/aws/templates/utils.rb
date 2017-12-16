@@ -1,17 +1,12 @@
-require 'aws/templates/exceptions'
-
-##
-# Hash implements resursive concept
-class Hash
-  def to_recursive
-    self
-  end
-end
+require 'aws/templates/utils/autoload'
+require 'facets/string/modulize'
 
 module Aws
   module Templates
     ##
-    # Variable utility functions used through the code
+    # Variable utility functions used through the code.
+    #
+    # Defines auxiliary functions set and serves as the namespace for the framework modules.
     module Utils
       RECURSIVE_METHODS = %i[keys [] include?].freeze
 
@@ -157,11 +152,11 @@ module Aws
         # we stop lookup and return nil if nil is encountered
         return if value.nil?
         # value was deleted in this layer
-        raise OptionValueDeleted.new(path) if value == DELETED_MARKER
+        raise Exception::OptionValueDeleted.new(path) if value == DELETED_MARKER
         # we reached our target! returning it
         return value if path.nil? || path.empty?
         # we still have some part of path to traverse but scalar was found
-        raise OptionScalarOnTheWay.new(value, path) if Utils.scalar?(value)
+        raise Exception::OptionScalarOnTheWay.new(value, path) if Utils.scalar?(value)
 
         _lookup_recursively(value, path.dup)
       end
@@ -194,7 +189,7 @@ module Aws
         last_key = path.pop
 
         last_branch = path.inject(container) do |obj, current_key|
-          raise OptionScalarOnTheWay.new(obj, path) unless Utils.recursive?(obj)
+          raise Exception::OptionScalarOnTheWay.new(obj, path) unless Utils.recursive?(obj)
           if obj.include?(current_key)
             obj[current_key]
           else
@@ -226,14 +221,11 @@ module Aws
       PATH_REGEXP = Regexp.compile('::|[.]|/')
 
       def self.lookup_module(str)
-        path = str.split(PATH_REGEXP)
+        target = str.split(PATH_REGEXP)
+                    .inject(::Object.lazy) { |acc, elem| acc.const_get(elem.modulize) }
+                    .reduce
 
-        target = path.inject(::Kernel) do |acc, elem|
-          require path.map(&:downcase).join('/') unless acc.const_defined?(elem)
-          acc.const_get(elem)
-        end
-
-        raise "#{str} == #{target} which is not a class" unless target.is_a?(Module)
+        raise "#{str} == #{target} which is not a module" unless target.is_a?(Module)
 
         target
       end

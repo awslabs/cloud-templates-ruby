@@ -1,15 +1,14 @@
-require 'user_directory/render/ldap/artifact_view'
-require 'user_directory/artifacts/user'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
-    module LDAP
+    module Ldap
       ##
       # POSIX user render
       #
       # It creates POSIX user LDIF entry
       class UserView < ArtifactView
-        artifact UserDirectory::User
+        artifact UserDirectory::Artifacts::User
 
         def prepare
           super().merge(cn: instance.cn).merge(passwd_block)

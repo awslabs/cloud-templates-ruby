@@ -1,6 +1,4 @@
-require 'aws/templates/exceptions'
-require 'aws/templates/render/registry'
-require 'aws/templates/render/view'
+require 'aws/templates/utils'
 
 module Aws
   module Templates

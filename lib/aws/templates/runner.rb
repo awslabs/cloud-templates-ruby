@@ -1,6 +1,5 @@
 require 'json'
 require 'optparse'
-require 'aws/templates/runner/formatter'
 require 'aws/templates/utils'
 
 module Aws
@@ -22,6 +21,7 @@ module Aws
 
       class ParameterException < RuntimeError
       end
+
       ##
       # Encapsulates run settings and execution
       #
@@ -52,7 +52,7 @@ module Aws
         end
 
         opts.on('-rNAME', '--render=NAME', 'Class name of the render to use') do |name|
-          store(:render, Utils.lookup_module(name))
+          store(:render, Templates::Utils.lookup_module(name))
         end
 
         opts.on('-fNAME', '--format=NAME', 'Formatter used for final output') do |name|
@@ -60,11 +60,11 @@ module Aws
         end
 
         opts.on('-aNAME', '--artifact=NAME', 'Artifact class name') do |name|
-          store(:artifact, Utils.lookup_module(name))
+          store(:artifact, Templates::Utils.lookup_module(name))
         end
 
         opts.on('-oOPTS', '--options=OPTS', 'JSON string for artifact options') do |str|
-          store(:options, JSON.parse(str, symbolize_names: true))
+          store(:options, ::JSON.parse(str, symbolize_names: true))
         end
       end
 

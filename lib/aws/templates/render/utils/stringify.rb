@@ -1,7 +1,4 @@
-require 'aws/templates/render'
-require 'aws/templates/artifact'
-require 'aws/templates/utils/parametrized/nested'
-require 'aws/templates/utils/dependency'
+require 'aws/templates/utils'
 
 module Aws
   module Templates

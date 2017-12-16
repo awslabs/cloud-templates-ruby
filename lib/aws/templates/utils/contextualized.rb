@@ -1,8 +1,4 @@
-require 'aws/templates/utils/contextualized/filters'
-require 'aws/templates/utils/contextualized/proc'
-require 'aws/templates/utils/contextualized/hash'
-require 'aws/templates/utils/contextualized/nil'
-require 'aws/templates/utils/inheritable'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -22,7 +18,8 @@ module Aws
       # by "filter" mixed method is a functor. No operations are performed
       # on options.
       module Contextualized
-        include Inheritable
+        include Utils::Inheritable
+        include Filter::Dsl
 
         instance_scope do
           ##
@@ -35,7 +32,7 @@ module Aws
           # The method is working correctly with both parent classes and all
           # Contextualized mixins used in between.
           def context
-            @context ||= filter(:scoped, self.class.context, self)
+            @context ||= Filter::Scoped.new(self.class.context, self)
           end
 
           ##
@@ -48,14 +45,14 @@ module Aws
             if blk
               clone._set_context(context.scoped_filter & arg).instance_exec(&blk)
             else
-              filter(:scoped, context.scoped_filter & arg, self)
+              Filter::Scoped.new(context.scoped_filter & arg, self)
             end
           end
 
           protected
 
           def _set_context(new_context)
-            @context = filter(:scoped, new_context, self)
+            @context = Filter::Scoped.new(new_context, self)
             self
           end
         end
@@ -72,7 +69,7 @@ module Aws
           # The method returns only the filter for the current class
           # without consideration of the class hierarchy.
           def module_context
-            @module_context ||= filter(:identity)
+            @module_context ||= Filter::Identity.new
           end
 
           ##
@@ -82,7 +79,7 @@ module Aws
           # The method returns aggregate filter include module's own filters
           # concatenated with all ancestor's filters.
           def context
-            @context ||= _contextualized_ancestors.inject(filter(:identity)) do |acc, mod|
+            @context ||= _contextualized_ancestors.inject(Filter::Identity.new) do |acc, mod|
               acc & mod.module_context
             end
           end

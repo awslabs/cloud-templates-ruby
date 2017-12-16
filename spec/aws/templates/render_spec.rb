@@ -57,6 +57,6 @@ describe Aws::Templates::Render do
 
   it 'throws an error once no classes are found' do
     expect { render.view_for(unknown_artifact.new).to_rendered }
-      .to raise_error Aws::Templates::ViewNotFound
+      .to raise_error Aws::Templates::Exception::ViewNotFound
   end
 end

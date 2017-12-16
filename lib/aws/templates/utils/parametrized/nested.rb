@@ -1,9 +1,4 @@
-require 'set'
-require 'aws/templates/utils/default'
-require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/getters'
-require 'aws/templates/utils/dependent'
-require 'aws/templates/utils/options'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -14,14 +9,17 @@ module Aws
         #
         # Wraps hash or object into "parametrized" instance. Used for nested parameter definitions.
         class Nested
+          using Utils::Recursive
+          using Utils::Dependency::Refinements
+
           include Parametrized
-          include Default
-          include Dependent
+          include Utils::Default
+          include Utils::Dependent
 
           attr_reader :options
 
           def self.getter
-            as_is
+            Parametrized::Getter::AsIs.instance
           end
 
           def self.create_class(scope)
@@ -58,20 +56,15 @@ module Aws
           attr_reader :parent
 
           def dependencies
-            @dependencies ||= Set.new
+            @dependencies ||= ::Set.new
           end
 
           protected
 
           def initialize(parent, obj)
-            unless obj.respond_to?(:to_recursive)
-              raise "Value #{obj} can't be transformed " \
-                    'into a recursive container'
-            end
-
             @parent = parent
             depends_on(obj) if obj.dependency?
-            @options = Options.new(defaults, obj.to_recursive)
+            @options = Utils::Options.new(defaults, obj.to_recursive)
           end
         end
       end

@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/getters'
 
 describe Aws::Templates::Utils::Parametrized do
   let(:including_class) do
@@ -222,7 +221,7 @@ describe Aws::Templates::Utils::Parametrized do
         Class.new(parametrized_class) do
           parameter :bare_minimum, description: 'Something existing'
         end
-      end.to raise_error Aws::Templates::ParameterAlreadyExist
+      end.to raise_error Aws::Templates::Exception::ParameterAlreadyExist
     end
 
     context 'method is defined' do
@@ -234,7 +233,7 @@ describe Aws::Templates::Utils::Parametrized do
 
       it 'fails when adding a parameter with the same name as a method' do
         expect { failing_class.parameter(:a, description: 'Unexpected') }
-          .to raise_error Aws::Templates::ParameterMethodNameConflict
+          .to raise_error Aws::Templates::Exception::ParameterMethodNameConflict
       end
     end
   end

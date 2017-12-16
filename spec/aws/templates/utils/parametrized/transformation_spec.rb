@@ -1,8 +1,5 @@
 require 'spec_helper'
 require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/transformations'
-require 'aws/templates/utils/parametrized/constraints'
-require 'aws/templates/utils/parametrized/getters'
 require 'aws/templates/render'
 
 module TestRender
@@ -65,7 +62,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'throws an error if sub-parameter constraint is not satisfied' do
       i = test_class.new(something: { a: 1, b: 2, c: nil })
       expect { [i.something.a, i.something.b, i.something.c] }
-        .to raise_error Aws::Templates::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
 
@@ -106,7 +103,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
     it 'fails if the value can be transformed to an array' do
       expect { test_class.new(something: 'abc').something }
-        .to raise_error Aws::Templates::NestedParameterException
+        .to raise_error Aws::Templates::Exception::NestedParameterException
     end
 
     it 'returns correct value if sub-constraints are satisfied' do
@@ -158,7 +155,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
     it 'fails on wrong value' do
       i = test_class.new(something: [])
-      expect { i.something }.to raise_error Aws::Templates::NestedParameterException
+      expect { i.something }.to raise_error Aws::Templates::Exception::NestedParameterException
     end
   end
 

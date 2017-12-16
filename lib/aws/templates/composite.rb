@@ -1,7 +1,4 @@
-require 'aws/templates/artifact'
-require 'aws/templates/utils/artifact_storage'
-require 'aws/templates/utils/contextualized'
-require 'aws/templates/utils/dependency'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -25,7 +22,9 @@ module Aws
     # supports inheritance as artifact does. So every component defined in
     # the parent class will be initialized properly in all children too.
     class Composite < Artifact
-      include Aws::Templates::Utils::Contextualized
+      include Templates::Utils::Contextualized
+      using Templates::Utils::Contextualized::Refinements
+      using Templates::Utils::Dependency::Refinements
 
       # propagate root to the components and set itself as the parent
       contextualize filter(:add, :root) & (filter(:override) { { parent: self } })
@@ -37,7 +36,7 @@ module Aws
       # Accessor returning dictionary of artifacts currently residing in
       # composite instance with labels as keys
       def artifacts
-        @artifacts ||= Utils::ArtifactStorage.new
+        @artifacts ||= Templates::Utils::ArtifactStorage.new
       end
 
       ##

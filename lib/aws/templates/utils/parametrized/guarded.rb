@@ -1,4 +1,4 @@
-require 'set'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -23,7 +23,7 @@ module Aws
           private
 
           def trace
-            Thread.current[Guarded.name] ||= Set.new
+            Thread.current[Guarded.name] ||= ::Set.new
           end
         end
       end

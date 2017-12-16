@@ -1,4 +1,4 @@
-require 'aws/templates/utils/inheritable'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -12,7 +12,7 @@ module Aws
       #
       # The module provides DSL for creating late binding points known as References.
       module LateBound
-        include Inheritable
+        include Utils::Inheritable
 
         ##
         # Reference

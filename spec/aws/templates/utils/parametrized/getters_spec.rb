@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'aws/templates/utils/parametrized'
-require 'aws/templates/utils/parametrized/getters'
 
 module Getters
   include Aws::Templates::Utils::Parametrized

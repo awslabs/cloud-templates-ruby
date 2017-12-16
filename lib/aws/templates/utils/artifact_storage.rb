@@ -1,5 +1,4 @@
-require 'aws/templates/artifact'
-require 'set'
+require 'aws/templates/utils'
 
 module Aws
   module Templates
@@ -100,7 +99,7 @@ module Aws
 
         def initialize
           @map = {}
-          @set = Set.new
+          @set = ::Set.new
         end
 
         private

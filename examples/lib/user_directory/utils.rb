@@ -1,4 +1,4 @@
-require 'aws/templates/utils/parametrized/constraints'
+require 'aws/templates/utils'
 
 module UserDirectory
   ##

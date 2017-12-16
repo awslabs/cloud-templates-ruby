@@ -1,15 +1,14 @@
-require 'aws/templates/artifact'
-require 'user_directory/render/ldap/registry'
+require 'aws/templates/utils'
 
 module UserDirectory
   module Render
-    module LDAP
+    module Ldap
       ##
       # Basic render
       #
       # It just puts a link between children and type registrar
       class ArtifactView < Aws::Templates::Render::View
-        register_in Render::LDAP
+        register_in Render::Ldap
         artifact Aws::Templates::Artifact
 
         def prepare
