@@ -10,7 +10,7 @@ end
 
 desc 'Check code notation'
 RuboCop::RakeTask.new(:lint) do |task|
-  task.patterns = ['lib/**/*.rb', 'spec/**/*.rb', 'examples/lib/**/*.rb', 'examples/spec/**/*.rb']
+  task.patterns = ['lib/**/*.rb', 'spec/**/*.rb', 'examples/lib/**/*.rb', 'examples/spec/**/*.rb', 'bin/**/*.rb']
   task.formatters += ['html']
   task.options += [
     '--fail-level', 'convention',
