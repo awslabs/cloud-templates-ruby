@@ -34,7 +34,7 @@ describe Aws::Templates::Utils::Contextualized do
     end
   end
 
-  context 'Class is inherited and the module is included' do
+  context 'when class is inherited and the module is included' do
     let(:parametrized_class) do
       klass = Class.new(including_class)
       klass.send(:include, including_module)
@@ -50,7 +50,7 @@ describe Aws::Templates::Utils::Contextualized do
     end
   end
 
-  context 'Class is inherited and extended with filters' do
+  context 'when class is inherited and extended with filters' do
     let(:parametrized_class) do
       Class.new(including_class) do
         contextualize lambda { |_, memo|
@@ -73,7 +73,7 @@ describe Aws::Templates::Utils::Contextualized do
       end
     end
 
-    context 'Instance of the class created' do
+    context 'when cnstance of the class created' do
       let(:instance) { parametrized_class.new }
 
       it 'filters it according to specified parameters' do
@@ -81,7 +81,7 @@ describe Aws::Templates::Utils::Contextualized do
       end
     end
 
-    context 'Class is inherited and a filter added' do
+    context 'when class is inherited and a filter added' do
       let(:extending_class) do
         Class.new(parametrized_class) do
           contextualize lambda { |_, memo|
@@ -97,7 +97,7 @@ describe Aws::Templates::Utils::Contextualized do
         expect(options.filter(&instance.context).to_hash).to be == { a: 3, z: 7, x: 4, w: 11 }
       end
 
-      context 'Class inherited and a filtered mixin added' do
+      context 'when class inherited and a filtered mixin added' do
         let(:mixing_class) do
           k = Class.new(extending_class)
           k.send(:include, including_module)

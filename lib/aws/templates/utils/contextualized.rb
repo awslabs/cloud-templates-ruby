@@ -79,15 +79,9 @@ module Aws
           # The method returns aggregate filter include module's own filters
           # concatenated with all ancestor's filters.
           def context
-            @context ||= _contextualized_ancestors.inject(Filter::Identity.new) do |acc, mod|
+            @context ||= ancestors_with(Contextualized).inject(Filter::Identity.new) do |acc, mod|
               acc & mod.module_context
             end
-          end
-
-          def _contextualized_ancestors
-            ancestors
-              .select { |mod| (mod != Contextualized) && mod.ancestors.include?(Contextualized) }
-              .reverse
           end
 
           ##

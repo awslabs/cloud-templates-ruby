@@ -51,6 +51,7 @@ module Aws
       include Templates::Utils::Default
       include Templates::Utils::Parametrized
       include Templates::Utils::Dependent
+      include Templates::Help::Dsl
 
       attr_accessor :options
 

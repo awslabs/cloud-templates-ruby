@@ -25,80 +25,21 @@ module Aws
       #
       # View class itself is an abstract class which can't be instantiated
       # directly.
-      class BasicView
-        ##
-        # Render accessor
-        #
-        # Returns either render of this view class or render of any ancestor.
-        def self.render
-          @render || superclass.render
+      class BasicView < Templates::Processor::Handler
+        class << self
+          alias artifact for_entity
         end
 
-        ##
-        # Register the view class in a render
-        #
-        # Registers the view class in the render
-        # * +r+ - render registrar
-        def self.register_in(r)
-          @render = r
-          self
-        end
-
-        ##
-        # Link the view class to the artifact class
-        #
-        # Registers the link in the render object of the view class.
-        def self.artifact(artifact_class)
-          render.register(artifact_class, self)
-          self
-        end
-
-        ##
-        # Artifact instance view object is attached to
-        attr_reader :instance
-
-        ##
-        # Assigned view parameters
-        attr_reader :parameters
-
-        ##
-        # Execute in the instance context
-        #
-        # Executed passed block in the context of the instance being rendered. It helps against
-        # putting too much instance method accesses in long blocks. Returns the value returned by
-        # the block.
-        def in_instance(*args, &blk)
-          instance.instance_exec(*args, &blk)
-        end
-
-        ##
-        # Create view instance and link it to the artifact instance
-        def initialize(obj, params = nil)
-          @instance = obj
-          @parameters = params
-        end
-
-        ##
-        # Alias for class method render
-        def render
-          self.class.render
-        end
-
-        ##
-        # Render the object
-        #
-        # Renders passed object with the view default render
-        def rendered_for(obj, parameters_override = nil)
-          render.view_for(obj, parameters_override.nil? ? parameters : parameters_override)
-                .to_rendered
-        end
+        alias instance context
+        alias in_instance in_context
+        alias rendered_for processed_for
 
         ##
         # Render the instance of the artifact
         #
         # The method should be overriden and return rendered form of the attached instance
         def to_rendered
-          raise Exception::NotImplementedError.new('The method should be overriden')
+          raise Templates::Exception::NotImplementedError.new('The method should be overriden')
         end
       end
     end

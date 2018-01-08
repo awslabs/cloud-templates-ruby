@@ -20,6 +20,7 @@ module Aws
         using Utils::Dependency::Refinements
 
         include Utils::Memoized
+        include Templates::Exception
 
         ##
         # Get a parameter from resulting hash or any nested part of it
@@ -83,6 +84,7 @@ module Aws
             select_recursively { |obj| obj.dependency? }
               .inject(::Set.new) { |acc, elem| acc.merge(elem.dependencies) }
           end
+          # rubocop:enable Style/SymbolProc
         end
 
         def select_recursively(&blk)
@@ -217,7 +219,7 @@ module Aws
             elsif Utils.hashable?(container)
               container.to_hash
             else
-              raise Exception::OptionShouldBeRecursive.new(container)
+              raise Templates::Exception::OptionShouldBeRecursive.new(container)
             end
           end
         end
@@ -284,3 +286,5 @@ module Aws
     end
   end
 end
+
+# rubocop:enable Metrics/ClassLength

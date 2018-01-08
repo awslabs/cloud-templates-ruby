@@ -51,7 +51,7 @@ describe Aws::Templates::Utils::Parametrized do
     end
   end
 
-  context 'Class is inherited and the module is included' do
+  context 'when class is inherited and the module is included' do
     let(:parametrized_class) do
       INCLUDING_MODULE = including_module
 
@@ -71,7 +71,7 @@ describe Aws::Templates::Utils::Parametrized do
     end
   end
 
-  context 'Class is inherited and extended with parameters' do
+  context 'when class is inherited and extended with parameters' do
     let(:parametrized_class) do
       Class.new(including_class) do
         parameter :all_properties_parameter,
@@ -99,7 +99,7 @@ describe Aws::Templates::Utils::Parametrized do
       end
     end
 
-    context 'Instance of the class created' do
+    context 'when instance of the class created' do
       let(:create_parameters) {}
 
       let(:instance) do
@@ -145,7 +145,7 @@ describe Aws::Templates::Utils::Parametrized do
       end
     end
 
-    context 'Class is inherited and a parameter added' do
+    context 'when class is inherited and a parameter added' do
       let(:extending_class) do
         Class.new(parametrized_class) do
           parameter :just_addition,
@@ -164,7 +164,7 @@ describe Aws::Templates::Utils::Parametrized do
         end
       end
 
-      context 'Instance of the class created' do
+      context 'when instance of the class created' do
         let(:create_parameters) do
           {
             all_properties_option: 2,
@@ -188,7 +188,7 @@ describe Aws::Templates::Utils::Parametrized do
         end
       end
 
-      context 'Class inherited and parameter mixin added' do
+      context 'when class inherited and parameter mixin added' do
         let(:mixing_class) do
           k = Class.new(extending_class)
           k.send(:include, including_module)
@@ -224,7 +224,7 @@ describe Aws::Templates::Utils::Parametrized do
       end.to raise_error Aws::Templates::Exception::ParameterAlreadyExist
     end
 
-    context 'method is defined' do
+    context 'with method' do
       let(:failing_class) do
         Class.new(parametrized_class) do
           def a; end

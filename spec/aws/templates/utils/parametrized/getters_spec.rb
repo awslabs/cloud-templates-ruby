@@ -77,7 +77,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
       hash
     end
 
-    context 'static path is specified' do
+    context 'with static path' do
       let(:getter) { Getters.path(:object, :something) }
 
       it 'returns value correctly' do
@@ -85,7 +85,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
       end
     end
 
-    context 'dynamic path is specified' do
+    context 'with dynamic path' do
       let(:getter) { Getters.path { %i[object something] } }
 
       it 'returns value correctly' do
@@ -97,7 +97,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
   describe 'value' do
     let(:options_hash) { { something: 3 } }
 
-    context 'static value is specified' do
+    context 'with static value' do
       let(:getter) { Getters.value(1) }
 
       it 'returns value correctly' do
@@ -105,7 +105,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
       end
     end
 
-    context 'dynamic calculation is specified' do
+    context 'with dynamic calculation' do
       let(:getter) { Getters.value { options[:something] + 2 } }
 
       it 'returns value correctly' do
@@ -119,7 +119,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
       Getters.one_of(->(p) { options[p.name] }, ->(_) { options[:default] })
     end
 
-    context 'first option value is specified' do
+    context 'with first option value' do
       let(:options_hash) { { something: 'a' } }
 
       it 'returns the value' do
@@ -127,7 +127,7 @@ describe Aws::Templates::Utils::Parametrized::Getter do
       end
     end
 
-    context 'another options value is specified' do
+    context 'with another options value' do
       let(:options_hash) { { default: 'a' } }
 
       it 'returns the value' do

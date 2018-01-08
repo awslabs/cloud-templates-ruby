@@ -50,7 +50,7 @@ module Aws
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
           def check_wrapper(parameter, value, instance)
-            check(parameter, value, instance) if pre_condition(value, instance)
+            check(parameter, value, instance) if pre_condition.check(value, instance)
           rescue StandardError
             raise Templates::Exception::ParameterValueInvalid.new(parameter, instance, value)
           end
@@ -62,14 +62,20 @@ module Aws
           # if pre-condition is not met. Default condition is that value should be not nil meaning
           # that if the value is nil then the constraint will be ignored.
           def if(*params, &blk)
-            @pre_condition = if params.empty?
-              blk
-            else
-              test = params.first
-              test.respond_to?(:to_proc) ? test : ->(v) { v == test }
-            end
+            @pre_condition = Condition.for(
+              if params.empty?
+                raise 'Block must be specified' unless block_given?
+                blk
+              else
+                params.first
+              end
+            )
 
             self
+          end
+
+          def pre_condition
+            @pre_condition ||= Condition.not_nil
           end
 
           protected
@@ -82,11 +88,6 @@ module Aws
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
           def check(parameter, value, instance); end
-
-          def pre_condition(value, instance)
-            return !value.nil? if @pre_condition.nil?
-            instance.instance_exec(value, &@pre_condition)
-          end
         end
       end
     end

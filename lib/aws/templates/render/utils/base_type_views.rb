@@ -37,7 +37,7 @@ module Aws
             def to_rendered
               instance
                 .to_a
-                .map { |element| render.view_for(element, parameters).to_rendered }
+                .map { |element| processed_for(element) }
             end
           end
 
@@ -47,7 +47,7 @@ module Aws
           # Converts value to hash and iteratively renders each key and value in it.
           class ToHash < Render::BasicView
             def to_rendered
-              _from(instance).map { |k, v| [_to_rendered(k), _to_rendered(v)] }.to_h
+              _from(instance).map { |k, v| [processed_for(k), processed_for(v)] }.to_h
             end
 
             private
@@ -58,10 +58,6 @@ module Aws
               else
                 instance.to_hash
               end
-            end
-
-            def _to_rendered(obj)
-              render.view_for(obj, parameters).to_rendered
             end
           end
 

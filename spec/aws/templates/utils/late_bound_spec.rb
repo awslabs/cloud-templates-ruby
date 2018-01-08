@@ -21,7 +21,7 @@ describe Aws::Templates::Utils::LateBound do
   end
 
   describe 'behavior' do
-    context 'class' do
+    describe 'class' do
       let(:reference) { including_class.reference(%i[a b c], explosive: true) }
 
       let(:evaluated) { instance.instance_exec(&reference) }
@@ -40,7 +40,7 @@ describe Aws::Templates::Utils::LateBound do
       end
     end
 
-    context 'instance' do
+    describe 'instance' do
       let(:reference) { instance.reference(%i[a b c], explosive: true) }
 
       it 'is evaluated into normal reference' do

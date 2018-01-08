@@ -56,7 +56,7 @@ describe Aws::Templates::Composite do
     instance.artifacts.each_with_object({}) { |(k, v), memo| memo[k] = v.params.to_hash }
   end
 
-  context 'a parameter is overriden' do
+  context 'when a parameter is overriden' do
     let(:instance) { composite_class.new(parameters) }
 
     let(:result) do
@@ -314,7 +314,7 @@ describe Aws::Templates::Composite do
       }
     end
 
-    context 'using constructor block' do
+    context 'when using constructor block' do
       let(:instance) do
         composite_class.new(parameters) do
           artifact(
@@ -328,7 +328,7 @@ describe Aws::Templates::Composite do
       it_behaves_like 'an artifact storage'
     end
 
-    context 'using instance components method' do
+    context 'when using instance components method' do
       let(:instance) do
         composite_class.new(parameters).components do
           artifact(
@@ -342,7 +342,7 @@ describe Aws::Templates::Composite do
       it_behaves_like 'an artifact storage'
     end
 
-    context 'using subclass' do
+    context 'when using subclass' do
       let(:subclass) do
         Class.new(composite_class) do
           components do

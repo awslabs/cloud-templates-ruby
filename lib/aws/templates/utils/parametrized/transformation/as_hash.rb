@@ -34,6 +34,9 @@ module Aws
           class AsHash < self
             include Parametrized::ClassScope
 
+            attr_reader :key_parameter
+            attr_reader :value_parameter
+
             def key(opts)
               @key_parameter = _create_parameter(opts)
             end

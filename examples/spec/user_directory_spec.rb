@@ -564,3 +564,4 @@ describe UserDirectory do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

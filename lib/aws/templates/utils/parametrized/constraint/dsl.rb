@@ -19,7 +19,7 @@ module Aws
               #
               # Any constraint with this precondition will process any value
               def any
-                ->(_) { true }
+                Constraint::Condition.any
               end
 
               ##

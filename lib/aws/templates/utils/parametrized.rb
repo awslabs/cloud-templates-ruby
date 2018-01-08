@@ -11,7 +11,7 @@ module Aws
       # value extraction, constraints checking and transformation. Essentially,
       # it's domain-specific extended implementation of attr_reader.
       module Parametrized
-        include Guarded
+        include Utils::Guarded
         include Utils::Dependent
         include Utils::Inheritable
         include Utils::Inspectable
@@ -173,6 +173,10 @@ module Aws
         end
 
         instance_scope do
+          def guarded_get(instance, parameter_object)
+            guarded_for(instance, parameter_object) { parameter_object.get(self) }
+          end
+
           ##
           # Lazy initializer
           def dependencies
@@ -228,11 +232,9 @@ module Aws
           # The list includes both the class parameters and all ancestor
           # parameters.
           def list_all_parameter_names
-            ancestors
-              .select { |mod| mod.include?(Parametrized) }
-              .inject(::Set.new) do |parameter_collection, mod|
-                parameter_collection.merge(mod.parameters.keys)
-              end
+            ancestors_with(Parametrized).inject(::Set.new) do |parameter_collection, mod|
+              parameter_collection.merge(mod.parameters.keys)
+            end
           end
 
           ##
@@ -251,10 +253,8 @@ module Aws
           # inheritance hierarchy.
           # * +parameter_alias+ - parameter name
           def get_parameter(parameter_alias)
-            ancestor =
-              ancestors
-              .select { |mod| mod.include?(Parametrized) }
-              .find { |mod| mod.parameters.key?(parameter_alias) }
+            ancestor = ancestors_with(Parametrized)
+                       .find { |mod| mod.parameters.key?(parameter_alias) }
 
             ancestor.parameters[parameter_alias] if ancestor
           end

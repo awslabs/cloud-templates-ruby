@@ -36,10 +36,9 @@ module Aws
             protected
 
             def get(parameter, instance)
-              getters.inject(nil) do |value, g|
-                value = instance.instance_exec(parameter, &g)
-                break value unless value.nil?
-              end
+              getters.lazy
+                     .map { |g| instance.instance_exec(parameter, &g) }
+                     .find { |v| !v.nil? }
             end
           end
         end

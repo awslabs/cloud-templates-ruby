@@ -27,31 +27,36 @@ module Aws
     #      extend Aws::Templates::Render
     #    end
     module Render
+      include Templates::Processor
+
       ##
-      # Registry accessor
+      # Can object be rendered
       #
-      # All views and corresponding artifacts in a render are stored
-      # in a registry.
-      def registry
-        @registry ||= Registry.new
+      # Returns true if the object passed can be rendered by one of the views in the registry
+      def can_render?(instance)
+        instance.class.ancestors.any? { |ancestor| handler?(ancestor) }
       end
 
       ##
-      # Proxy for Registry register method
-      def register(*args)
-        registry.register(*args)
+      # Lookup a view for the artifact
+      #
+      # Searches registry for artifact's class and all its ancestors
+      # in the registry and returns the closest matching view
+      # * +instance+ - artifact instance to render
+      # * +params+ - assigned parameters; it can be arbitrary value;
+      #              it is propagated to selected render
+      def view_for(instance, params = nil)
+        return instance if instance.respond_to?(:to_rendered)
+
+        ancestor = instance.class.ancestors.find { |mod| handler?(mod) }
+
+        raise Templates::Exception::ViewNotFound.new(instance) unless ancestor
+
+        handler_for(ancestor).new(instance, params)
       end
 
-      ##
-      # Proxy for Registry can_render? method
-      def can_render?(*args)
-        registry.can_render?(*args)
-      end
-
-      ##
-      # Proxy for Registry view_for method
-      def view_for(*args)
-        registry.view_for(*args)
+      def process(entity, params = nil)
+        view_for(entity, params).to_rendered
       end
 
       ##
@@ -59,12 +64,11 @@ module Aws
       #
       # Another way to define views for artifacts. Creates anonymous class and attaches as the view
       # to the specified artifact
-      def define_view(artifact_class, view = nil, &blk)
-        Class
-          .new(view || Aws::Templates::Render::BasicView, &blk)
-          .register_in(self)
-          .artifact(artifact_class)
+      def define_handler(artifact_class, view = nil, &blk)
+        super(artifact_class, view || BasicView, &blk)
       end
+
+      alias define_view define_handler
     end
   end
 end

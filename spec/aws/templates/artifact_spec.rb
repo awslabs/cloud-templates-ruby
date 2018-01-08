@@ -25,7 +25,7 @@ describe Aws::Templates::Artifact do
     Struct.new(:root)
   end
 
-  context 'featuring class is created' do
+  context 'when featuring class is created' do
     let(:featuring_class) { artifact_class.featuring(TestTest::A, TestTest::B) }
 
     it 'returns correct class name' do
@@ -33,7 +33,7 @@ describe Aws::Templates::Artifact do
     end
   end
 
-  context 'instance created' do
+  context 'when instance created' do
     let(:params) do
       {
         c: 'qwe',
@@ -48,13 +48,13 @@ describe Aws::Templates::Artifact do
 
     let(:instance) { artifact_class.new(params) }
 
-    context 'label is not specified' do
+    context 'without label' do
       it 'contains auto-generated label' do
         expect(instance.label).not_to be_nil
       end
     end
 
-    context 'root is not specified' do
+    context 'without root' do
       it 'root is not empty' do
         expect(instance.root).not_to be_nil
       end
@@ -62,13 +62,13 @@ describe Aws::Templates::Artifact do
         expect(instance.dependencies).to be_empty
       end
     end
-    context 'label is specified' do
+    context 'with label' do
       before { params[:label] = 'b' }
       it 'contains passed label' do
         expect(instance.label).to be == 'b'
       end
     end
-    context 'root is specified' do
+    context 'with root' do
       before { params[:root] = 1 }
       it 'contains one dependency' do
         expect(instance.dependencies).to be == [just_object.new(1)].to_set
@@ -77,13 +77,13 @@ describe Aws::Templates::Artifact do
         expect(instance.root).to be == 1
       end
     end
-    context 'different root is specified' do
+    context 'with different root' do
       before { params[:root] = 2 }
       it 'contains one dependency' do
         expect(instance.dependencies).to be == [just_object.new(2)].to_set
       end
     end
-    context 'no overrides specified' do
+    context 'without overrides' do
       before { params.merge!(root: 3, label: 'thing') }
 
       let(:expected) do
@@ -106,7 +106,7 @@ describe Aws::Templates::Artifact do
         expect(instance.options.to_hash).to be == expected
       end
     end
-    context 'override is present in input hash' do
+    context 'with override' do
       before { params.merge!(root: 3, label: 'thing', a: 'rty') }
 
       let(:expected) do
@@ -131,7 +131,7 @@ describe Aws::Templates::Artifact do
     end
   end
 
-  context 'instance of child class created' do
+  context 'when instance of child class created' do
     let(:child_class) do
       Class.new(artifact_class) do
         default a: deleted,

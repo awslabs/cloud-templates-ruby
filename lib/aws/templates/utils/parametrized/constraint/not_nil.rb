@@ -22,7 +22,7 @@ module Aws
           #    i.param1 # throws ParameterValueInvalid
           class NotNil < self
             def initialize
-              self.if(nil)
+              self.if(Constraint::Condition.any)
             end
 
             protected

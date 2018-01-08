@@ -29,7 +29,7 @@ describe Aws::Templates::Runner do
     described_class.with(argv, io)
   end
 
-  context 'label and root options are specified through CLI parameter' do
+  context 'when label and root options are specified through CLI parameter' do
     before do
       parameters['--options='] = { label: 1, root: 2 }.to_json
     end
@@ -39,7 +39,7 @@ describe Aws::Templates::Runner do
     end
   end
 
-  context 'label and root options are specified through STDIN' do
+  context 'when label and root options are specified through STDIN' do
     let(:io) { { label: 1, root: 2 }.to_json }
 
     it 'returns empty output' do

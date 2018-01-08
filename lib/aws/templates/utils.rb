@@ -1,6 +1,16 @@
 require 'aws/templates/utils/autoload'
 require 'facets/string/modulize'
 
+##
+# Utility methods for Module class
+class Module
+  ##
+  # Get all ancestors which have "base" module as one of its' own ancestors
+  def ancestors_with(base)
+    ancestors.reverse_each.select { |mod| mod < base }
+  end
+end
+
 module Aws
   module Templates
     ##
@@ -8,6 +18,8 @@ module Aws
     #
     # Defines auxiliary functions set and serves as the namespace for the framework modules.
     module Utils
+      include Templates::Exception
+
       RECURSIVE_METHODS = %i[keys [] include?].freeze
 
       ##
@@ -90,19 +102,24 @@ module Aws
       ##
       # Recursively merge two "recursive" objects
       # PS: Yes I know that there is "merge" method for *hashes*.
-      def self.merge(a, b)
-        return hashify(b) unless Utils.recursive?(a) && Utils.recursive?(b)
-        _merge_back(_merge_forward(a, b), b)
+      def self.merge(a, b, &blk)
+        unless Utils.recursive?(a) && Utils.recursive?(b)
+          return hashify(blk.nil? ? b : blk.call(a, b))
+        end
+
+        _merge_back(_merge_forward(a, b, blk), b)
       end
 
-      def self._merge_forward(a, b)
+      def self._merge_forward(a, b, blk)
         a.keys.each_with_object({}) do |k, hsh|
-          hsh[k] = b[k].nil? ? hashify(a[k]) : merge(a[k], b[k])
+          hsh[k] = b[k].nil? ? hashify(a[k]) : merge(a[k], b[k], &blk)
         end
       end
 
       def self._merge_back(result, b)
-        b.keys.reject { |k| result.include?(k) }.each_with_object(result) { |k, res| res[k] = b[k] }
+        b.keys
+         .reject { |k| result.include?(k) }
+         .each_with_object(result) { |k, res| res[k] = hashify(b[k]) }
       end
 
       def self.hashify(v)

@@ -29,7 +29,6 @@ module Aws
           #    i.param1 # => 2
           class Requires < self
             attr_reader :dependencies
-            attr_reader :condition
 
             def initialize(dependencies)
               @dependencies = dependencies

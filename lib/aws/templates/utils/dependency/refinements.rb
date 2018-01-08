@@ -11,14 +11,14 @@ module Aws
         # arbitrary objects and object collections. This refinement introduces methods used
         # for dependency processing.
         module Refinements
+          EMPTY_SET = ::Set.new.freeze
+
           ##
           # Dependency method stubs
           #
           # To avoid checking classes directly to filter out dependencies and non-dependencies,
           # we're monkey-patching Object class with stubs for Dependency class.
           refine ::Object do
-            EMPTY_SET = ::Set.new.freeze
-
             # By default an object is not a dependency
             def dependency?
               false
@@ -71,6 +71,7 @@ module Enumerable
     # Refinements don't support dynamic dispatch yet. So, symbolic methods don't work
     find_all { |obj| obj.dependency? }
       .inject(::Set.new) { |acc, elem| acc.merge(elem.dependencies) }
+    # rubocop:enable Style/SymbolProc
   end
 
   def dependency?
