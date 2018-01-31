@@ -35,11 +35,18 @@ module Aws
                 )
               end
 
-              @filters = flts
+              @filters = flts.flat_map { |f| _as_flattened_filters(f) }
             end
 
             def filter(options, memo, instance)
               filters.inject(memo) { |acc, elem| instance.instance_exec(options, acc, &elem) }
+            end
+
+            private
+
+            def _as_flattened_filters(flt)
+              return flt unless flt.is_a?(self.class)
+              flt.filters.flat_map { |obj| _as_flattened_filters(obj) }
             end
           end
         end
