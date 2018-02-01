@@ -22,6 +22,10 @@ module Aws
         include Utils::Memoized
         include Templates::Exception
 
+        def structures
+          @structures ||= []
+        end
+
         ##
         # Get a parameter from resulting hash or any nested part of it
         #
@@ -52,7 +56,7 @@ module Aws
         #    # multi-level wildcard match
         #    opts['a', 'z', 'r'] # => 2
         def [](*path)
-          @structures.reverse_each.inject(nil) do |memo, container|
+          structures.reverse_each.inject(nil) do |memo, container|
             ret = begin
               Utils.lookup(container, path.dup)
             rescue Exception::OptionValueDeleted, Exception::OptionScalarOnTheWay
@@ -117,7 +121,7 @@ module Aws
           value = path_and_value.pop
           path = path_and_value
           dirty!.cow! # mooo
-          Utils.set_recursively(@structures.last, value, path)
+          Utils.set_recursively(structures.last, value, path)
         end
 
         ##
@@ -137,7 +141,7 @@ module Aws
         # recursively.
         def to_hash
           memoize(:to_hash) do
-            _process_hashed(@structures.inject({}) { |acc, elem| Utils.merge(acc, elem) })
+            _process_hashed(structures.inject({}) { |acc, elem| Utils.merge(acc, elem) })
           end
         end
 
@@ -160,7 +164,7 @@ module Aws
         # Produces a list of top-level keys from all layers. Deleted branches are not included.
         def keys
           memoize(:keys) do
-            @structures
+            structures
               .each_with_object(::Set.new) do |container, keyset|
                 container.keys.each do |k|
                   container[k] == Utils::DELETED_MARKER ? keyset.delete(k) : keyset.add(k)
@@ -175,7 +179,7 @@ module Aws
         #
         # Checks if top-level key exists. Deleted branches are excluded.
         def include?(k)
-          found = @structures.reverse_each.find { |container| container.include?(k) }
+          found = structures.reverse_each.find { |container| container.include?(k) }
           !found.nil? && (found[k] != Utils::DELETED_MARKER)
         end
 
@@ -186,7 +190,7 @@ module Aws
         # The object must be "recusrsive" meaning it should satisfy minimum contract for
         # "recursive". See Utils::recursive? for details
         def merge(other)
-          self.class.new(*@structures, other)
+          self.class.new(*structures, other)
         end
 
         ##
@@ -197,7 +201,13 @@ module Aws
         # "recursive". See Utils::recursive? for details
         def merge!(other)
           raise Exception::OptionShouldBeRecursive.new(other) unless Utils.recursive?(other)
-          @structures << other
+
+          if other.is_a?(self.class)
+            structures.concat(other.structures)
+          else
+            structures << other
+          end
+
           dirty!
         end
 
@@ -213,15 +223,7 @@ module Aws
         ##
         # Initialize Options with list of recursive structures (See Options#recursive?)
         def initialize(*structures)
-          @structures = structures.reject(&:nil?).map do |container|
-            if Utils.recursive?(container)
-              container
-            elsif Utils.hashable?(container)
-              container.to_hash
-            else
-              raise Templates::Exception::OptionShouldBeRecursive.new(container)
-            end
-          end
+          structures.reject(&:nil?).each { |container| merge!(container) }
         end
 
         ##
@@ -230,7 +232,7 @@ module Aws
         # Duplicates the object itself and puts another layer of hash map. All original hash maps
         # are not touched if the duplicate is modified.
         def dup
-          Options.new(*@structures)
+          Options.new(*structures)
         end
 
         ##
@@ -255,13 +257,19 @@ module Aws
         # stack of the Options instance effectively making it the least prioritized layer.
         def unshift_layer!(layer)
           raise Exception::OptionShouldBeRecursive.new(layer) unless Utils.recursive?(layer)
-          @structures.unshift(layer)
+
+          if layer.is_a?(self.class)
+            layer.structures.dup.concat(structures)
+          else
+            structures.unshift(layer)
+          end
+
           dirty!
         end
 
         def cow!
           unless @is_cowed
-            @structures << {}
+            structures << {}
             @is_cowed = true
           end
 
