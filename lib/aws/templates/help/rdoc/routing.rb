@@ -67,6 +67,8 @@ module Aws
                    Rdoc.lazy::Parametrized::Transformations::AsHash
           register Templates.lazy::Utils::Parametrized::Transformation::AsInteger,
                    Rdoc.lazy::Parametrized::Transformations::AsInteger
+          register Templates.lazy::Utils::Parametrized::Transformation::AsFloat,
+                   Rdoc.lazy::Parametrized::Transformations::AsFloat
           register Templates.lazy::Utils::Parametrized::Transformation::AsList,
                    Rdoc.lazy::Parametrized::Transformations::AsList
           register Templates.lazy::Utils::Parametrized::Transformation::AsModule,

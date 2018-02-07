@@ -55,6 +55,14 @@ module Aws
               end
 
               ##
+              # Convert input into float
+              #
+              # alias for AsFloat class
+              def as_float
+                Parametrized::Transformation::AsFloat.instance
+              end
+
+              ##
               # Convert input into string
               #
               # alias for AsString class

@@ -159,6 +159,29 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     end
   end
 
+  describe 'as_float' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_float
+      end
+    end
+
+    it 'transforms string into float correctly' do
+      i = test_class.new(something: '23.0')
+      expect(i.something).to be == 23.0
+    end
+
+    it 'allows nil value' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+
+    it 'fails on wrong value' do
+      i = test_class.new(something: [])
+      expect { i.something }.to raise_error Aws::Templates::Exception::NestedParameterException
+    end
+  end
+
   describe 'as_string' do
     let(:test_class) do
       Class.new(parametrized_class) do
