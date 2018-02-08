@@ -1,10 +1,37 @@
 # Hierarchical data templates
+[![Gem Version](https://badge.fury.io/rb/cloud-templates.svg)](https://badge.fury.io/rb/cloud-templates)
 
-> MVC-based templating framework for hierarchical data structures
+> Template your world because everything is code.
 
-The purpose of the framework is to bring templating capabilities to
-the areas where traditional approach for auto-generation
-(ERB can be an example) is problematic to apply.
+The framework is an MVC-based templating engine for hierarchical data structures.
+It promotes a logical extension to Infrastructure-as-a-code paradigm.
+
+## Why?
+The template project was created as a reaction to the trends in Infrastructure-as-a-code community
+which we were not necessarily agree with. Namely, one of the trends which is still visible is
+merging together infrastructure orchestration engine with extremely specialized DSL-based
+templating system (Puppet, Chef). What becomes problematic is when you want to use both separately
+mixing-n-matching programming languages and technologies of your choice for either orchestration
+engine or templating system. Also, it's not straightforward to use the same templating system for
+generating different config files which are relevant to the infrastructure you are creating
+(endpoint configs, loadbalancing parameters, etc)
+
+## Tenets
+The project has the following tenets:
+* OOP everywhere: encapsulation, inheritance, polymorphism. The paradigm has proven being viable
+  over years of software development (think Eclipse) so let's re-use it for our solution.
+* Native-language objects.
+* Multi-language support. Programming language X will always be a new Perl in 5 years time.
+* Developer experience and productivity is paramount.
+* People is bad in writing code and documentation. Let's make the framework self-documenting and
+  self-explanatory.
+* Let's choose the scope abstract enough so we can adopt the framework to maximum number of use
+  cases where linking two values is necessary.
+* Let's choose the scope concrete enough to start optimizing against it.
+
+## How?
+The purpose of the framework is to bring templating capabilities to the areas where traditional
+approach for auto-generation (ERB can be an example) is problematic to apply.
 
 Text-based templating frameworks work well when the resulting output has
 moderate number of parameter-driven parts. For example, HTML output
