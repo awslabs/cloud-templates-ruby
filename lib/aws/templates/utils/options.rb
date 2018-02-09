@@ -131,7 +131,7 @@ module Aws
         # with special marker that it was deleted. It helps avoid hash recalculation leading to
         # memory thrashing simultaneously maintaining semantics close to Hash#delete
         def delete(*path)
-          self[*path] = Utils::DELETED_MARKER
+          self[*path] = Utils::DeletedMarker
         end
 
         ##
@@ -167,7 +167,7 @@ module Aws
             structures
               .each_with_object(::Set.new) do |container, keyset|
                 container.keys.each do |k|
-                  container[k] == Utils::DELETED_MARKER ? keyset.delete(k) : keyset.add(k)
+                  container[k].equal?(Utils::DeletedMarker) ? keyset.delete(k) : keyset.add(k)
                 end
               end
               .to_a
@@ -180,7 +180,7 @@ module Aws
         # Checks if top-level key exists. Deleted branches are excluded.
         def include?(k)
           found = structures.reverse_each.find { |container| container.include?(k) }
-          !found.nil? && (found[k] != Utils::DELETED_MARKER)
+          !found.nil? && (found[k] != Utils::DeletedMarker)
         end
 
         ##
@@ -281,7 +281,7 @@ module Aws
         # :nodoc: process hashable recursively removing all keys marked as deleted
         def _process_hashed(hashed)
           hashed.each_pair do |key, value|
-            if value == Utils::DELETED_MARKER
+            if value.equal?(Utils::DeletedMarker)
               hashed.delete(key)
             elsif Utils.hashable?(value)
               _process_hashed(value.to_hash).freeze

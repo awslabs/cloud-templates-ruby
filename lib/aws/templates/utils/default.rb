@@ -333,7 +333,7 @@ module Aws
           ##
           # To mark hash branch as deleted
           def deleted
-            Aws::Templates::Utils::DELETED_MARKER
+            Aws::Templates::Utils::DeletedMarker
           end
 
           ##

@@ -134,7 +134,8 @@ module Aws
       # initialization immutable) and iterates through all of them during value look-up, we need
       # a way of marking some branch as deleted when deletion operation is invoked on an Options
       # object. So, the algorithm marks branch with the object to stop iteration during look-up.
-      DELETED_MARKER = Object.new
+      module DeletedMarker
+      end
 
       ##
       # Get a parameter from resulting hash or any nested part of it
@@ -169,7 +170,7 @@ module Aws
         # we stop lookup and return nil if nil is encountered
         return if value.nil?
         # value was deleted in this layer
-        raise Exception::OptionValueDeleted.new(path) if value == DELETED_MARKER
+        raise Exception::OptionValueDeleted.new(path) if value.equal?(DeletedMarker)
         # we reached our target! returning it
         return value if path.nil? || path.empty?
         # we still have some part of path to traverse but scalar was found
