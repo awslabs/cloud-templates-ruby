@@ -47,6 +47,14 @@ module Aws
               end
 
               ##
+              # Parse the value
+              #
+              # alias for AsParsed class
+              def as_parsed(parser, params = nil, &params_block)
+                Parametrized::Transformation::AsParsed.new(parser, params || params_block)
+              end
+
+              ##
               # Convert input into integer
               #
               # alias for AsInteger class

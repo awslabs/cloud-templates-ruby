@@ -77,6 +77,8 @@ module Aws
                    Rdoc.lazy::Parametrized::Transformations::AsObject
           register Templates.lazy::Utils::Parametrized::Transformation::AsRendered,
                    Rdoc.lazy::Parametrized::Transformations::AsRendered
+          register Templates.lazy::Utils::Parametrized::Transformation::AsParsed,
+                   Rdoc.lazy::Parametrized::Transformations::AsParsed
           register Templates.lazy::Utils::Parametrized::Transformation::AsString,
                    Rdoc.lazy::Parametrized::Transformations::AsString
 

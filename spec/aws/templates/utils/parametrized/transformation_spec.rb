@@ -1,6 +1,9 @@
 require 'spec_helper'
 require 'aws/templates/utils/parametrized'
 require 'aws/templates/render'
+require 'polyglot'
+require 'treetop'
+require 'test_grammar'
 
 module TestRender
   extend Aws::Templates::Render
@@ -133,6 +136,31 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'allows nil value' do
       i = test_class.new({})
       expect(i.something).to be_nil
+    end
+  end
+
+  describe 'as_parsed' do
+    let(:parser) { TestGrammarParser }
+
+    let(:test_class) do
+      klass = Class.new(parametrized_class)
+      klass.parameter :something, transform: klass.as_parsed(parser)
+      klass
+    end
+
+    it 'parses expression' do
+      i = test_class.new(something: '1 + 1')
+      expect(i.something.value).to be == 2
+    end
+
+    it 'does not parse nil' do
+      i = test_class.new({})
+      expect(i.something).to be_nil
+    end
+
+    it 'throws exception on syntax error' do
+      i = test_class.new(something: '1a')
+      expect { i.something }.to raise_error(/Expected one of/)
     end
   end
 

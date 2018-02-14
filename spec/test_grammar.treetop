@@ -1,0 +1,17 @@
+grammar TestGrammar
+  rule additive
+    a:value ' '* '+' ' '* b:value {
+      def value
+        a.value + b.value
+      end
+    }
+  end
+
+  rule value
+    v:[0-9]+ {
+      def value
+        v.text_value.to_f
+      end
+    }
+  end
+end
