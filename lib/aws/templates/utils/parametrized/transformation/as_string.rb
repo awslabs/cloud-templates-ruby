@@ -24,12 +24,14 @@ module Aws
           #    i.param # => '23'
           class AsString < self
             include ::Singleton
+            using Utils::Dependency::Refinements
 
             protected
 
             def transform(_, value, _)
               return if value.nil?
-              String(value)
+              result = String(value)
+              value.dependencies.empty? ? result : result.as_a_dependency.to(value)
             end
           end
         end
