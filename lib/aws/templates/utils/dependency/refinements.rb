@@ -18,7 +18,7 @@ module Aws
           #
           # To avoid checking classes directly to filter out dependencies and non-dependencies,
           # we're monkey-patching Object class with stubs for Dependency class.
-          refine ::Object do
+          refine ::BasicObject do
             # By default an object is not a dependency
             def dependency?
               false
