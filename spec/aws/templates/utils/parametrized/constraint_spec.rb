@@ -170,4 +170,39 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         .to raise_error Aws::Templates::Exception::ParameterValueInvalid
     end
   end
+
+  describe 'module?' do
+    context 'without base' do
+      let(:constraint) { Constraints.module? }
+
+      it 'ignores when nil' do
+        expect(test_class.new({}).something).to be_nil
+      end
+
+      it 'succeeds when a Module is passed' do
+        expect(test_class.new(something: ::Object).something).to be == ::Object
+      end
+
+      it 'fails when arbitrary object is passed' do
+        expect { test_class.new(something: 'Object').something }.to raise_error(/Object.*is not/)
+      end
+    end
+
+    context 'with base' do
+      let(:constraint) { Constraints.module?(::Object) }
+
+      it 'ignores when nil' do
+        expect(test_class.new({}).something).to be_nil
+      end
+
+      it 'succeeds when a correct Module is passed' do
+        expect(test_class.new(something: ::String).something).to be == ::String
+      end
+
+      it 'fails when arbitrary Module is passed' do
+        expect { test_class.new(something: ::BasicObject).something }
+          .to raise_error(/BasicObject is not a child of Object/)
+      end
+    end
+  end
 end

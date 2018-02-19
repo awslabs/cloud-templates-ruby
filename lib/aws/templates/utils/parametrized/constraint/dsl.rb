@@ -77,6 +77,14 @@ module Aws
               def matches(rex)
                 Parametrized::Constraint::Matches.new(rex)
               end
+
+              ##
+              # Value should match the regular experession
+              #
+              # alias for Matches
+              def module?(base = nil)
+                Parametrized::Constraint::IsModule.with(base)
+              end
             end
           end
         end

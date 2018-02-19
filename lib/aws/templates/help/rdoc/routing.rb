@@ -46,6 +46,10 @@ module Aws
                    Rdoc.lazy::Parametrized::Constraints::Requires
           register Templates.lazy::Utils::Parametrized::Constraint::SatisfiesCondition,
                    Rdoc.lazy::Parametrized::Constraints::SatisfiesCondition
+          register Templates.lazy::Utils::Parametrized::Constraint::IsModule::Baseless,
+                   Rdoc.lazy::Parametrized::Constraints::IsModule::Baseless
+          register Templates.lazy::Utils::Parametrized::Constraint::IsModule::Based,
+                   Rdoc.lazy::Parametrized::Constraints::IsModule::Based
 
           register Templates.lazy::Utils::Parametrized::Constraint::Condition,
                    Rdoc.lazy::Parametrized::Constraints::Condition
