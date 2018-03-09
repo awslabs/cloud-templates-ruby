@@ -253,8 +253,8 @@ module Aws
             true
           end
 
-          def dependencies
-            to_hash.dependencies
+          def links
+            to_hash.links
           end
 
           ##

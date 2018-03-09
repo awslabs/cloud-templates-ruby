@@ -90,16 +90,14 @@ describe Aws::Templates::Composite do
           rocket: 'serenity',
           spaceship: 'martyr',
           erased: 'forever',
-          w: Aws::Templates::Utils::Dependency.new(
-            A.new(
-              label: 'z',
-              rocket: 'serenity',
-              spaceship: 'martyr',
-              erased: 'forever',
-              root: instance,
-              parent: instance
-            )
-          ),
+          w: A.new(
+            label: 'z',
+            rocket: 'serenity',
+            spaceship: 'martyr',
+            erased: 'forever',
+            root: instance,
+            parent: instance
+          ).as_a_dependency,
           root: instance,
           parent: instance
         },
@@ -258,17 +256,15 @@ describe Aws::Templates::Composite do
           spaceship: 'martyr',
           erased: 'forever',
           postfix: 'X',
-          w: Aws::Templates::Utils::Dependency.new(
-            A.new(
-              label: 'z',
-              rocket: 'spacehawk',
-              spaceship: 'martyr',
-              erased: 'forever',
-              postfix: 'X',
-              root: instance,
-              parent: instance
-            )
-          ),
+          w: A.new(
+            label: 'z',
+            rocket: 'spacehawk',
+            spaceship: 'martyr',
+            erased: 'forever',
+            postfix: 'X',
+            root: instance,
+            parent: instance
+          ).as_a_dependency,
           root: instance,
           parent: instance
         },

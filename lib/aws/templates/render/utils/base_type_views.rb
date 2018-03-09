@@ -93,7 +93,7 @@ module Aws
             ::FalseClass => AsIs,
             ::NilClass => AsIs,
             ::Symbol => AsIs,
-            Aws::Templates::Utils::Dependency => AsIs,
+            Aws::Templates::Utils::Dependency::Depending => AsIs,
             ::Array => ToArray,
             ::Hash => ToHash,
             Aws::Templates::Utils::Options => ToHash

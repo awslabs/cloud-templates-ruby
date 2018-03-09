@@ -3,7 +3,7 @@ require 'aws/templates/utils'
 module Aws
   module Templates
     module Utils
-      class Dependency
+      module Dependency
         ##
         # Refinements for transparent dependecy handling
         #
@@ -38,13 +38,91 @@ module Aws
             alias_method :not_a_dependency, :object
 
             # it returns a set containing a single dependency on itself
-            def dependencies
+            def links
               EMPTY_SET
             end
 
             # mark the object as dependency
             def as_a_dependency
-              Aws::Templates::Utils::Dependency.new(object)
+              target = object.dup
+
+              class << target
+                include ::Aws::Templates::Utils::Dependency::SingletonMixin
+              end
+
+              target
+            end
+
+            # mark the object as dependency of itself
+            def as_a_self_dependency
+              as_a_dependency.to_self
+            end
+          end
+
+          refine ::Aws::Templates::Artifact do
+            # mark the object as a dependency
+            def as_a_dependency
+              ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
+            end
+
+            # mark the object as dependency of itself
+            def as_a_self_dependency
+              as_a_dependency.to_self
+            end
+          end
+
+          refine ::Numeric do
+            # mark the object as a dependency
+            def as_a_dependency
+              ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
+            end
+
+            # mark the object as dependency of itself
+            def as_a_self_dependency
+              as_a_dependency.to_self
+            end
+          end
+
+          refine ::Symbol do
+            # mark the object as a dependency
+            def as_a_dependency
+              ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
+            end
+
+            # mark the object as dependency of itself
+            def as_a_self_dependency
+              as_a_dependency.to_self
+            end
+          end
+
+          refine ::NilClass do
+            # mark the object as a dependency
+            def as_a_dependency
+              ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
+            end
+
+            # mark the object as dependency of itself
+            def as_a_self_dependency
+              as_a_dependency.to_self
+            end
+          end
+
+          refine ::TrueClass do
+            # mark the object as a dependency
+            def as_a_dependency
+              ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
+            end
+
+            # mark the object as dependency of itself
+            def as_a_self_dependency
+              as_a_dependency.to_self
+            end
+          end
+
+          refine ::FalseClass do
+            # mark the object as a dependency
+            def as_a_dependency
+              ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
             end
 
             # mark the object as dependency of itself
@@ -66,11 +144,11 @@ end
 module Enumerable
   using Aws::Templates::Utils::Dependency::Refinements
 
-  def dependencies
+  def links
     # rubocop:disable Style/SymbolProc
-    # Refinements don't support dynamic dispatch yet. So, symbolic methods don't work
+    # Refinements don't support dynamic dispatch yet. So, symbolic methods won't work
     find_all { |obj| obj.dependency? }
-      .inject(::Set.new) { |acc, elem| acc.merge(elem.dependencies) }
+      .inject(::Set.new) { |acc, elem| acc.merge(elem.links) }
     # rubocop:enable Style/SymbolProc
   end
 

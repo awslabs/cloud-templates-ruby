@@ -78,15 +78,15 @@ module Aws
         end
 
         def dependency?
-          !dependencies.empty?
+          !links.empty?
         end
 
-        def dependencies
+        def links
           # rubocop:disable Style/SymbolProc
           # Refinements don't support dynamic dispatch yet. So, symbolic methods don't work
-          memoize(:dependencies) do
+          memoize(:links) do
             select_recursively { |obj| obj.dependency? }
-              .inject(::Set.new) { |acc, elem| acc.merge(elem.dependencies) }
+              .inject(::Set.new) { |acc, elem| acc.merge(elem.links) }
           end
           # rubocop:enable Style/SymbolProc
         end

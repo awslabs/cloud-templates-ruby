@@ -12,7 +12,7 @@ module Aws
       # it's domain-specific extended implementation of attr_reader.
       module Parametrized
         include Utils::Guarded
-        include Utils::Dependent
+        include Utils::Dependency::Dependent
         include Utils::Inheritable
         include Utils::Inspectable
         include Getter::Dsl

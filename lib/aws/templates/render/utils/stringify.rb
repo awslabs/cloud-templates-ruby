@@ -18,7 +18,7 @@ module Aws
             end
           end
 
-          define_view(::Aws::Templates::Utils::Dependency) do
+          define_view(::Aws::Templates::Utils::Dependency::Depending) do
             def to_rendered
               instance.object.to_s
             end

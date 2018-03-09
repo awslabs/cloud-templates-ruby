@@ -39,7 +39,7 @@ module Aws
 
             def transform(_, value, instance)
               return if value.nil?
-              _with_dependencies(_parse(value, instance), value.dependencies)
+              _with_links(_parse(value, instance), value.links)
             end
 
             private
@@ -50,8 +50,8 @@ module Aws
               result
             end
 
-            def _with_dependencies(result, dependencies)
-              dependencies.empty? ? result : result.as_a_dependency.to(dependencies)
+            def _with_links(result, links)
+              links.empty? ? result : result.as_a_dependency.to(links)
             end
 
             def _compute_parser_parameters(instance)

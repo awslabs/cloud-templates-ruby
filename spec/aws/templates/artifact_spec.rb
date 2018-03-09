@@ -18,7 +18,7 @@ describe Aws::Templates::Artifact do
   end
 
   let(:dependency) do
-    Struct.new(:"dependency?", :dependencies)
+    Struct.new(:"dependency?", :links)
   end
 
   let(:just_object) do

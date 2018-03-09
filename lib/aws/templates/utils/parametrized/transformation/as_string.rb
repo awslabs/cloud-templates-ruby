@@ -31,7 +31,7 @@ module Aws
             def transform(_, value, _)
               return if value.nil?
               result = String(value)
-              value.dependencies.empty? ? result : result.as_a_dependency.to(value)
+              value.dependency? ? result.as_a_dependency.to(value) : result
             end
           end
         end

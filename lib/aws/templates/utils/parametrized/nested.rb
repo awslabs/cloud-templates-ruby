@@ -14,7 +14,6 @@ module Aws
 
           include Parametrized
           include Utils::Default
-          include Utils::Dependent
 
           attr_reader :options
 
@@ -55,15 +54,15 @@ module Aws
 
           attr_reader :parent
 
-          def dependencies
-            @dependencies ||= ::Set.new
+          def links
+            @links ||= ::Set.new
           end
 
           protected
 
           def initialize(parent, obj)
             @parent = parent
-            depends_on(obj) if obj.dependency?
+            @links = obj.links if obj.dependency?
             @options = Utils::Options.new(defaults, obj.to_recursive)
           end
         end

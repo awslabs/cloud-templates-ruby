@@ -63,11 +63,11 @@ module Aws
             end
           end
 
-          define_view(Templates::Utils::Dependency, InspectView) do
+          define_view(Templates::Utils::Dependency::Depending, InspectView) do
             def to_rendered
               'Dependency(' \
                 "#{rendered_for(instance.object, depth)}" \
-                " => #{rendered_for(instance.dependencies, depth)})"
+                " => #{rendered_for(instance.links, depth)})"
             end
           end
 
