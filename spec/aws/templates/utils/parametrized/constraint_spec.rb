@@ -43,7 +43,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     end
   end
 
-  describe 'enum works as expected' do
+  describe 'enum' do
     let(:constraint) { Constraints.enum(1, 2, 3) }
 
     it 'passes when a value from the list is specifed' do
@@ -202,6 +202,50 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       it 'fails when arbitrary Module is passed' do
         expect { test_class.new(something: ::BasicObject).something }
           .to raise_error(/BasicObject is not a child of Object/)
+      end
+    end
+  end
+
+  describe 'is?' do
+    context 'with class' do
+<<<<<<< HEAD
+      let(:constraint) { Constraints.is?(::Enumerable) }
+=======
+      let(:constraint) { Constraints.is?(::Enumerable => nil) }
+>>>>>>> 4a97138... Add Is constraint
+
+      it 'passes when nil' do
+        expect(test_class.new({}).something).to be_nil
+      end
+
+      it 'passes when an instance of the class is passed' do
+        expect(test_class.new(something: []).something).to be == []
+      end
+
+      it 'throws an error when wrong object is passed' do
+        expect { test_class.new(something: 123).something }
+          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+      end
+    end
+
+    context 'with class and attributes' do
+      let(:constraint) do
+        Constraints.is?(
+          ::String => { to_s: Constraints.satisfies('big') { |v| v.to_s.length > 5 } }
+        )
+      end
+
+      it 'passes when nil' do
+        expect(test_class.new({}).something).to be_nil
+      end
+
+      it 'passes when an object with satisfying condition is passed' do
+        expect(test_class.new(something: '123456').something).to be == '123456'
+      end
+
+      it 'throws an error when wrong object is passed' do
+        expect { test_class.new(something: 123_456).something }
+          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
       end
     end
   end

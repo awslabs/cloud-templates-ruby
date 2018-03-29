@@ -47,6 +47,14 @@ module Aws
               end
 
               ##
+              # Look up value of the parameter with index
+              #
+              # alias for Path class
+              def index(i)
+                Parametrized::Getter::Path.new([i])
+              end
+
+              ##
               # Choose one non-nil value from nested getters
               #
               # alias for OneOf class

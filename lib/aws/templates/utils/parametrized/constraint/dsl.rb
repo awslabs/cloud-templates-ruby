@@ -79,11 +79,19 @@ module Aws
               end
 
               ##
-              # Value should match the regular experession
+              # Value should match the regular expression
               #
               # alias for Matches
               def module?(base = nil)
                 Parametrized::Constraint::IsModule.with(base)
+              end
+
+              ##
+              # Check object class and fields if specified
+              #
+              # alias for Is
+              def is?(selector)
+                Parametrized::Constraint::Is.new(selector)
               end
             end
           end
