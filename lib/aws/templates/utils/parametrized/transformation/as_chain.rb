@@ -32,11 +32,9 @@ module Aws
               @components = _check_components(components)
             end
 
-            protected
-
-            def transform(parameter, value, instance)
+            def transform(value, instance)
               return if value.nil?
-              components.inject(value) { |acc, elem| instance.instance_exec(parameter, acc, &elem) }
+              components.inject(value) { |acc, elem| instance.instance_exec(acc, &elem) }
             end
 
             private

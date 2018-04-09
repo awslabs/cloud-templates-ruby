@@ -61,9 +61,7 @@ module Aws
               @parameters = params
             end
 
-            protected
-
-            def transform(_, value, instance)
+            def transform(value, instance)
               return if value.nil?
               type.view_for(value, _compute_render_parameters(instance)).to_rendered
             end

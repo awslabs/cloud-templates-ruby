@@ -29,13 +29,9 @@ module Aws
 
             protected
 
-            def check(_, value, _)
+            def check(value, _)
               return if set.include?(value)
-
-              raise(
-                "Value #{value.inspect} is not in the set of allowed " \
-                "values #{set.inspect}"
-              )
+              raise "Value #{value.inspect} is not in the set of allowed values #{set.inspect}"
             end
           end
         end

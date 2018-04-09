@@ -12,7 +12,7 @@ module UserDirectory
 
       parameter :path,
                 description: 'Path',
-                transform: ->(_, s) { ::Pathname.new(s) },
+                transform: ->(s) { ::Pathname.new(s) },
                 constraint: all_of(
                   not_nil,
                   satisfies('The path is a valid absolute path', &:absolute?)

@@ -29,7 +29,7 @@ module Aws
           attr_reader :name
           attr_accessor :description
 
-          def getter(instance = nil)
+          def getter_for(instance = nil)
             @getter || (
               instance &&
               (
@@ -87,31 +87,41 @@ module Aws
           end
 
           def process_value(instance, value)
-            value = instance.instance_exec(self, value, &transform) if transform
-            instance.instance_exec(self, value, &constraint) if constraint
-            value
+            check_value(instance, transform_value(instance, value))
           end
 
           private
 
           def extract_value(instance)
-            unless getter(instance)
-              raise(
-                Templates::Exception::ParameterGetterIsNotDefined.new(self)
-              )
-            end
+            getter = getter_for(instance)
+            raise Templates::Exception::ParameterGetterIsNotDefined.new(self) if getter.nil?
 
-            execute_getter(instance, getter(instance))
-          end
-
-          def execute_getter(instance, getter)
             if getter.respond_to?(:to_hash)
               getter
             elsif getter.respond_to?(:to_proc)
-              instance.instance_exec(self, &getter)
+              execute_getter(instance, getter)
             else
               getter
             end
+          end
+
+          def execute_getter(instance, getter)
+            instance.instance_exec(self, &getter)
+          rescue StandardError
+            raise Templates::Exception::NestedParameterException.new(self)
+          end
+
+          def transform_value(instance, value)
+            transform ? instance.instance_exec(value, &transform) : value
+          rescue StandardError
+            raise Templates::Exception::NestedParameterException.new(self)
+          end
+
+          def check_value(instance, value)
+            instance.instance_exec(value, &constraint) if constraint
+            value
+          rescue StandardError
+            raise Templates::Exception::ParameterValueInvalid.new(self, instance, value)
           end
 
           ALLOWED_SPECIFICATION_ENTRIES = ::Set.new %i[description getter transform constraint]

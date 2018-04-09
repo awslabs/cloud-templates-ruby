@@ -34,25 +34,9 @@ module Aws
             getter = self
 
             lambda do |parameter|
-              getter.get_wrapper(parameter, self)
+              getter.get(parameter, self)
             end
           end
-
-          ##
-          # Wraps getter-dependent method
-          #
-          # It wraps constraint-dependent "get" method into a rescue block
-          # to standardize exception type and information provided by failed
-          # value calculation
-          # * +parameter+ - the Parameter object which the getter is executed for
-          # * +instance+ - the instance value is taken from
-          def get_wrapper(parameter, instance)
-            get(parameter, instance)
-          rescue StandardError
-            raise Templates::Exception::NestedParameterException.new(parameter)
-          end
-
-          protected
 
           ##
           # Getter method

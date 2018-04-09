@@ -27,7 +27,7 @@ module Aws
 
             protected
 
-            def check(_, value, _)
+            def check(value, _)
               raise('required but was not found in input hash') if value.nil?
             end
           end

@@ -28,9 +28,7 @@ module Aws
           class AsBoolean < self
             include ::Singleton
 
-            protected
-
-            def transform(_, value, _)
+            def transform(value, _)
               return if value.nil?
               !value.to_s.casecmp('false').zero?
             end

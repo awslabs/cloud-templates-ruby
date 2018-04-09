@@ -32,9 +32,9 @@ module Aws
 
             protected
 
-            def check(parameter, value, _)
+            def check(value, _)
               return if expression =~ value.to_s
-              raise "#{value} doesn't match #{expression} for parameter #{parameter.name}"
+              raise "#{value} doesn't match #{expression}"
             end
           end
         end

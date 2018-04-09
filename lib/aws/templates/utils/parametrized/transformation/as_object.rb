@@ -62,9 +62,7 @@ module Aws
               @klass.class_eval(&definition) unless definition.nil?
             end
 
-            protected
-
-            def transform(_, value, instance)
+            def transform(value, instance)
               return if value.nil?
               klass.new(instance, value)
             end

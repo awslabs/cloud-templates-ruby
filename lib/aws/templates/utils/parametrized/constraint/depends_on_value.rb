@@ -43,14 +43,9 @@ module Aws
 
             protected
 
-            def check(parameter, value, instance)
+            def check(value, instance)
               return unless selector.key?(value)
-
-              instance.instance_exec(
-                parameter,
-                value,
-                &selector[value]
-              )
+              instance.instance_exec(value, &selector[value])
             end
           end
         end

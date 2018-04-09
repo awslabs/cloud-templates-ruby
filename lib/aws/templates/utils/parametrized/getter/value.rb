@@ -31,8 +31,6 @@ module Aws
               @calculation = calculation
             end
 
-            protected
-
             def get(_, instance)
               if calculation.respond_to?(:to_hash)
                 calculation

@@ -36,37 +36,17 @@ module Aws
           def to_proc
             transform = self
 
-            lambda do |parameter, value|
-              transform.transform_wrapper(parameter, value, self)
+            lambda do |value|
+              transform.transform(value, self)
             end
           end
 
           ##
-          # Wraps transformation-dependent method
-          #
-          # It wraps constraint-dependent "transform" method into a rescue block
-          # to standardize exception type and information provided by failed
-          # transformation calculation
-          # * +parameter+ - the Parameter object which the transformation will
-          #                 be performed for
-          # * +value+ - parameter value to be transformed
-          # * +instance+ - the instance value is transform
-          def transform_wrapper(parameter, value, instance)
-            transform(parameter, value, instance)
-          rescue StandardError
-            raise Templates::Exception::NestedParameterException.new(parameter)
-          end
-
-          protected
-
-          ##
           # Transform method
           #
-          # * +parameter+ - the Parameter object which the transformation is
-          #                 performed for
           # * +value+ - parameter value to be transformed
           # * +instance+ - the instance value is transform
-          def transform(parameter, value, instance); end
+          def transform(value, instance); end
         end
       end
     end

@@ -33,7 +33,7 @@ module Aws
 
             protected
 
-            def check(_, value, _)
+            def check(value, _)
               attributes = selector[_find_ancestor(value)]
               _check_attributes(attributes, value) unless attributes.nil?
             end

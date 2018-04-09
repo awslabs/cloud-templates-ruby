@@ -25,7 +25,7 @@ describe Aws::Templates::Utils::Parametrized do
       parameter :mixed_parameter,
                 description: 'Just a parameter which will be added ' \
                   'into including modules/classes',
-                transform: ->(_, v) { v.to_s }
+                transform: ->(v) { v.to_s }
     end
   end
 
@@ -80,8 +80,8 @@ describe Aws::Templates::Utils::Parametrized do
                   getter: lambda { |p|
                     options[p.name.to_s.sub('parameter', 'option').to_sym]
                   },
-                  transform: ->(_, v) { v + 1 },
-                  constraint: ->(_, v) { raise "it's > 3!" if v > 3 }
+                  transform: ->(v) { v + 1 },
+                  constraint: ->(v) { raise "it's > 3!" if v > 3 }
 
         parameter :bare_minimum,
                   description: '"Do defaults" type of parameter'

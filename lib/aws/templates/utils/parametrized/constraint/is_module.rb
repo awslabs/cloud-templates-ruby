@@ -38,7 +38,7 @@ module Aws
 
               protected
 
-              def check(_, value, _)
+              def check(value, _)
                 super
                 raise "#{value} is not a child of #{base}" unless value <= base
               end
@@ -50,7 +50,7 @@ module Aws
 
             protected
 
-            def check(_, value, _)
+            def check(value, _)
               _check_if_module(value)
             end
 

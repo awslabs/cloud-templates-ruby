@@ -36,8 +36,6 @@ module Aws
               @path = path
             end
 
-            protected
-
             def get(_, instance)
               if path.respond_to?(:to_proc)
                 instance.options[*instance.instance_eval(&path)]

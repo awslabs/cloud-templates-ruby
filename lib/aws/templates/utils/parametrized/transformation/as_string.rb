@@ -26,9 +26,7 @@ module Aws
             include ::Singleton
             using Utils::Dependency::Refinements
 
-            protected
-
-            def transform(_, value, _)
+            def transform(value, _)
               return if value.nil?
               result = String(value)
               value.dependency? ? result.as_a_dependency.to(value) : result

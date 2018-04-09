@@ -35,9 +35,7 @@ module Aws
               @parameters = parameters
             end
 
-            protected
-
-            def transform(_, value, instance)
+            def transform(value, instance)
               return if value.nil?
               _with_links(_parse(value, instance), value.links)
             end

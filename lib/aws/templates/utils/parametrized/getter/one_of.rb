@@ -33,8 +33,6 @@ module Aws
               @getters = getters
             end
 
-            protected
-
             def get(parameter, instance)
               getters.lazy
                      .map { |g| instance.instance_exec(parameter, &g) }

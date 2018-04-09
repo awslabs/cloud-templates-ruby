@@ -26,9 +26,7 @@ module Aws
           class AsModule < self
             include ::Singleton
 
-            protected
-
-            def transform(_, value, _)
+            def transform(value, _)
               return if value.nil?
               return value if value.is_a?(Module)
               return Utils.lookup_module(value.to_s) if value.respond_to?(:to_s)

@@ -73,15 +73,10 @@ module Aws
               )
             end
 
-            protected
-
-            def transform(parameter, value, instance)
+            def transform(value, instance)
               return if value.nil?
 
-              unless value.respond_to?(:to_a)
-                raise "#{parameter.name} is assigned to " \
-                  "#{value.inspect} which is not a list"
-              end
+              raise "#{value.inspect} is not a list" unless value.respond_to?(:to_a)
 
               if sub_parameter
                 value.to_a.map { |el| sub_parameter.process_value(instance, el) }

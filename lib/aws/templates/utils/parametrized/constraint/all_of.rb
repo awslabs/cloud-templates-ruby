@@ -38,10 +38,8 @@ module Aws
 
             protected
 
-            def check(parameter, value, instance)
-              constraints.each do |c|
-                instance.instance_exec(parameter, value, &c)
-              end
+            def check(value, instance)
+              constraints.each { |c| instance.instance_exec(value, &c) }
             end
           end
         end

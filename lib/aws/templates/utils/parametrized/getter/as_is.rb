@@ -24,8 +24,6 @@ module Aws
           class AsIs < self
             include ::Singleton
 
-            protected
-
             def get(parameter, instance)
               instance.options[parameter.name]
             end

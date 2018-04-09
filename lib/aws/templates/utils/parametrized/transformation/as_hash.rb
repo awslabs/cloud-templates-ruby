@@ -50,9 +50,7 @@ module Aws
               instance_eval(&blk) if blk
             end
 
-            protected
-
-            def transform(_, value, instance)
+            def transform(value, instance)
               return if value.nil?
 
               Hash[
@@ -65,12 +63,12 @@ module Aws
               ]
             end
 
+            private
+
             def _process_value(parameter, instance, value)
               return value if parameter.nil?
               parameter.process_value(instance, value)
             end
-
-            private
 
             def _create_parameter(opts)
               Parametrized::Parameter.new(

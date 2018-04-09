@@ -28,8 +28,6 @@ module Aws
           class AsInstanceVariable < self
             include ::Singleton
 
-            protected
-
             def get(parameter, instance)
               instance.instance_variable_get("@#{parameter.name}")
             end

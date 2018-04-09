@@ -25,9 +25,7 @@ module Aws
           class AsFloat < self
             include ::Singleton
 
-            protected
-
-            def transform(_, value, _)
+            def transform(value, _)
               return if value.nil?
               Float(value)
             end

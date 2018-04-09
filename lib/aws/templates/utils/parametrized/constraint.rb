@@ -34,8 +34,8 @@ module Aws
           def to_proc
             constraint = self
 
-            lambda do |parameter, value|
-              constraint.check_wrapper(parameter, value, self)
+            lambda do |value|
+              constraint.check_wrapper(value, self)
             end
           end
 
@@ -45,14 +45,10 @@ module Aws
           # It wraps constraint-dependent "check" method into a rescue block
           # to standardize exception type and information provided by failed
           # constraint validation
-          # * +parameter+ - the Parameter object which the constraint is evaluated
-          #                 against
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
-          def check_wrapper(parameter, value, instance)
-            check(parameter, value, instance) if pre_condition.check(value, instance)
-          rescue StandardError
-            raise Templates::Exception::ParameterValueInvalid.new(parameter, instance, value)
+          def check_wrapper(value, instance)
+            check(value, instance) if pre_condition.check(value, instance)
           end
 
           ##
@@ -87,7 +83,7 @@ module Aws
           #                 against
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
-          def check(parameter, value, instance); end
+          def check(value, instance); end
         end
       end
     end
