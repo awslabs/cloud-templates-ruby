@@ -117,10 +117,6 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       expect(test_class.new({}).something).to be_nil
     end
 
-    it 'passes when value is not one of the conditions' do
-      expect(test_class.new(something: 2).something).to be == 2
-    end
-
     it 'passes when conditional constraint is met' do
       expect(test_class.new(something: :condition, condition: 2).something)
         .to be == :condition
@@ -208,11 +204,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
   describe 'is?' do
     context 'with class' do
-<<<<<<< HEAD
       let(:constraint) { Constraints.is?(::Enumerable) }
-=======
-      let(:constraint) { Constraints.is?(::Enumerable => nil) }
->>>>>>> 4a97138... Add Is constraint
 
       it 'passes when nil' do
         expect(test_class.new({}).something).to be_nil
@@ -231,7 +223,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     context 'with class and attributes' do
       let(:constraint) do
         Constraints.is?(
-          ::String => { to_s: Constraints.satisfies('big') { |v| v.to_s.length > 5 } }
+          ::String => Constraints.satisfies('big') { |v| v.to_s.length > 5 }
         )
       end
 
@@ -243,8 +235,51 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         expect(test_class.new(something: '123456').something).to be == '123456'
       end
 
+      it 'throws an error when the object doesn\'t satisfy condition' do
+        expect { test_class.new(something: '12345').something }
+          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+      end
+
       it 'throws an error when wrong object is passed' do
         expect { test_class.new(something: 123_456).something }
+          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+      end
+    end
+  end
+
+  describe 'has?' do
+    context 'without field constraints' do
+      let(:constraint) { Constraints.has?(:to_str) }
+
+      it 'passes when nil' do
+        expect(test_class.new({}).something).to be_nil
+      end
+
+      it 'passes when the object has the field' do
+        expect(test_class.new(something: '123456').something).to be == '123456'
+      end
+
+      it 'fails when the object doesn\'t have the field' do
+        expect { test_class.new(something: true).something }
+          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+      end
+    end
+
+    context 'with field constraints' do
+      let(:constraint) do
+        Constraints.has?(to_str: Constraints.satisfies('big') { |v| v.length > 5 })
+      end
+
+      it 'passes when nil' do
+        expect(test_class.new({}).something).to be_nil
+      end
+
+      it 'passes when the field satisfies the constraint' do
+        expect(test_class.new(something: '123456').something).to be == '123456'
+      end
+
+      it 'fails when the field fails the constraint' do
+        expect { test_class.new(something: '123').something }
           .to raise_error Aws::Templates::Exception::ParameterValueInvalid
       end
     end

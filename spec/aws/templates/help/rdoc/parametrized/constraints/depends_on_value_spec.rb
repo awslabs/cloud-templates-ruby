@@ -7,7 +7,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::DependsOnValue d
       include Aws::Templates::Utils::Parametrized
       parameter :field
       parameter :depends_on_value_requires_field,
-                constraint: depends_on_value(a: requires(:field))
+                constraint: depends_on_value(ardx: requires(:field))
     end
   end
 
@@ -15,7 +15,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::DependsOnValue d
 
   it 'prints documentation' do
     expect(help).to match(
-      /depends_on_value_requires_field.*depends.*when[^\n]+a.*requires.*field/m
+      /depends_on_value_requires_field.*depends.*ardx.*requires.*field/m
     )
   end
 end

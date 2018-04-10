@@ -52,6 +52,8 @@ module Aws
                    Rdoc.lazy::Parametrized::Constraints::IsModule::Based
           register Templates.lazy::Utils::Parametrized::Constraint::Is,
                    Rdoc.lazy::Parametrized::Constraints::Is
+          register Templates.lazy::Utils::Parametrized::Constraint::Has,
+                   Rdoc.lazy::Parametrized::Constraints::Has
 
           register Templates.lazy::Utils::Parametrized::Constraint::Condition,
                    Rdoc.lazy::Parametrized::Constraints::Condition

@@ -23,7 +23,7 @@ module Aws
         # Parameter object
         #
         # The object incorporates parameter specification and basic logic for
-        # value extraction, checking and transformation.  Parameter objects
+        # value extraction, checking and transformation. Parameter objects
         # are created at each parameter description.
         class Parameter
           attr_reader :name

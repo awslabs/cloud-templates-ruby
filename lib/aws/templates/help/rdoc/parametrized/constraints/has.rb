@@ -7,16 +7,16 @@ module Aws
         module Parametrized
           module Constraints
             ##
-            # Is constraint documentation provider
+            # Has constraint documentation provider
             #
-            # Prints defined class and fields constraints.
-            class Is < Schemed
-              for_entity Templates::Utils::Parametrized::Constraint::Is
+            # Prints defined fields and constraints for them.
+            class Has < Schemed
+              for_entity Templates::Utils::Parametrized::Constraint::Has
 
               protected
 
               def header
-                'should be an instance of:'
+                'should have the fields:'
               end
             end
           end

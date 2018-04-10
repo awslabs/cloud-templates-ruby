@@ -87,11 +87,19 @@ module Aws
               end
 
               ##
-              # Check object class and fields if specified
+              # Check object class and constraints if specified
               #
               # alias for Is
               def is?(selector)
                 Parametrized::Constraint::Is.new(selector)
+              end
+
+              ##
+              # Check if object has specified fields and value constraints if specified
+              #
+              # alias for Has
+              def has?(fields)
+                Parametrized::Constraint::Has.new(fields)
               end
             end
           end

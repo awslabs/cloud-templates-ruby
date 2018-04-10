@@ -1,40 +1,38 @@
 require 'spec_helper'
 require 'aws/templates/utils'
 
-describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::Is do
+describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::Has do
   let(:parametrized) do
     Module.new { include Aws::Templates::Utils::Parametrized }
   end
 
   let(:help) { Aws::Templates::Help::Rdoc.show(parametrized) }
 
-  context 'with class and attributes' do
+  context 'with attributes and constraints' do
     let(:parametrized) do
       Module.new do
         include Aws::Templates::Utils::Parametrized
-        parameter :is_an_instance_with_attribute, constraint: is?(::String => enum('a', 'b'))
+        parameter :attributes_with_constraints, constraint: has?(azdc: not_nil)
       end
     end
 
     it 'prints documentation' do
       expect(help).to match(
-        /is_an_instance_with_attribute.*should be an instance of:.*String.*one of: "a","b"/m
+        /attributes_with_constraints.*should have the fields:.*azdc.*can\'t be nil/m
       )
     end
   end
 
-  context 'with class' do
+  context 'with attributes' do
     let(:parametrized) do
       Module.new do
         include Aws::Templates::Utils::Parametrized
-        parameter :is_an_instance, constraint: is?(::Enumerable)
+        parameter :attributes, constraint: has?(:azdc)
       end
     end
 
     it 'prints documentation' do
-      expect(help).to match(
-        /is_an_instance.*should be an instance of:.*Enumerable/m
-      )
+      expect(help).to match(/attributes.*should have the fields:.*azdc/m)
     end
   end
 end

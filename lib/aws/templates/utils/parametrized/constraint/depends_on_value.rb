@@ -32,20 +32,28 @@ module Aws
           #    i = Piece.new(:param1 => 2, :param2 => 5)
           #    i.param1 # => 2
           class DependsOnValue < self
-            ##
-            # Selector hash
-            attr_reader :selector
+            include Utils::Schemed
 
-            def initialize(selector)
-              @selector = selector
+            def initialize(*args)
+              super
               self.if(Parametrized.any)
+            end
+
+            def check_schema(schema)
+              schema.each_value.reject(&:nil?).each do |c|
+                raise "#{c.inspect}(#{c.class}) is not a proc" unless c.respond_to?(:to_proc)
+              end
             end
 
             protected
 
             def check(value, instance)
-              return unless selector.key?(value)
-              instance.instance_exec(value, &selector[value])
+              unless schema.key?(value)
+                return if value.nil?
+                raise "#{value.inspect} not present in selector"
+              end
+
+              instance.instance_exec(value, &schema[value])
             end
           end
         end
