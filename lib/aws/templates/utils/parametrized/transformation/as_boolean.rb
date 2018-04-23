@@ -26,7 +26,9 @@ module Aws
           #    i = Piece.new(:param => 0)
           #    i.param # => true
           class AsBoolean < self
-            include ::Singleton
+            extend Utils::Singleton
+
+            protected
 
             def transform(value, _)
               return if value.nil?

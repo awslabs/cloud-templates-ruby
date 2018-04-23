@@ -36,7 +36,7 @@ module Aws
 
             def initialize(*args)
               super
-              self.if(Parametrized.any)
+              self.if(Constraint::Condition.any)
             end
 
             def check_schema(schema)

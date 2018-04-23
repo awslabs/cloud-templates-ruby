@@ -61,17 +61,18 @@ module Aws
           class AsList < self
             attr_reader :sub_parameter
 
-            def initialize(klass = nil, options = nil)
+            def initialize(options = nil)
               return if options.nil?
 
               @sub_parameter = Parametrized::Parameter.new(
                 options[:name],
-                klass,
                 description: options[:description],
                 transform: options[:transform],
                 constraint: options[:constraint]
               )
             end
+
+            protected
 
             def transform(value, instance)
               return if value.nil?

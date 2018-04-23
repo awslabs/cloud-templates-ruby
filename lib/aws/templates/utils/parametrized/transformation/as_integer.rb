@@ -23,7 +23,9 @@ module Aws
           #    i = Piece.new(:param => '23')
           #    i.param # => 23
           class AsInteger < self
-            include ::Singleton
+            extend Utils::Singleton
+
+            protected
 
             def transform(value, _)
               return if value.nil?

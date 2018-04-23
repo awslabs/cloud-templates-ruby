@@ -135,4 +135,16 @@ describe Aws::Templates::Utils::Parametrized::Getter do
       end
     end
   end
+
+  describe 'index' do
+    let(:getter) do
+      Getters.index(3)
+    end
+
+    let(:options_hash) { [0, 1, 2, 'z', 'd'] }
+
+    it 'returns the value' do
+      expect(instance.something).to be == 'z'
+    end
+  end
 end

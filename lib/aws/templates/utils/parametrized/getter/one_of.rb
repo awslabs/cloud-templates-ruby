@@ -27,11 +27,15 @@ module Aws
           #    i = Piece.new( :b => { :c => 4 } )
           #    i.param1 # => 4
           class OneOf < self
+            include Utils::Dsl::Element
+
             attr_reader :getters
 
-            def initialize(getters)
+            def initialize(*getters)
               @getters = getters
             end
+
+            protected
 
             def get(parameter, instance)
               getters.lazy

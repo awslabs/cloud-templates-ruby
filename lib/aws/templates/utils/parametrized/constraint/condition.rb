@@ -13,7 +13,9 @@ module Aws
           class Condition
             ##
             # Enforce constraint in all cases
-            class Unconditional < Condition
+            class Any < Condition
+              extend Utils::Singleton
+
               def check(_, _)
                 true
               end
@@ -22,6 +24,8 @@ module Aws
             ##
             # Do not evaluate constraint if value is nil
             class NotNil < Condition
+              extend Utils::Singleton
+
               def check(value, _)
                 !value.nil?
               end
@@ -60,15 +64,15 @@ module Aws
             end
 
             ##
-            # Factory method for Unconditional singleton
-            def self.any
-              @any ||= Unconditional.new
+            # Factory method for NotNil condition
+            def self.not_nil
+              NotNil.new
             end
 
             ##
-            # Factory method for NotNil singleton
-            def self.not_nil
-              @not_nil ||= NotNil.new
+            # Factory method for Any condition
+            def self.any
+              Any.new
             end
 
             ##

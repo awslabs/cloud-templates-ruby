@@ -14,39 +14,29 @@ module Aws
         # handling inheritance of class-scope methods.
         module ClassMethods
           ##
-          # Empty class scope
-          #
-          # Identity class scope which contains nothing. Used as base case for class scope
-          # inheritance hierarchy.
-          module ClassScope
-          end
-
-          ##
           # To add class methods also while including the module
           def included(base)
             super(base)
             base.extend(ClassMethods)
-            base.extend(ClassScope)
+            base.class_scope(_class_scope)
           end
 
           def instance_scope(&blk)
             module_eval(&blk)
           end
 
-          def class_scope(&blk)
-            raise ScriptError.new('class_scope should have a block') if blk.nil?
-            _define_class_scope unless _class_scope_defined?
-            ClassScope.module_eval(&blk)
-            extend ClassScope
+          def class_scope(mod = nil, &blk)
+            _class_scope.module_eval(&blk) if blk
+            _class_scope.send(:include, mod) if mod
+            extend _class_scope
           end
 
-          def _class_scope_defined?
-            @class_scope_defined || false
+          def _class_scope_duplicated?
+            @class_scope_duplicated || false
           end
 
-          def _define_class_scope
-            const_set(:ClassScope, ClassScope.dup)
-            @class_scope_defined = true
+          def _class_scope
+            @_class_scope ||= ::Module.new
           end
         end
 

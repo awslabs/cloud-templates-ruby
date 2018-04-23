@@ -8,14 +8,12 @@ module Aws
       #
       # Getter wasn't specified neither for the individual parameter nor for the mixing instance nor
       # for its class.
-      class ParameterGetterIsNotDefined < ParameterException
-        def initialize(target_parameter)
-          super(
-            target_parameter,
-            "Can't find getter for #{target_parameter.name} (#{target_parameter.description}): " \
-              'a getter should be attached either to the parameter or the instance ' \
-              'or the instance class'
-          )
+      class ParameterGetterIsNotDefined < ParameterProcessingException
+        protected
+
+        def custom_message
+          "Can't find getter for #{parameter_description}: a getter should be attached either " \
+            'to the parameter or the instance or the class'
         end
       end
     end

@@ -27,9 +27,11 @@ module Aws
           class Value < self
             attr_reader :calculation
 
-            def initialize(calculation)
-              @calculation = calculation
+            def initialize(value = nil, &calculation)
+              @calculation = value.nil? ? calculation : value
             end
+
+            protected
 
             def get(_, instance)
               if calculation.respond_to?(:to_hash)

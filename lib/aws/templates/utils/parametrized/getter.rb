@@ -19,6 +19,8 @@ module Aws
         # It provides protected method get which should be overriden in
         # all concrete getter classes.
         class Getter
+          include Utils::Dsl::Element
+
           ##
           # Creates closure with getter invocation
           #
@@ -34,9 +36,25 @@ module Aws
             getter = self
 
             lambda do |parameter|
-              getter.get(parameter, self)
+              getter.get_wrapper(parameter, self)
             end
           end
+
+          ##
+          # Wraps getter-dependent method
+          #
+          # It wraps constraint-dependent "get" method into a rescue block
+          # to standardize exception type and information provided by failed
+          # value calculation
+          # * +parameter+ - the Parameter object which the getter is executed for
+          # * +instance+ - the instance value is taken from
+          def get_wrapper(parameter, instance)
+            get(parameter, instance)
+          rescue StandardError
+            raise Templates::Exception::ParameterGetterException.new(self)
+          end
+
+          protected
 
           ##
           # Getter method

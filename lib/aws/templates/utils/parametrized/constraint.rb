@@ -18,6 +18,8 @@ module Aws
         # It provides protected method check which should be overriden in
         # all concrete constraint classes.
         class Constraint
+          include Utils::Dsl::Element
+
           ##
           # Creates closure with checker invocation
           #
@@ -49,6 +51,8 @@ module Aws
           # * +instance+ - the instance value is checked for
           def check_wrapper(value, instance)
             check(value, instance) if pre_condition.check(value, instance)
+          rescue StandardError
+            raise Templates::Exception::ParameterConstraintException.new(self, instance, value)
           end
 
           ##

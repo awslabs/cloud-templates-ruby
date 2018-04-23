@@ -56,10 +56,12 @@ module Aws
             attr_reader :type
             attr_reader :parameters
 
-            def initialize(render_type, params)
+            def initialize(render_type, params = nil, &params_block)
               @type = _check_render_type(render_type)
-              @parameters = params
+              @parameters = params || params_block
             end
+
+            protected
 
             def transform(value, instance)
               return if value.nil?

@@ -25,6 +25,8 @@ module Aws
           class Has < self
             include Utils::Schemed
 
+            as_dsl :has?
+
             def check_schema(schema)
               schema.each_pair do |field, constraint|
                 _raise_wrong_type(field, 'field name') unless field.respond_to?(:to_sym)
@@ -35,7 +37,7 @@ module Aws
 
             protected
 
-            def check(value, instance)
+            def check(value, _instance)
               schema.each_pair do |field, constraint|
                 _raise_no_field(value, field) unless value.respond_to?(field)
                 next if constraint.nil?

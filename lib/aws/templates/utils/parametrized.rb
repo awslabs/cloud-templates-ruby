@@ -15,9 +15,6 @@ module Aws
         include Utils::Dependency::Dependent
         include Utils::Inheritable
         include Utils::Inspectable
-        include Getter::Dsl
-        include Constraint::Dsl
-        include Transformation::Dsl
 
         ##
         # Parameter object
@@ -26,8 +23,11 @@ module Aws
         # value extraction, checking and transformation. Parameter objects
         # are created at each parameter description.
         class Parameter
+          include Utils::Scoped
+
           attr_reader :name
           attr_accessor :description
+          attr_accessor :concept
 
           def getter_for(instance = nil)
             @getter || (
@@ -38,10 +38,6 @@ module Aws
               )
             )
           end
-
-          attr_accessor :transform
-          attr_accessor :constraint
-          attr_accessor :klass
 
           ##
           # Create a parameter object with given specification
@@ -67,9 +63,12 @@ module Aws
           #                    is expected to receive one arg and throw an
           #                    exception if constraints are not met
           #                    (see Constraint for more information)
-          def initialize(name, enclosing_class, specification = {})
+          # ** +:concept+ - instead of specifying transformation and constraint individually you
+          #                 can specify a concept; both are not mutually exclusive and you can
+          #                 chain additional transformation or constraint to a concept
+          def initialize(name, specification = {})
             @name = name
-            set_specification(enclosing_class, specification)
+            set_specification(specification)
           end
 
           ##
@@ -87,7 +86,9 @@ module Aws
           end
 
           def process_value(instance, value)
-            check_value(instance, transform_value(instance, value))
+            concept.process_value(instance, value)
+          rescue Templates::Exception::ParameterRuntimeException
+            raise Templates::Exception::ParameterProcessingException.new(instance, self)
           end
 
           private
@@ -107,46 +108,17 @@ module Aws
 
           def execute_getter(instance, getter)
             instance.instance_exec(self, &getter)
-          rescue StandardError
-            raise Templates::Exception::NestedParameterException.new(self)
+          rescue Templates::Exception::ParameterRuntimeException
+            raise Templates::Exception::ParameterProcessingException.new(instance, self)
           end
 
-          def transform_value(instance, value)
-            transform ? instance.instance_exec(value, &transform) : value
-          rescue StandardError
-            raise Templates::Exception::NestedParameterException.new(self)
-          end
-
-          def check_value(instance, value)
-            instance.instance_exec(value, &constraint) if constraint
-            value
-          rescue StandardError
-            raise Templates::Exception::ParameterValueInvalid.new(self, instance, value)
-          end
-
-          ALLOWED_SPECIFICATION_ENTRIES = ::Set.new %i[description getter transform constraint]
-
-          def set_specification(enclosing_class, specification) # :nodoc:
-            @klass = enclosing_class
-
-            wrong_options = specification.keys.reject do |option_name|
-              ALLOWED_SPECIFICATION_ENTRIES.include?(option_name)
-            end
-
-            raise_wrong_options(wrong_options) unless wrong_options.empty?
-
-            process_specification(specification)
-          end
-
-          def raise_wrong_options(wrong_options)
-            raise Templates::Exception::ParameterSpecificationIsInvalid.new(self, wrong_options)
-          end
-
-          def process_specification(spec)
-            @description = spec[:description] if spec.key?(:description)
-            @getter = spec[:getter] if spec.key?(:getter)
-            @transform = spec[:transform] if spec.key?(:transform)
-            @constraint = spec[:constraint] if spec.key?(:constraint)
+          def set_specification(
+            description: nil, getter: nil, transform: nil, constraint: nil, concept: nil
+          )
+            @description = description
+            @getter = getter
+            @concept = Parametrized::Concept.from(concept) &
+                       Parametrized::Concept.from(transform: transform, constraint: constraint)
           end
         end
 
@@ -236,6 +208,10 @@ module Aws
         #
         # It's a DSL extension to declaratively define parameters.
         class_scope do
+          include Getter::Dsl
+          include Constraint::Dsl
+          include Transformation::Dsl
+
           ##
           # List all defined parameter names
           #
@@ -282,8 +258,11 @@ module Aws
           def parameter(name, spec = {})
             raise_already_exists(name) if method_defined?(name)
 
-            parameter_object = Parameter.new(name, self, spec)
+            parameter_object = Parameter.new(name, spec)
+            parameter_object.location = caller_locations[0..0].first
+            parameter_object.scope = self
             parameters[name] = parameter_object
+
             define_method(name) { guarded_get(self, parameter_object) }
           end
 

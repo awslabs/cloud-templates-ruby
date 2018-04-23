@@ -30,10 +30,12 @@ module Aws
             attr_reader :parser
             attr_reader :parameters
 
-            def initialize(parser, parameters)
+            def initialize(parser, parameters = nil, &parameters_block)
               @parser = parser.is_a?(Class) ? parser.new : parser
-              @parameters = parameters
+              @parameters = parameters || parameters_block
             end
+
+            protected
 
             def transform(value, instance)
               return if value.nil?

@@ -22,8 +22,8 @@ describe Aws::Templates::Help::Rdoc::Composite do
     "    Very good thing\n\n\n" \
     "  \e[4mParameters\e[m\n" \
     "  * \e[4mlabel\e[m Artifact's label\n" \
-    "    * constraint:\n" \
-    "      * can't be nil\n" \
+    "      * constraint:\n" \
+    "        * can't be nil\n" \
     "  * \e[4mparent\e[m Artifact parent\n" \
     "  * \e[4mundocumented\e[m \n\n" \
     "  \e[4mDefaults\e[m\n" \

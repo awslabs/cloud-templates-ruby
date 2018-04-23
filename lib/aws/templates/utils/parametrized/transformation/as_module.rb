@@ -24,7 +24,9 @@ module Aws
           #    i = Piece.new(:param => 'Object')
           #    i.param # => Object
           class AsModule < self
-            include ::Singleton
+            extend Utils::Singleton
+
+            protected
 
             def transform(value, _)
               return if value.nil?

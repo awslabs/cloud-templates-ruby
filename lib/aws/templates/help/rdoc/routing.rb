@@ -90,6 +90,11 @@ module Aws
           register Templates.lazy::Utils::Parametrized::Transformation::AsString,
                    Rdoc.lazy::Parametrized::Transformations::AsString
 
+          register Templates.lazy::Utils::Parametrized::Concept,
+                   Rdoc.lazy::Parametrized::Concept
+          register Templates.lazy::Utils::Parametrized::Concept::Chain,
+                   Rdoc.lazy::Parametrized::Concept::Chain
+
           register Templates.lazy::Utils::Contextualized, Rdoc.lazy::Contextualized::Provider
           register Templates.lazy::Utils::Contextualized::Filter,
                    Rdoc.lazy::Contextualized::Filter

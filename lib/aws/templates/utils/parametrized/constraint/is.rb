@@ -28,6 +28,8 @@ module Aws
           class Is < self
             include Utils::Schemed
 
+            as_dsl :is?
+
             def check_schema(schema)
               schema.each_pair do |obj, c|
                 raise "#{obj.inspect}(#{obj.class}) is not a Module" unless obj.is_a?(::Module)

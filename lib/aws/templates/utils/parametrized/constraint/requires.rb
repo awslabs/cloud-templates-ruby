@@ -30,7 +30,7 @@ module Aws
           class Requires < self
             attr_reader :dependencies
 
-            def initialize(dependencies)
+            def initialize(*dependencies)
               @dependencies = dependencies
             end
 

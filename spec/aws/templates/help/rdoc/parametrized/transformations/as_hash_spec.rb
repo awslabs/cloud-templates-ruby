@@ -15,7 +15,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Transformations::AsHash do
     end
 
     it 'prints documentation' do
-      expect(help).to match(/key.*can be anything.*value.*can be anything/m)
+      expect(help).to match(/as a hash/m)
     end
   end
 
@@ -23,6 +23,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Transformations::AsHash do
     let(:parametrized) do
       Module.new do
         include Aws::Templates::Utils::Parametrized
+
         parameter :as_hash_with_defined_key,
                   transform: as_hash {
                     key name: :id,

@@ -48,19 +48,21 @@ module Aws
           class AsObject < self
             attr_reader :klass
 
-            def initialize(scope, klass = nil, &definition)
+            def initialize(klass = nil, &definition)
               @klass = if klass.nil?
-                Parametrized::Nested.create_class(scope)
+                Parametrized::Nested.create_class
               elsif klass.is_a?(Class)
                 klass
               elsif klass.is_a?(Module)
-                Parametrized::Nested.create_class(scope).with(klass)
+                Parametrized::Nested.create_class.with(klass)
               else
                 raise "#{klass} is neither a class nor a module"
               end
 
               @klass.class_eval(&definition) unless definition.nil?
             end
+
+            protected
 
             def transform(value, instance)
               return if value.nil?

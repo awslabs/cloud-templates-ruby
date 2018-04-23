@@ -26,7 +26,9 @@ module Aws
           #    i = Piece.new(3)
           #    i.param1 # => 3
           class AsInstanceVariable < self
-            include ::Singleton
+            extend Utils::Singleton
+
+            protected
 
             def get(parameter, instance)
               instance.instance_variable_get("@#{parameter.name}")

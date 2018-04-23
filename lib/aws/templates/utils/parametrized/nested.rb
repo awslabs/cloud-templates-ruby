@@ -18,13 +18,11 @@ module Aws
           attr_reader :options
 
           def self.getter
-            Parametrized::Getter::AsIs.instance
+            as_is
           end
 
-          def self.create_class(scope)
-            klass = ::Class.new(self)
-            klass.singleton_class.send(:define_method, :scope) { scope }
-            klass
+          def self.create_class
+            ::Class.new(self)
           end
 
           def self.with(mod)
@@ -36,12 +34,8 @@ module Aws
             to_s
           end
 
-          def self.scope
-            ::Object
-          end
-
           def self.to_s
-            "<Nested object definition in #{scope}>"
+            '<Nested object definition>'
           end
 
           def dependency?

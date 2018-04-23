@@ -4,21 +4,39 @@ module Aws
   module Templates
     module Exception
       ##
-      # Parameter exception
-      #
-      # Happens during runtime if an error happens during parameter
-      # evaluation
+      # Generic exception happening at parameter invocation
       class ParameterException < RuntimeError
-        # Parameter object
         attr_reader :parameter
+        attr_reader :instance
 
-        def message
-          cause.nil? ? super : "#{super} : #{cause.message}"
+        def initialize(instance, parameter)
+          @parameter = parameter
+          @instance = instance
+          super(custom_message)
         end
 
-        def initialize(target_parameter, custom_message)
-          @parameter = target_parameter
-          super(custom_message)
+        protected
+
+        def custom_message
+          "Can't get #{parameter_description}"
+        end
+
+        def parameter_description
+          description = "#{instance.class}.#{parameter.name} (#{parameter.description})"
+
+          description += " inherited from #{parameter.scope}" if parameter_inherited?
+
+          description += " defined at #{parameter_location}" if parameter.located?
+
+          description
+        end
+
+        def parameter_inherited?
+          parameter.scoped? && (instance.class != parameter.scope)
+        end
+
+        def parameter_location
+          parameter.source_location.join(':')
         end
       end
     end

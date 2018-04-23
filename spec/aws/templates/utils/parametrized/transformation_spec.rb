@@ -65,7 +65,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'throws an error if sub-parameter constraint is not satisfied' do
       i = test_class.new(something: { a: 1, b: 2, c: nil })
       expect { [i.something.a, i.something.b, i.something.c] }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -106,16 +106,41 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
     it 'fails if the value can be transformed to an array' do
       expect { test_class.new(something: 'abc').something }
-        .to raise_error Aws::Templates::Exception::NestedParameterException
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
 
     it 'returns correct value if sub-constraints are satisfied' do
       expect(test_class.new(something_else: [1, 2, 3]).something_else).to be == [1, 2, 3]
     end
 
-    it 'throws an exception if one or more elements don\'t satisfy sub-constraint' do
-      expect { test_class.new(something_else: [1, nil, 3]).something_else }
-        .to raise_error(/Celestial image/)
+    context 'when one or more elements don\'t satisfy sub-constraint' do
+      let(:exception) do
+        begin
+          test_class.new(something_else: [1, nil, 3]).something_else
+        rescue StandardError => e
+          e
+        end
+      end
+
+      it 'fails' do
+        expect { test_class.new(something_else: [1, nil, 3]).something_else }.to raise_error(
+          Aws::Templates::Exception::ParameterProcessingException,
+          /something_else/
+        )
+      end
+
+      it 'fails transform exception' do
+        expect(exception.cause).to be_a Aws::Templates::Exception::ParameterTransformException
+      end
+
+      it 'fails nested parameter exception' do
+        expect(exception.cause.cause)
+          .to be_a Aws::Templates::Exception::ParameterProcessingException
+      end
+
+      it 'fails with correct message' do
+        expect(exception.cause.cause.message).to match(/Celestial image/)
+      end
     end
   end
 
@@ -158,9 +183,29 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       expect(i.something).to be_nil
     end
 
-    it 'throws exception on syntax error' do
-      i = test_class.new(something: '1a')
-      expect { i.something }.to raise_error(/Expected one of/)
+    context 'with syntax error' do
+      let(:exception) do
+        begin
+          test_class.new(something: '1a').something
+        rescue StandardError => e
+          e
+        end
+      end
+
+      it 'fails' do
+        expect { test_class.new(something: '1a').something }.to raise_error(
+          Aws::Templates::Exception::ParameterProcessingException,
+          /something/
+        )
+      end
+
+      it 'fails transform exception' do
+        expect(exception.cause).to be_a Aws::Templates::Exception::ParameterTransformException
+      end
+
+      it 'fails with correct message' do
+        expect(exception.cause.cause.message).to match(/Expected one of/)
+      end
     end
   end
 
@@ -183,7 +228,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
     it 'fails on wrong value' do
       i = test_class.new(something: [])
-      expect { i.something }.to raise_error Aws::Templates::Exception::NestedParameterException
+      expect { i.something }.to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -206,7 +251,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
     it 'fails on wrong value' do
       i = test_class.new(something: [])
-      expect { i.something }.to raise_error Aws::Templates::Exception::NestedParameterException
+      expect { i.something }.to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -312,9 +357,34 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       expect(i.something2).to be == { 'q' => 3 }
     end
 
-    it 'performs internal constraint check' do
-      i = test_class.new(something2: { q: nil })
-      expect { i.something2 }.to raise_error(/Just a number/)
+    context 'with internal constraint violated' do
+      let(:exception) do
+        begin
+          test_class.new(something2: { q: nil }).something2
+        rescue StandardError => e
+          e
+        end
+      end
+
+      it 'fails' do
+        expect { test_class.new(something2: { q: nil }).something2 }.to raise_error(
+          Aws::Templates::Exception::ParameterProcessingException,
+          /something/
+        )
+      end
+
+      it 'fails transform exception' do
+        expect(exception.cause).to be_a Aws::Templates::Exception::ParameterTransformException
+      end
+
+      it 'fails nested parameter exception' do
+        expect(exception.cause.cause)
+          .to be_a Aws::Templates::Exception::ParameterProcessingException
+      end
+
+      it 'fails with correct message' do
+        expect(exception.cause.cause.message).to match(/Just a number/)
+      end
     end
   end
 

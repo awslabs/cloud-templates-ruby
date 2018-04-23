@@ -50,30 +50,30 @@ describe Aws::Templates::Help::Rdoc::Artifact do
     "    Very good thing\n\n\n" \
     "  \e[4mParameters\e[m\n" \
     "  * \e[4mlabel\e[m Artifact's label\n" \
-    "    * constraint:\n" \
-    "      * can't be nil\n" \
+    "      * constraint:\n" \
+    "        * can't be nil\n" \
     "  * \e[4mparent\e[m Artifact parent\n" \
     "  * \e[4mundocumented\e[m \n" \
     "  * \e[4mundocumented_with_constraint\e[m \n" \
-    "    * constraint:\n" \
-    "      * can't be nil\n" \
+    "      * constraint:\n" \
+    "        * can't be nil\n" \
     "  * \e[4mundocumented_with_constraint_and_transform\e[m \n" \
-    "    * transformation:\n" \
-    "      * to string\n" \
-    "    * constraint:\n" \
-    "      * can't be nil\n" \
+    "      * transformation:\n" \
+    "        * to string\n" \
+    "      * constraint:\n" \
+    "        * can't be nil\n" \
     "  * \e[4mdocumented\e[m Documented parameter\n" \
     "  * \e[4mdocumented_with_constraint\e[m Documented parameter with constraint\n" \
-    "    * constraint:\n" \
-    "      * one of: 1,2,3\n" \
+    "      * constraint:\n" \
+    "        * one of: 1,2,3\n" \
     "  * \e[4mdocumented_with_constraint_and_transform\e[m Documented parameter with\n" \
     "    constraint and transformation\n" \
-    "    * transformation:\n" \
-    "      * as a list where elements can be anything\n" \
-    "    * constraint:\n" \
-    "      * satisfies all of the following:\n" \
-    "        * can't be nil\n" \
-    "        * not too big\n\n" \
+    "      * transformation:\n" \
+    "        * as a list where elements can be anything\n" \
+    "      * constraint:\n" \
+    "        * satisfies all of the following:\n" \
+    "          * can't be nil\n" \
+    "          * not too big\n\n" \
     "  \e[4mDefaults\e[m\n" \
     "    * \e[4mlabel\e[m :ert\n" \
     "    * \e[4mroot\e[m :a\n" \

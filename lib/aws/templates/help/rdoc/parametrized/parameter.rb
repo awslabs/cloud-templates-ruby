@@ -14,12 +14,13 @@ module Aws
             for_entity Templates::Utils::Parametrized::Parameter
 
             def provide
-              sub(description) do |s|
-                s << list(:BULLET) do |l|
-                  add_transformation(l)
-                  add_constraint(l)
-                end
+              item = sub(description)
+
+              unless context.concept.nil? || context.concept.empty?
+                item << processed_for(context.concept)
               end
+
+              item
             end
 
             private
@@ -28,24 +29,6 @@ module Aws
               desc = "_#{context.name}_ "
               desc.concat(context.description) if context.description
               text(desc)
-            end
-
-            def add_transformation(lst)
-              return unless context.transform
-
-              lst << sub(
-                text('transformation:'),
-                processed_for(context.transform)
-              )
-            end
-
-            def add_constraint(lst)
-              return unless context.constraint
-
-              lst << sub(
-                text('constraint:'),
-                processed_for(context.constraint)
-              )
             end
           end
         end

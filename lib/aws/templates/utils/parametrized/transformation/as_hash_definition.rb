@@ -31,41 +31,34 @@ module Aws
           #    i.param # => {1=>2}
           #    i = Piece.new(:param2 => [[1,'3']])
           #    i.param # => {1=>3}
-          class AsHash < self
-            attr_reader :definition
+          class AsHashDefinition
+            include Parametrized::Constraint::Dsl
+            include Parametrized::Transformation::Dsl
 
-            def initialize(&blk)
-              @definition = Transformation::AsHashDefinition.new(&blk) if blk
+            attr_reader :key_parameter
+            attr_reader :value_parameter
+
+            def key(opts)
+              @key_parameter = _create_parameter(opts)
             end
 
-            protected
+            def value(opts)
+              @value_parameter = _create_parameter(opts)
+            end
 
-            def transform(value, instance)
-              return if value.nil?
-
-              result = Hash[value]
-
-              result = _process_hash(definition, result, instance) unless definition.nil?
-
-              result
+            def initialize(&blk)
+              instance_eval(&blk)
             end
 
             private
 
-            def _process_hash(definition, hsh, instance)
-              Hash[
-                hsh.map do |k, v|
-                  [
-                    _process_value(definition.key_parameter, instance, k),
-                    _process_value(definition.value_parameter, instance, v)
-                  ]
-                end
-              ]
-            end
-
-            def _process_value(parameter, instance, value)
-              return value if parameter.nil?
-              parameter.process_value(instance, value)
+            def _create_parameter(opts)
+              Parametrized::Parameter.new(
+                opts[:name],
+                description: opts[:description],
+                transform: opts[:transform],
+                constraint: opts[:constraint]
+              )
             end
           end
         end

@@ -23,36 +23,21 @@ module Aws
           #
           #    i = Piece.new(:a => { :b => 3 })
           #    i.param1 # => 3
-          class Path < self
-            attr_reader :path
+          class Index < self
+            attr_reader :index
 
-            def initialize(*path, &path_calculation)
-              @path = _check_path(path.empty? ? path_calculation : path)
+            def initialize(index)
+              @index = index
             end
 
             def arguments
-              path
+              [index]
             end
 
             protected
 
             def get(_, instance)
-              if path.respond_to?(:to_proc)
-                instance.options[*instance.instance_eval(&path)]
-              elsif path.respond_to?(:to_a)
-                instance.options[*path]
-              end
-            end
-
-            private
-
-            def _check_path(path)
-              _raise_wrong_path(path) unless path.respond_to?(:to_proc) || path.respond_to?(:to_a)
-              path
-            end
-
-            def _raise_wrong_path(path)
-              raise ArgumentError.new("Path can be either array or Proc: #{path.inspect}")
+              instance.options[index]
             end
           end
         end

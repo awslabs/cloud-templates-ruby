@@ -8,7 +8,7 @@ module Aws
       #
       # A parameter was specified with the same name as exsiting method
       # in the class or in an ancestor of the class.
-      class ParameterMethodNameConflict < ParametrizedDSLError
+      class ParameterMethodNameConflict < ParametrizedDslError
         # Method object of the method specified
         attr_reader :method_object
 

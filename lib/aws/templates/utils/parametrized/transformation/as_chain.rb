@@ -28,9 +28,11 @@ module Aws
           class AsChain < self
             attr_reader :components
 
-            def initialize(components)
+            def initialize(*components)
               @components = _check_components(components)
             end
+
+            protected
 
             def transform(value, instance)
               return if value.nil?

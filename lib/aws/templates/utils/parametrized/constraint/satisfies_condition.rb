@@ -32,6 +32,8 @@ module Aws
             attr_reader :condition
             attr_reader :description
 
+            as_dsl :satisfies
+
             def initialize(description, &cond_block)
               @condition = cond_block
               @description = description

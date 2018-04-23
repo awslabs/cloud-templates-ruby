@@ -19,6 +19,8 @@ module Aws
         # It provides protected method transform which should be overriden in
         # all concrete transformation classes.
         class Transformation
+          include Utils::Dsl::Element
+
           ##
           # Creates closure with transformation invocation
           #
@@ -37,9 +39,26 @@ module Aws
             transform = self
 
             lambda do |value|
-              transform.transform(value, self)
+              transform.transform_wrapper(value, self)
             end
           end
+
+          ##
+          # Wraps transformation-dependent method
+          #
+          # It wraps transformation-dependent "transform" method into a rescue block
+          # to standardize exception type and information provided by failed
+          # transformation
+          # * +value+ - parameter value to be transformed
+          # * +instance+ - the instance the value originates from; used for context-dependent
+          #                calculations
+          def transform_wrapper(value, instance)
+            transform(value, instance)
+          rescue StandardError
+            raise Templates::Exception::ParameterTransformException.new(self, instance, value)
+          end
+
+          protected
 
           ##
           # Transform method

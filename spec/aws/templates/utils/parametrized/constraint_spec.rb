@@ -39,7 +39,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws error when parameter is not specified' do
       expect { test_class.new(something_else: 1).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -56,7 +56,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when a value is specified which is not a member of the enumeration' do
       expect { test_class.new(something: 5).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -69,12 +69,12 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error if one of the constraints are failed (not_nil)' do
       expect { test_class.new(something_else: 2).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
 
     it 'throws an error if one of the constraints are failed (enum)' do
       expect { test_class.new(something: 5).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -96,7 +96,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when requirement is not satisfied' do
       expect { test_class.new(something: 5).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -124,7 +124,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when conditional constraint is not met' do
       expect { test_class.new(something: :condition, requirement: 2).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
 
     it 'passes when other conditional constraint is met' do
@@ -146,7 +146,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when condition is not satisfied' do
       expect { test_class.new(something: 1).something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -163,7 +163,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     it 'throws an error when condition is not satisfied' do
       expect { test_class.new(something: 'rooster').something }
-        .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
   end
 
@@ -179,8 +179,29 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         expect(test_class.new(something: ::Object).something).to be == ::Object
       end
 
-      it 'fails when arbitrary object is passed' do
-        expect { test_class.new(something: 'Object').something }.to raise_error(/Object.*is not/)
+      context 'with arbitrary object' do
+        let(:exception) do
+          begin
+            test_class.new(something: 'Object').something
+          rescue StandardError => e
+            e
+          end
+        end
+
+        it 'fails' do
+          expect { test_class.new(something: 'Object').something }.to raise_error(
+            Aws::Templates::Exception::ParameterProcessingException,
+            /something/
+          )
+        end
+
+        it 'fails constraint exception' do
+          expect(exception.cause).to be_a Aws::Templates::Exception::ParameterConstraintException
+        end
+
+        it 'fails with correct message' do
+          expect(exception.cause.cause.message).to match(/Object.*is not/)
+        end
       end
     end
 
@@ -195,9 +216,29 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         expect(test_class.new(something: ::String).something).to be == ::String
       end
 
-      it 'fails when arbitrary Module is passed' do
-        expect { test_class.new(something: ::BasicObject).something }
-          .to raise_error(/BasicObject is not a child of Object/)
+      context 'when arbitrary Module is passed' do
+        let(:exception) do
+          begin
+            test_class.new(something: ::BasicObject).something
+          rescue StandardError => e
+            e
+          end
+        end
+
+        it 'fails' do
+          expect { test_class.new(something: ::BasicObject).something }.to raise_error(
+            Aws::Templates::Exception::ParameterProcessingException,
+            /something/
+          )
+        end
+
+        it 'fails constraint exception' do
+          expect(exception.cause).to be_a Aws::Templates::Exception::ParameterConstraintException
+        end
+
+        it 'fails with correct message' do
+          expect(exception.cause.cause.message).to match(/BasicObject is not a child of Object/)
+        end
       end
     end
   end
@@ -216,7 +257,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
       it 'throws an error when wrong object is passed' do
         expect { test_class.new(something: 123).something }
-          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+          .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
     end
 
@@ -237,12 +278,12 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
       it 'throws an error when the object doesn\'t satisfy condition' do
         expect { test_class.new(something: '12345').something }
-          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+          .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
 
       it 'throws an error when wrong object is passed' do
         expect { test_class.new(something: 123_456).something }
-          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+          .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
     end
   end
@@ -261,7 +302,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
       it 'fails when the object doesn\'t have the field' do
         expect { test_class.new(something: true).something }
-          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+          .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
     end
 
@@ -280,7 +321,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
       it 'fails when the field fails the constraint' do
         expect { test_class.new(something: '123').something }
-          .to raise_error Aws::Templates::Exception::ParameterValueInvalid
+          .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
     end
   end

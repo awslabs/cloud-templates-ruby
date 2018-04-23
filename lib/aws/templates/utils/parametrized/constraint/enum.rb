@@ -23,7 +23,7 @@ module Aws
           class Enum < self
             attr_reader :set
 
-            def initialize(list)
+            def initialize(*list)
               @set = Set.new(list)
             end
 

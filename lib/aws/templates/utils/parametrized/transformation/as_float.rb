@@ -23,7 +23,9 @@ module Aws
           #    i = Piece.new(:param => '23.0')
           #    i.param # => 23.0
           class AsFloat < self
-            include ::Singleton
+            extend Utils::Singleton
+
+            protected
 
             def transform(value, _)
               return if value.nil?

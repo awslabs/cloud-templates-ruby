@@ -7,7 +7,7 @@ module Aws
       # Parameter definition exception
       #
       # Meta-programming exception related to Parametrized DSL
-      class ParametrizedDSLError < StandardError
+      class ParametrizedDslError < StandardError
       end
     end
   end

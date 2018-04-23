@@ -20,10 +20,11 @@ module Aws
           #    i = Piece.new(:param1 => 'Bar')
           #    i.param1 # raise ParameterValueInvalid
           class IsModule < self
+            as_dsl :module?
+
             ##
             # Simple check if something is a Module
             class Baseless < self
-              include ::Singleton
             end
 
             ##
@@ -44,8 +45,8 @@ module Aws
               end
             end
 
-            def self.with(base)
-              base.nil? ? Baseless.instance : Based.new(base)
+            def self.create(base = nil)
+              base.nil? ? Baseless.new : Based.new(base)
             end
 
             protected

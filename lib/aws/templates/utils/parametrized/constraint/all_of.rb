@@ -31,9 +31,9 @@ module Aws
           class AllOf < self
             attr_reader :constraints
 
-            def initialize(constraints)
+            def initialize(*constraints)
               @constraints = constraints
-              self.if(Parametrized.any)
+              self.if(Constraint::Condition.any)
             end
 
             protected

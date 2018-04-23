@@ -11,57 +11,14 @@ module Aws
           # It injects the methods as class-scope methods into mixing classes.
           # The methods are factories to create particular type of getter
           module Dsl
-            include Utils::Inheritable
+            extend Utils::Dsl
 
-            class_scope do
-              ##
-              # Get parameter from instance variables as is
-              #
-              # alias for AsInstanceVariable class
-              def as_instance_variable
-                Parametrized::Getter::AsInstanceVariable.instance
-              end
-
-              ##
-              # Get parameter from Options as is
-              #
-              # alias for AsIs class
-              def as_is
-                Parametrized::Getter::AsIs.instance
-              end
-
-              ##
-              # Calculate value of parameter
-              #
-              # alias for Value class
-              def value(value = nil, &blk)
-                Parametrized::Getter::Value.new(value.nil? ? blk : value)
-              end
-
-              ##
-              # Look up value of the parameter with path
-              #
-              # alias for Path class
-              def path(*value, &blk)
-                Parametrized::Getter::Path.new(value.empty? ? blk : value)
-              end
-
-              ##
-              # Look up value of the parameter with index
-              #
-              # alias for Path class
-              def index(i)
-                Parametrized::Getter::Path.new([i])
-              end
-
-              ##
-              # Choose one non-nil value from nested getters
-              #
-              # alias for OneOf class
-              def one_of(*getters)
-                Parametrized::Getter::OneOf.new(getters)
-              end
-            end
+            elements Getter::AsInstanceVariable, # Get parameter from instance variables as is
+                     Getter::AsIs, # Get parameter from Options as is
+                     Getter::Value, # Calculate value of parameter
+                     Getter::Path, # Look up value of the parameter with path
+                     Getter::OneOf, # Choose one non-nil value from nested getters
+                     Getter::Index # Look up value of the parameter with index
           end
         end
       end

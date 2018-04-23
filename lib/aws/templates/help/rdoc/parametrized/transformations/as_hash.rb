@@ -14,6 +14,8 @@ module Aws
               for_entity Templates::Utils::Parametrized::Transformation::AsHash
 
               def provide
+                return sub(text('as a hash')) if context.definition.nil?
+
                 sub(text('as a hash where:'), key_value_description)
               end
 
@@ -22,8 +24,8 @@ module Aws
               def key_value_description
                 list(
                   :BULLET,
-                  description_for('key', context.key_parameter),
-                  description_for('value', context.value_parameter)
+                  description_for('key', context.definition.key_parameter),
+                  description_for('value', context.definition.value_parameter)
                 )
               end
 
