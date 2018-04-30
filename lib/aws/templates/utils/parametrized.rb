@@ -157,14 +157,14 @@ module Aws
           # Performs intermediate transformation of value if needed (if value is a lambda) and
           # returns it wrapping into Definition instance with the same context if needed
           # (if value is a map)
-          def [](k)
-            target.parameter_names.include?(k) ? target.send(k) : target.options[k]
+          def [](key)
+            target.parameter_names.include?(key) ? target.send(key) : target.options[key]
           end
 
           ##
           # Check if the key is present in the hash
-          def include?(k)
-            target.parameter_names.include?(k) || target.options.include?(k)
+          def include?(key)
+            target.parameter_names.include?(key) || target.options.include?(key)
           end
 
           def initialize(target)

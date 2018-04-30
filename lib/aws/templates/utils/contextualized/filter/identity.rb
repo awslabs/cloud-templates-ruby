@@ -27,7 +27,7 @@ module Aws
             using Contextualized::Refinements
 
             def self.new
-              @singleton ||= super()
+              @new ||= super()
             end
 
             def filter(_, memo, _)

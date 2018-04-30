@@ -57,8 +57,8 @@ module Aws
               {}
             end
 
-            def merge(b)
-              b.to_definition
+            def merge(other)
+              other.to_definition
             end
           end
 
@@ -78,8 +78,8 @@ module Aws
               value
             end
 
-            def merge(b)
-              b.to_definition
+            def merge(other)
+              other.to_definition
             end
 
             def override?
@@ -101,13 +101,13 @@ module Aws
               @scheme = scheme
             end
 
-            def merge(b)
-              if b.is_a? self.class
-                merge(b.scheme)
-              elsif Utils.recursive?(b)
-                self.class.new(Utils.merge(scheme, b) { |left, right| _merge(left, right) })
+            def merge(other)
+              if other.is_a? self.class
+                merge(other.scheme)
+              elsif Utils.recursive?(other)
+                self.class.new(Utils.merge(scheme, other) { |left, right| _merge(left, right) })
               else
-                super(b)
+                super(other)
               end
             end
 
@@ -117,8 +117,8 @@ module Aws
 
             private
 
-            def _merge(a, b)
-              a.override? || b.override? ? b : a.to_definition.merge(b)
+            def _merge(one, another)
+              one.override? || another.override? ? another : one.to_definition.merge(another)
             end
           end
 
@@ -153,37 +153,37 @@ module Aws
           # Pair of definitions which act like one.
           class Pair < Definition
             class << self
-              def [](a, b)
-                return b if b.override? || a.override? || a == Definition.empty
-                return a if b.nil? || b == Definition.empty
-                _unite(a, b)
+              def [](one, another)
+                return another if another.override? || one.override? || one == Definition.empty
+                return one if another.nil? || another == Definition.empty
+                _unite(one, another)
               end
 
               private
 
-              def _unite(a, b)
-                if a.is_a?(self)
-                  new(a.a, a.b.merge(b))
-                elsif b.is_a?(self)
-                  new(a.merge(b.a), b.b)
+              def _unite(one, another)
+                if one.is_a?(self)
+                  new(one.one, one.another.merge(another))
+                elsif another.is_a?(self)
+                  new(one.merge(another.one), another.another)
                 else
-                  new(a, b)
+                  new(one, another)
                 end
               end
             end
 
-            attr_reader :a
-            attr_reader :b
+            attr_reader :one
+            attr_reader :another
 
-            def initialize(a, b)
-              @a = a.to_definition
-              @b = b.to_definition
+            def initialize(one, another)
+              @one = one.to_definition
+              @another = another.to_definition
             end
 
             def for(instance)
-              eval_b = b.for(instance)
+              eval_b = another.for(instance)
               return eval_b if eval_b.override? && !eval_b.nil?
-              eval_a = a.for(instance)
+              eval_a = one.for(instance)
               return eval_b if eval_a.override?
 
               eval_a.to_definition.merge(eval_b).for(instance)
@@ -205,10 +205,10 @@ module Aws
             end
           end
 
-          def merge(b)
-            return b if b.override?
-            return self if b == Definition.empty
-            Pair[self, b]
+          def merge(another)
+            return another if another.override?
+            return self if another == Definition.empty
+            Pair[self, another]
           end
 
           def for(_)
@@ -263,15 +263,15 @@ module Aws
           # Performs intermediate transformation of value if needed (if value is a lambda) and
           # returns it wrapping into Definition instance with the same context if needed
           # (if value is a map)
-          def [](k)
-            result = _process_value(value[k])
+          def [](key)
+            result = _process_value(value[key])
             Utils.recursive?(result) ? _new(result) : result
           end
 
           ##
           # Check if the key is present in the hash
-          def include?(k)
-            value.include?(k)
+          def include?(key)
+            value.include?(key)
           end
 
           # The class already supports recursive concept so return self

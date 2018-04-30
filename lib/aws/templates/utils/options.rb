@@ -178,9 +178,9 @@ module Aws
         # If top-level key exists
         #
         # Checks if top-level key exists. Deleted branches are excluded.
-        def include?(k)
-          found = structures.reverse_each.find { |container| container.include?(k) }
-          !found.nil? && (found[k] != Utils::DeletedMarker)
+        def include?(key)
+          found = structures.reverse_each.find { |container| container.include?(key) }
+          !found.nil? && (found[key] != Utils::DeletedMarker)
         end
 
         ##

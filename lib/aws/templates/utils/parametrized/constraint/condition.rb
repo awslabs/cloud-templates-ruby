@@ -62,7 +62,7 @@ module Aws
             ##
             # Factory method for Unconditional singleton
             def self.any
-              @unconditional ||= Unconditional.new
+              @any ||= Unconditional.new
             end
 
             ##

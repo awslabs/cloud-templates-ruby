@@ -54,22 +54,22 @@ module Aws
 
         ##
         # If the label is present
-        def label?(l)
-          @map.key?(l)
+        def label?(label)
+          @map.key?(label)
         end
 
         ##
         # Extract object by label
-        def [](k)
-          @map[k]
+        def [](key)
+          @map[key]
         end
 
         ##
         # Associate label to the object
-        def []=(k, v)
-          raise 'nil artifacts are not supported' if v.nil?
-          @set << v unless @set.include?(v)
-          @map[k] = v
+        def []=(key, value)
+          raise 'nil artifacts are not supported' if value.nil?
+          @set << value unless @set.include?(value)
+          @map[key] = value
         end
 
         alias values artifacts

@@ -74,8 +74,8 @@ module Aws
           path
         end
 
-        def self.sanitize_load_exception(e, path)
-          raise e unless e.path == path
+        def self.sanitize_load_exception(exc, path)
+          raise exc unless exc.path == path
         end
 
         def self.const_is_loaded?(mod, const_name)

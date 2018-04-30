@@ -56,8 +56,8 @@ module Aws
 
         ##
         # Check if handler exists
-        def include?(k)
-          !self[k].nil?
+        def include?(key)
+          !self[key].nil?
         end
 
         alias handler? include?

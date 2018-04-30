@@ -33,8 +33,8 @@ module Aws
           #
           # Registers the handler class in the processor
           # * +r+ - processor registrar
-          def register_in(r)
-            @processor = r
+          def register_in(registrar)
+            @processor = registrar
             self
           end
 

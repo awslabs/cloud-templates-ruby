@@ -10,8 +10,8 @@ class A
     @params[:label]
   end
 
-  def initialize(p)
-    @params = p
+  def initialize(params)
+    @params = params
   end
 
   def eql?(other)

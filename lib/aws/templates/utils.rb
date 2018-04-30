@@ -102,29 +102,29 @@ module Aws
       ##
       # Recursively merge two "recursive" objects
       # PS: Yes I know that there is "merge" method for *hashes*.
-      def self.merge(a, b, &blk)
-        unless Utils.recursive?(a) && Utils.recursive?(b)
-          return hashify(blk.nil? ? b : blk.call(a, b))
+      def self.merge(one, another, &blk)
+        unless Utils.recursive?(one) && Utils.recursive?(another)
+          return hashify(blk.nil? ? another : blk.call(one, another))
         end
 
-        _merge_back(_merge_forward(a, b, blk), b)
+        _merge_back(_merge_forward(one, another, blk), another)
       end
 
-      def self._merge_forward(a, b, blk)
-        a.keys.each_with_object({}) do |k, hsh|
-          hsh[k] = b[k].nil? ? hashify(a[k]) : merge(a[k], b[k], &blk)
+      def self._merge_forward(one, another, blk)
+        one.keys.each_with_object({}) do |k, hsh|
+          hsh[k] = another[k].nil? ? hashify(one[k]) : merge(one[k], another[k], &blk)
         end
       end
 
-      def self._merge_back(result, b)
-        b.keys
-         .reject { |k| result.include?(k) }
-         .each_with_object(result) { |k, res| res[k] = hashify(b[k]) }
+      def self._merge_back(result, hsh)
+        hsh.keys
+           .reject { |k| result.include?(k) }
+           .each_with_object(result) { |k, res| res[k] = hashify(hsh[k]) }
       end
 
-      def self.hashify(v)
-        return v unless Utils.recursive?(v)
-        v.keys.each_with_object({}) { |k, hsh| hsh[k] = hashify(v[k]) }
+      def self.hashify(value)
+        return value unless Utils.recursive?(value)
+        value.keys.each_with_object({}) { |k, hsh| hsh[k] = hashify(value[k]) }
       end
 
       ##

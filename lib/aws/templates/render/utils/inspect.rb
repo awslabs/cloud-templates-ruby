@@ -48,8 +48,8 @@ module Aws
               end
             end
 
-            def render_pair(k, v)
-              "#{rendered_for(k, depth)}: #{rendered_for(v, depth)}"
+            def render_pair(key, value)
+              "#{rendered_for(key, depth)}: #{rendered_for(value, depth)}"
             end
           end
 

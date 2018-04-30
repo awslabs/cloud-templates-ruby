@@ -34,16 +34,16 @@ module Aws
               # Calculate value of parameter
               #
               # alias for Value class
-              def value(v = nil, &blk)
-                Parametrized::Getter::Value.new(v.nil? ? blk : v)
+              def value(value = nil, &blk)
+                Parametrized::Getter::Value.new(value.nil? ? blk : value)
               end
 
               ##
               # Look up value of the parameter with path
               #
               # alias for Path class
-              def path(*v, &blk)
-                Parametrized::Getter::Path.new(v.empty? ? blk : v)
+              def path(*value, &blk)
+                Parametrized::Getter::Path.new(value.empty? ? blk : value)
               end
 
               ##

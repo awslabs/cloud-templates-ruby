@@ -33,9 +33,9 @@ module Aws
 
               def provide
                 sub do |s|
-                  _add_parts(context.a, s)
+                  _add_parts(context.one, s)
                   s << text('_overlayed_ _with_')
-                  _add_parts(context.b, s)
+                  _add_parts(context.another, s)
                 end
               end
 

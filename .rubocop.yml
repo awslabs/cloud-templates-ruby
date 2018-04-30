@@ -3,7 +3,7 @@ require: rubocop-rspec
 RSpec/NestedGroups:
   Max: 4
 
-Lint/EndAlignment:
+Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 
 Lint/InheritException:
@@ -26,5 +26,7 @@ Style/RaiseArgs:
 Metrics/LineLength:
   Max: 100
 
-Performance/HashEachMethods:
-  Enabled: false
+Naming/UncommunicativeMethodParamName:
+  AllowedNames:
+    - _
+    - id

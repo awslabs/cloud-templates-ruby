@@ -30,19 +30,19 @@ module Aws
               text(desc)
             end
 
-            def add_transformation(l)
+            def add_transformation(lst)
               return unless context.transform
 
-              l << sub(
+              lst << sub(
                 text('transformation:'),
                 processed_for(context.transform)
               )
             end
 
-            def add_constraint(l)
+            def add_constraint(lst)
               return unless context.constraint
 
-              l << sub(
+              lst << sub(
                 text('constraint:'),
                 processed_for(context.constraint)
               )
