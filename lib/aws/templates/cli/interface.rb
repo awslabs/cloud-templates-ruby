@@ -37,12 +37,18 @@ module Aws
                       required: true,
                       type: :string
 
+        method_option :render_parameters,
+                      desc: 'Render parameters',
+                      aliases: :rp,
+                      type: :string
+
         def render(artifact_path)
           say _format(
             Templates::Utils.lookup_module(artifact_path),
             Templates::Utils.lookup_module(options[:render]),
             Aws::Templates::Cli::Formatter.format_as(options[:format]),
-            ::JSON.parse(options[:options] || _as_string(STDIN), symbolize_names: true)
+            _artifact_options,
+            _render_parameters
           )
         end
 
@@ -71,8 +77,13 @@ module Aws
 
         private
 
-        def _format(artifact, render, format, artifact_options)
-          format.format(render.view_for(artifact.new(artifact_options)).to_rendered)
+        def _format(artifact, render, format, artifact_options, render_parameters)
+          format.format(
+            render.view_for(
+              artifact.new(artifact_options),
+              render_parameters
+            ).to_rendered
+          )
         end
 
         def _as_string(obj)
@@ -85,6 +96,17 @@ module Aws
           else
             obj.to_s
           end
+        end
+
+        def _artifact_options
+          ::JSON.parse(options[:options] || _as_string(STDIN), symbolize_names: true)
+        end
+
+        def _render_parameters
+          options[:render_parameters] && ::JSON.parse(
+            options[:render_parameters],
+            symbolize_names: true
+          )
         end
       end
     end
