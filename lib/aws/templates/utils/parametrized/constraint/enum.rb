@@ -24,7 +24,7 @@ module Aws
             attr_reader :set
 
             def initialize(*list)
-              @set = Set.new(list)
+              @set = Set.new(list.flatten(1))
             end
 
             protected
