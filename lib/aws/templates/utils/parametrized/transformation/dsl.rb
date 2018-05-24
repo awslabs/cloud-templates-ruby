@@ -23,7 +23,8 @@ module Aws
                      Transformation::AsString, # Convert input into string
                      Transformation::AsBoolean, # Convert input into boolean
                      Transformation::AsHash, # Convert input into hash
-                     Transformation::AsModule # Convert input into a class
+                     Transformation::AsModule, # Convert input into a class
+                     Transformation::AsExpression # Convert input into an "expression"
           end
         end
       end

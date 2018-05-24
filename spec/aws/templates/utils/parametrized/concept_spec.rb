@@ -15,7 +15,8 @@ describe Aws::Templates::Utils::Parametrized::Concept do
   end
 
   it 'fails on nil' do
-    expect { concept.process_value(self, nil) }.to raise_error
+    expect { concept.process_value(self, nil) }
+      .to raise_error Aws::Templates::Exception::ParameterConstraintException
   end
 
   context 'with chained concepts' do
@@ -34,7 +35,8 @@ describe Aws::Templates::Utils::Parametrized::Concept do
     end
 
     it 'fails on constraint' do
-      expect { chained.process_value(self, 1) }.to raise_error
+      expect { chained.process_value(self, 1) }
+        .to raise_error Aws::Templates::Exception::ParameterConstraintException
     end
   end
 end

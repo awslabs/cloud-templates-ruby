@@ -1,0 +1,113 @@
+require 'aws/templates/utils/expressions/parser/nodes'
+
+module Aws::Templates::Utils::Expressions::Parser
+  grammar Grammar
+    rule disjunction
+      _left:conjunction _rest:(disjunction_part)* <Nodes::Operation>
+    end
+
+    rule disjunction_part
+      space? _op:'|' space? _argument:conjunction <Nodes::Part>
+    end
+
+    rule conjunction
+      _left:logical_primary _rest:(conjunction_part)* <Nodes::Operation>
+    end
+
+    rule conjunction_part
+      space? _op:'&' space? _argument:logical_primary <Nodes::Part>
+    end
+
+    rule logical_primary
+      _argument:(negation / comparison) <Nodes::Wrapper>
+    end
+
+    rule negation
+      negation_op space? _argument:logical_primary <Nodes::Negation>
+    end
+
+    rule negation_op
+      '!' ![=~]
+    end
+
+    rule comparison
+      _left:additive space? _right:(_op:comparison_op space? _argument:additive)? <Nodes::Comparison>
+    end
+
+    rule comparison_op
+      '<=' / '>=' / '!=' / '!~' / '=~' / '==' / '<' / '>'
+    end
+
+    rule additive
+      _left:multiplicative _rest:(additive_part)* <Nodes::Operation>
+    end
+
+    rule additive_part
+      space? _op:additive_op space? _argument:multiplicative <Nodes::Part>
+    end
+
+    rule additive_op
+      '+' / '-'
+    end
+
+    rule multiplicative
+      _left:expression_primary _rest:(multiplicative_part)* <Nodes::Operation>
+    end
+
+    rule multiplicative_part
+      space? _op:multiplicative_op space? _argument:expression_primary <Nodes::Part>
+    end
+
+    rule multiplicative_op
+      '*' / [/]
+    end
+
+    rule expression_primary
+      _argument:(parenthesis / boolean / function / variable / number / string) <Nodes::Wrapper>
+    end
+
+    rule parenthesis
+      '(' space? _argument:disjunction space? ')' <Nodes::Wrapper>
+    end
+
+    rule boolean
+      _argument:('true' / 'false') <Nodes::BooleanLiteral>
+    end
+
+    rule function
+      _name:function_name '(' space? _first:disjunction _rest:(space? ',' space? _argument:disjunction)* space? ')' <Nodes::Function>
+    end
+
+    rule function_name
+      identifier &([(]) <Nodes::Identifier>
+    end
+
+    rule variable
+      _name:identifier <Nodes::Variable>
+    end
+
+    rule identifier
+      [_a-zA-Z] [_0-9a-zA-Z]* <Nodes::Identifier>
+    end
+
+    rule number
+      integer / float <Nodes::Wrapper>
+    end
+
+    rule integer
+      ('-' / '+')? [0-9]+ !'.' <Nodes::IntegerLiteral>
+    end
+
+    rule float
+      ('-' / '+')? [0-9]+ '.' [0-9]+ <Nodes::FloatLiteral>
+    end
+
+    rule string
+      '"' _content:(('\"' / !'"' .)*) '"' <Nodes::StringLiteral>
+    end
+
+    rule space
+      ' '+
+    end
+  end
+end

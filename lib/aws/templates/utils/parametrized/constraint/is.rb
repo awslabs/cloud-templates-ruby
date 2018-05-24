@@ -49,7 +49,7 @@ module Aws
 
             def _find_ancestor(obj)
               key = obj.class.ancestors.find { |klass| schema.include?(klass) }
-              raise "#{obj.inspect} (#{obj.class}) is not recognized" if key.nil?
+              raise "#{obj.inspect} has invalid type #{obj.class}" if key.nil?
               key
             end
           end

@@ -33,7 +33,7 @@ module Aws
             end
           end
 
-          define_view(::Object, InspectView) do
+          define_view(::BasicObject, InspectView) do
             def to_rendered
               depth > 0 ? instance.inspect : instance.to_s
             end

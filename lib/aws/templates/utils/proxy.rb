@@ -10,6 +10,11 @@ module Aws
       class Proxy < BasicObject
         attr_reader :delegate
 
+        def self.inherited(klass)
+          super
+          klass.send(:define_method, :class) { klass }
+        end
+
         ##
         # Equality
         #
