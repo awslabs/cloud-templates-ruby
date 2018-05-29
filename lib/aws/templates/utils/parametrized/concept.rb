@@ -11,6 +11,9 @@ module Aws
         # includes type constraint and transformation. Concepts can be chained together to represent
         # increasingly complex transformation and constraints.
         class Concept
+          extend Utils::Parametrized::Constraint::Dsl
+          extend Utils::Parametrized::Transformation::Dsl
+
           ##
           # Identity concept
           #
@@ -45,10 +48,10 @@ module Aws
 
             def &(other)
               self.class.new(
-                if concept.is_as?(self.class)
+                if other.is_as?(self.class)
                   concepts + other.concepts
                 else
-                  concepts.dup << concept
+                  concepts.dup << other
                 end
               )
             end
@@ -66,15 +69,16 @@ module Aws
             private
 
             def _check_concept(concept)
-              return if concept.respond_to?(process_value)
+              return if concept.respond_to?(:process_value)
               raise "#{parent.inspect} is not a concept"
             end
           end
 
-          def self.from(obj)
-            return Empty.instance if obj.nil?
+          def self.from(obj = nil, &blk)
             return obj if obj.respond_to?(:process_value)
             return with_parameters(obj.to_hash) if obj.respond_to?(:to_hash)
+            return with_parameters(instance_eval(&blk).to_hash) if block_given?
+            return Empty.instance if obj.nil?
             raise "#{obj.inspect} can't be transformed to a concept"
           end
 
@@ -96,7 +100,7 @@ module Aws
           end
 
           def &(other)
-            Chain.new(self, other)
+            Chain.new([self, other])
           end
 
           def empty?
