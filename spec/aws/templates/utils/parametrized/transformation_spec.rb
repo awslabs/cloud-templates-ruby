@@ -388,6 +388,24 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     end
   end
 
+  describe 'as_json' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_json
+      end
+    end
+
+    it 'passes nil as is' do
+      i = test_class.new(something: nil)
+      expect(i.something).to be_nil
+    end
+
+    it 'looks up class name' do
+      i = test_class.new(something: { q: 1 })
+      expect(i.something).to be == '{"q":1}'
+    end
+  end
+
   describe 'as_module' do
     let(:test_class) do
       Class.new(parametrized_class) do

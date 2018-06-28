@@ -89,6 +89,8 @@ module Aws
                    Rdoc.lazy::Parametrized::Transformations::AsParsed
           register Templates.lazy::Utils::Parametrized::Transformation::AsString,
                    Rdoc.lazy::Parametrized::Transformations::AsString
+          register Templates.lazy::Utils::Parametrized::Transformation::AsJson,
+                   Rdoc.lazy::Parametrized::Transformations::AsJson
 
           register Templates.lazy::Utils::Parametrized::Concept,
                    Rdoc.lazy::Parametrized::Concept

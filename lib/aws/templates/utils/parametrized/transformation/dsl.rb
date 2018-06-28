@@ -24,7 +24,8 @@ module Aws
                      Transformation::AsBoolean, # Convert input into boolean
                      Transformation::AsHash, # Convert input into hash
                      Transformation::AsModule, # Convert input into a class
-                     Transformation::AsExpression # Convert input into an "expression"
+                     Transformation::AsExpression, # Convert input into an "expression"
+                     Transformation::AsJson # Print the value into JSON string
           end
         end
       end
