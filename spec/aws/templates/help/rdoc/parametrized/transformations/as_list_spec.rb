@@ -19,7 +19,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Transformations::AsList do
     end
   end
 
-  context 'with typed element' do
+  context 'with typed element and uniqueness' do
     let(:parametrized) do
       Module.new do
         include Aws::Templates::Utils::Parametrized
@@ -27,13 +27,18 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Transformations::AsList do
                   transform: as_list(
                     name: :thing,
                     description: 'One of many',
-                    constraint: not_nil
+                    constraint: not_nil,
+                    unique: true
                   )
       end
     end
 
     it 'prints documentation' do
       expect(help).to match(/typed_list_field.*thing.*One of many.*be nil/m)
+    end
+
+    it 'mentions that elements should be unique' do
+      expect(help).to match(/typed_list_field.*without duplicates.*/m)
     end
   end
 end

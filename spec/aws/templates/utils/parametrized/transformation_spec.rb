@@ -85,6 +85,14 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
                     description: 'Celestial image',
                     constraint: not_nil
                   )
+        parameter :something_without_duplicates,
+                  description: 'Absolutely incomprehensible',
+                  transform: as_list(
+                    name: :element,
+                    description: 'Celestial image',
+                    constraint: not_nil,
+                    unique: true
+                  )
       end
     end
 
@@ -104,13 +112,26 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       expect(test_class.new(something: 'abc'.each_char).something).to be == %w[a b c]
     end
 
-    it 'fails if the value can be transformed to an array' do
+    it 'fails if the value can not be transformed to an array' do
       expect { test_class.new(something: 'abc').something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
 
     it 'returns correct value if sub-constraints are satisfied' do
       expect(test_class.new(something_else: [1, 2, 3]).something_else).to be == [1, 2, 3]
+    end
+
+    context 'when uniqueness is required' do
+      it 'works if elements are unique' do
+        expect(test_class.new(something_without_duplicates: [1, 2, 3]).something_without_duplicates)
+          .to be == [1, 2, 3]
+      end
+
+      it 'fails if there are duplicates' do
+        expect do
+          test_class.new(something_without_duplicates: [1, 1, 3]).something_without_duplicates
+        end.to raise_error Aws::Templates::Exception::ParameterProcessingException
+      end
     end
 
     context 'when one or more elements don\'t satisfy sub-constraint' do

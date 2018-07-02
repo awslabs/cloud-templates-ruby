@@ -17,11 +17,18 @@ module Aws
                 parameter = context.sub_parameter
                 sub do |s|
                   if parameter.nil?
-                    s << text('as a list where elements can be anything')
+                    s << text("#{_blurb} can be anything")
                   else
-                    s << text('as a list where elements are:') << processed_for(parameter)
+                    s << text("#{_blurb} are:") << processed_for(parameter)
                   end
                 end
+              end
+
+              private
+
+              def _blurb
+                part = 'without duplicates ' if context.unique?
+                "as a list #{part}where elements"
               end
             end
           end

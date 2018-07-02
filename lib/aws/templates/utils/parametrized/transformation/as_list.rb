@@ -1,4 +1,5 @@
 require 'aws/templates/utils'
+require 'set'
 
 module Aws
   module Templates
@@ -61,14 +62,26 @@ module Aws
           class AsList < self
             attr_reader :sub_parameter
 
-            def initialize(options = nil)
-              return if options.nil?
+            def unique?
+              @is_unique
+            end
+
+            def initialize(
+              name: nil,
+              description: nil,
+              transform: nil,
+              constraint: nil,
+              unique: false
+            )
+              @is_unique = unique
+
+              return if [name, description, transform, constraint].all?(&:nil?)
 
               @sub_parameter = Parametrized::Parameter.new(
-                options[:name],
-                description: options[:description],
-                transform: options[:transform],
-                constraint: options[:constraint]
+                name || :element,
+                description: description,
+                transform: transform,
+                constraint: constraint
               )
             end
 
@@ -79,10 +92,25 @@ module Aws
 
               raise "#{value.inspect} is not a list" unless value.respond_to?(:to_a)
 
-              if sub_parameter
+              result = if sub_parameter
                 value.to_a.map { |el| sub_parameter.process_value(instance, el) }
               else
                 value.to_a
+              end
+
+              _check_for_uniqueness(result) if unique?
+
+              result
+            end
+
+            private
+
+            def _check_for_uniqueness(result)
+              set = Set.new
+
+              result.each do |element|
+                raise "#{element.inspect} is not unique" if set.include?(element)
+                set << element
               end
             end
           end

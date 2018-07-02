@@ -52,12 +52,20 @@ module Aws
 
             private
 
-            def _create_parameter(opts)
+            def _create_key(name: nil, description: nil, transform: nil, constraint: nil)
+              _create_parameter(name || :key, description, transform, constraint)
+            end
+
+            def _create_value(name: nil, description: nil, transform: nil, constraint: nil)
+              _create_parameter(name || :value, description, transform, constraint)
+            end
+
+            def _create_parameter(name: nil, description: nil, transform: nil, constraint: nil)
               Parametrized::Parameter.new(
-                opts[:name],
-                description: opts[:description],
-                transform: opts[:transform],
-                constraint: opts[:constraint]
+                name || :object,
+                description: description,
+                transform: transform,
+                constraint: constraint
               )
             end
           end
