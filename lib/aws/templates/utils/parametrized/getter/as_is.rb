@@ -22,8 +22,6 @@ module Aws
           #    i = Piece.new(:param1 => 3)
           #    i.param1 # => 3
           class AsIs < self
-            extend Utils::Singleton
-
             protected
 
             def get(parameter, instance)

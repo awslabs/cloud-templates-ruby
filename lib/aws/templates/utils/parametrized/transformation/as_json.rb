@@ -24,8 +24,6 @@ module Aws
           #    i = Piece.new(:param => {q: 1})
           #    i.param # => '{"q":1}'
           class AsJson < self
-            extend Utils::Singleton
-
             protected
 
             def transform(value, _)

@@ -23,7 +23,6 @@ module Aws
           #    i = Piece.new(:param => 23)
           #    i.param # => '23'
           class AsString < self
-            extend Utils::Singleton
             using Utils::Dependency::Refinements
 
             protected

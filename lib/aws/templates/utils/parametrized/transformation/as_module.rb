@@ -24,8 +24,6 @@ module Aws
           #    i = Piece.new(:param => 'Object')
           #    i.param # => Object
           class AsModule < self
-            extend Utils::Singleton
-
             protected
 
             def transform(value, _)

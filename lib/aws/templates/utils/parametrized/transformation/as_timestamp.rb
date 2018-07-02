@@ -24,8 +24,6 @@ module Aws
           #    i = Piece.new(:param => '01 May 2018 10:00:00')
           #    i.param # => <Time>
           class AsTimestamp < self
-            extend Utils::Singleton
-
             protected
 
             def transform(value, _)

@@ -23,8 +23,6 @@ module Aws
           #    i = Piece.new(:param => '23.0')
           #    i.param # => 23.0
           class AsFloat < self
-            extend Utils::Singleton
-
             protected
 
             def transform(value, _)
