@@ -25,7 +25,8 @@ module Aws
                      Transformation::AsHash, # Convert input into hash
                      Transformation::AsModule, # Convert input into a class
                      Transformation::AsExpression, # Convert input into an "expression"
-                     Transformation::AsJson # Print the value into JSON string
+                     Transformation::AsJson, # Print the value into JSON string
+                     Transformation::AsTimestamp # Transform passed value into Time object
           end
         end
       end

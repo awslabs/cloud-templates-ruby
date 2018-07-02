@@ -91,6 +91,8 @@ module Aws
                    Rdoc.lazy::Parametrized::Transformations::AsString
           register Templates.lazy::Utils::Parametrized::Transformation::AsJson,
                    Rdoc.lazy::Parametrized::Transformations::AsJson
+          register Templates.lazy::Utils::Parametrized::Transformation::AsTimestamp,
+                   Rdoc.lazy::Parametrized::Transformations::AsTimestamp
 
           register Templates.lazy::Utils::Parametrized::Concept,
                    Rdoc.lazy::Parametrized::Concept

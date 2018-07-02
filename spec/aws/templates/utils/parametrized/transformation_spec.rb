@@ -406,6 +406,24 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     end
   end
 
+  describe 'as_timestamp' do
+    let(:test_class) do
+      Class.new(parametrized_class) do
+        parameter :something, transform: as_timestamp
+      end
+    end
+
+    it 'passes nil as is' do
+      i = test_class.new(something: nil)
+      expect(i.something).to be_nil
+    end
+
+    it 'looks up class name' do
+      i = test_class.new(something: '2018-05-01T10:00:00Z')
+      expect(i.something.to_s).to be == '2018-05-01 10:00:00 UTC'
+    end
+  end
+
   describe 'as_module' do
     let(:test_class) do
       Class.new(parametrized_class) do
