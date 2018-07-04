@@ -260,6 +260,13 @@ module Aws
 
             parameter_object = Parameter.new(name, spec)
             parameter_object.location = caller_locations[0..0].first
+            accept_parameter(parameter_object)
+          end
+
+          def accept_parameter(parameter_object)
+            name = parameter_object.name
+            raise_already_exists(name) if method_defined?(name)
+
             parameter_object.scope = self
             parameters[name] = parameter_object
 
