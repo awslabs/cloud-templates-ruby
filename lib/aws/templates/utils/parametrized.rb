@@ -11,11 +11,6 @@ module Aws
       # value extraction, constraints checking and transformation. Essentially,
       # it's domain-specific extended implementation of attr_reader.
       module Parametrized
-        include Utils::Guarded
-        include Utils::Dependency::Dependent
-        include Utils::Inheritable
-        include Utils::Inspectable
-
         ##
         # Parameter object
         #
@@ -30,13 +25,10 @@ module Aws
           attr_accessor :concept
 
           def getter_for(instance = nil)
-            @getter || (
-              instance &&
-              (
-                (instance.respond_to?(:getter) && instance.getter) ||
-                (instance.class.respond_to?(:getter) && instance.class.getter)
-              )
-            )
+            return @getter unless @getter.nil?
+            return if instance.nil?
+            return instance.getter if instance.respond_to?(:getter)
+            return instance.class.getter if instance.class.respond_to?(:getter)
           end
 
           ##
@@ -94,15 +86,15 @@ module Aws
           private
 
           def extract_value(instance)
-            getter = getter_for(instance)
-            raise Templates::Exception::ParameterGetterIsNotDefined.new(self) if getter.nil?
+            obj = getter_for(instance)
+            raise Templates::Exception::ParameterGetterIsNotDefined.new(instance, self) if obj.nil?
 
-            if getter.respond_to?(:to_hash)
-              getter
-            elsif getter.respond_to?(:to_proc)
-              execute_getter(instance, getter)
+            if obj.respond_to?(:to_hash)
+              obj
+            elsif obj.respond_to?(:to_proc)
+              execute_getter(instance, obj)
             else
-              getter
+              obj
             end
           end
 
@@ -154,64 +146,15 @@ module Aws
           end
         end
 
-        instance_scope do
-          def guarded_get(instance, parameter_object)
-            guarded_for(instance, parameter_object) { parameter_object.get(self) }
-          end
-
-          ##
-          # Lazy initializer
-          def dependencies
-            if @dependencies.nil?
-              @dependencies = ::Set.new
-              depends_on(parameter_names.map { |name| send(name) })
-            end
-
-            @dependencies
-          end
-
-          ##
-          # Parameter names list
-          #
-          # Instance-level alias for list_all_parameter_names
-          def parameter_names
-            self.class.list_all_parameter_names
-          end
-
-          ##
-          # Validate all parameters
-          #
-          # Performs calculation of all specified parameters to check options validity
-          def validate
-            parameter_names.each { |name| send(name) }
-          end
-
-          ##
-          # Evaluate all parameters
-          #
-          # Return parameters as a hash
-          def parameters_map
-            parameter_names.each_with_object({}) { |name, obj| obj[name] = send(name) }
-          end
-
-          ##
-          # Transforms parametrized into an instance of recursive concept
-          def to_recursive
-            RecursiveAdapter.new(self)
-          end
-
-          attr_reader :getter
-        end
+        include Utils::Inheritable
+        include Utils::Guarded
+        include Utils::Inspectable
 
         ##
         # Class-level mixins
         #
         # It's a DSL extension to declaratively define parameters.
         class_scope do
-          include Getter::Dsl
-          include Constraint::Dsl
-          include Transformation::Dsl
-
           ##
           # List all defined parameter names
           #
@@ -284,7 +227,60 @@ module Aws
 
             raise Aws::Templates::Exception::ParameterMethodNameConflict.new(instance_method(name))
           end
+
+          include Getter::Dsl
+          include Constraint::Dsl
+          include Transformation::Dsl
         end
+
+        instance_scope do
+          def guarded_get(instance, parameter_object)
+            guarded_for(instance, parameter_object) { parameter_object.get(self) }
+          end
+
+          ##
+          # Lazy initializer
+          def dependencies
+            if @dependencies.nil?
+              @dependencies = ::Set.new
+              depends_on(parameter_names.map { |name| send(name) })
+            end
+
+            @dependencies
+          end
+
+          ##
+          # Parameter names list
+          #
+          # Instance-level alias for list_all_parameter_names
+          def parameter_names
+            self.class.list_all_parameter_names
+          end
+
+          ##
+          # Validate all parameters
+          #
+          # Performs calculation of all specified parameters to check options validity
+          def validate
+            parameter_names.each { |name| send(name) }
+          end
+
+          ##
+          # Evaluate all parameters
+          #
+          # Return parameters as a hash
+          def parameters_map
+            parameter_names.each_with_object({}) { |name, obj| obj[name] = send(name) }
+          end
+
+          ##
+          # Transforms parametrized into an instance of recursive concept
+          def to_recursive
+            RecursiveAdapter.new(self)
+          end
+        end
+
+        include Utils::Dependency::Dependent
       end
     end
   end
