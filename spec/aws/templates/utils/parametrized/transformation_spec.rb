@@ -421,9 +421,14 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       expect(i.something).to be_nil
     end
 
-    it 'looks up class name' do
+    it 'returns hash if simple hash is passed' do
       i = test_class.new(something: { q: 1 })
-      expect(i.something).to be == '{"q":1}'
+      expect(i.something).to be == { 'q' => 1 }
+    end
+
+    it 'parses string' do
+      i = test_class.new(something: '{"q":1}')
+      expect(i.something).to be == { 'q' => 1 }
     end
   end
 
