@@ -17,8 +17,8 @@ module Aws
         cursor = exception
 
         while cursor
-          puts cursor
-          puts
+          STDERR.puts cursor
+          STDERR.puts
           cursor = cursor.cause
         end
       end
