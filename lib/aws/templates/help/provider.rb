@@ -5,10 +5,7 @@ module Aws
     module Help
       ##
       # Abstract help provider
-      class Provider < Templates::Processor::Handler
-        def provide
-          raise Templates::Exception::NotImplementedError.new('The method should be overriden')
-        end
+      class Provider < Templates::Processing::Handler
       end
     end
   end

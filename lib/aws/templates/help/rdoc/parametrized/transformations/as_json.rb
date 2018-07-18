@@ -13,7 +13,7 @@ module Aws
             class AsJson < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsJson
 
-              def provide
+              def to_processed
                 sub(text('to JSON string'))
               end
             end

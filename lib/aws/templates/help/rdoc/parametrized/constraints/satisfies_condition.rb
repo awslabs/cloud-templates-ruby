@@ -11,7 +11,6 @@ module Aws
             #
             # Just prints condition description.
             class SatisfiesCondition < Parametrized::Constraint
-              register_in Rdoc
               for_entity Templates::Utils::Parametrized::Constraint::SatisfiesCondition
 
               protected

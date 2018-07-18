@@ -9,7 +9,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Transformations::AsFloat do
     end
   end
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(parametrized) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(parametrized) }
 
   it 'prints documentation' do
     expect(help).to match(/float_field.*to float/m)

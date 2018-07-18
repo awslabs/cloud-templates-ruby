@@ -20,7 +20,7 @@ module Aws
             @header = header
           end
 
-          def provide
+          def to_processed
             desc = ancestors_description
             sub(text(self.class.header.gsub(/(\S+)/, '_\1_')), desc) if desc
           end

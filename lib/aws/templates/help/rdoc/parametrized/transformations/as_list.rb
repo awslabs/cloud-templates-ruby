@@ -13,7 +13,7 @@ module Aws
             class AsList < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsList
 
-              def provide
+              def to_processed
                 parameter = context.sub_parameter
                 sub do |s|
                   if parameter.nil?

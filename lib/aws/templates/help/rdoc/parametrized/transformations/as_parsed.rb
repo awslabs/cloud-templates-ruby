@@ -13,7 +13,7 @@ module Aws
             class AsParsed < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsParsed
 
-              def provide
+              def to_processed
                 description = "parse with #{context.parser.class}"
                 description.concat(" (#{context.parameters})") if context.parameters
 

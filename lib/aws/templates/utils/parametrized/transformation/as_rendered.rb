@@ -53,11 +53,11 @@ module Aws
           #    i = Piece.new(picture: Circle.new(10, Brush.new(:red, 2, :dots)))
           #    i.picture # => <rendered representation>
           class AsRendered < self
-            attr_reader :type
+            attr_reader :render
             attr_reader :parameters
 
-            def initialize(render_type, params = nil, &params_block)
-              @type = _check_render_type(render_type)
+            def initialize(render, params = nil, &params_block)
+              @render = _check_render(render)
               @parameters = params || params_block
             end
 
@@ -65,20 +65,20 @@ module Aws
 
             def transform(value, instance)
               return if value.nil?
-              type.view_for(value, _compute_render_parameters(instance)).to_rendered
+              render.process(value, _compute_render_parameters(instance))
             end
 
             private
 
-            def _check_render_type(render_type)
-              unless render_type.respond_to?(:view_for)
+            def _check_render(render)
+              unless render.respond_to?(:process)
                 raise(
-                  "Wrong render type object #{params}. " \
+                  "Wrong render type object #{render}. " \
                   'The instance should have #view_for method.'
                 )
               end
 
-              render_type
+              render
             end
 
             def _compute_render_parameters(instance)

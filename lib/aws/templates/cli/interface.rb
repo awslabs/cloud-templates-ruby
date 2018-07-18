@@ -58,7 +58,7 @@ module Aws
                       desc: 'Generator to be used to generate the documentation',
                       aliases: :g,
                       required: false,
-                      default: 'Aws::Templates::Help::Rdoc',
+                      default: 'Aws::Templates::Help::Rdoc::Processor',
                       type: :string
 
         method_option :parameters,
@@ -69,20 +69,19 @@ module Aws
 
         def document(artifact_path)
           artifact = Templates::Utils.lookup_module(artifact_path)
-          generator = Templates::Utils.lookup_module(options[:generator])
+          generator_class = Templates::Utils.lookup_module(options[:generator])
           params = options[:parameters] && ::JSON.parse(options[:parameters], symbolize_names: true)
-
-          say(generator.show(artifact, params))
+          say(generator_class.process(artifact, params))
         end
 
         private
 
-        def _format(artifact, render, format, artifact_options, render_parameters)
+        def _format(artifact, render_class, format, artifact_options, render_parameters)
           format.format(
-            render.view_for(
+            render_class.process(
               artifact.new(artifact_options),
               render_parameters
-            ).to_rendered
+            )
           )
         end
 

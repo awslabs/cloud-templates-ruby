@@ -13,7 +13,7 @@ module Aws
             class AsString < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsRendered
 
-              def provide
+              def to_processed
                 sub(text('to string'))
               end
             end

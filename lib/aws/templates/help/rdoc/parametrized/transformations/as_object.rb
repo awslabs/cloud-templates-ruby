@@ -14,7 +14,7 @@ module Aws
             class AsObject < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsObject
 
-              def provide
+              def to_processed
                 klass = processed_for(context.klass)
 
                 if klass.nil?

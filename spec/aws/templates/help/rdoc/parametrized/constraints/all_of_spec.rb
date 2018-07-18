@@ -9,7 +9,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::AllOf do
     end
   end
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(parametrized) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(parametrized) }
 
   it 'prints documentation' do
     expect(help).to match(/all_of_field.*be nil.*one of.*a..b..c/m)

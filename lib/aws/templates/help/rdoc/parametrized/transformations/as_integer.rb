@@ -11,10 +11,9 @@ module Aws
             #
             # Just prints the blurb since the transformation is not parametrizable.
             class AsInteger < Rdoc::Parametrized::Transformation
-              register_in Rdoc
               for_entity Templates::Utils::Parametrized::Transformation::AsInteger
 
-              def provide
+              def to_processed
                 sub(text('to integer'))
               end
             end

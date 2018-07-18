@@ -18,7 +18,7 @@ module Aws
               class Equal < Condition
                 for_entity Templates::Utils::Parametrized::Constraint::Condition::Equal
 
-                def provide
+                def to_processed
                   value = context.expected
                   text("_when_ value #{value.nil? ? 'is nil' : "== #{value.inspect}"}")
                 end
@@ -29,12 +29,12 @@ module Aws
               class Conditional < Condition
                 for_entity Templates::Utils::Parametrized::Constraint::Condition::Conditional
 
-                def provide
+                def to_processed
                   text("_when_ #{context.condition.source_location.join(':')}")
                 end
               end
 
-              def provide; end
+              def to_processed; end
             end
           end
         end

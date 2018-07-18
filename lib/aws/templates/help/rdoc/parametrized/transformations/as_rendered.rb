@@ -13,8 +13,8 @@ module Aws
             class AsRendered < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsRendered
 
-              def provide
-                description = "render with #{context.type}"
+              def to_processed
+                description = "render with #{context.render}"
                 description.concat(" (#{context.parameters})") if context.parameters
 
                 sub(text(description))

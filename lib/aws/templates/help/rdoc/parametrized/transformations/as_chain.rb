@@ -13,7 +13,7 @@ module Aws
             class AsChain < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsChain
 
-              def provide
+              def to_processed
                 sub(text('as chain of transformations:'), transformations)
               end
 

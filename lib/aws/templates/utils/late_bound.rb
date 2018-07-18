@@ -80,7 +80,7 @@ module Aws
           # you need to specify a proc/lambda object for the option. This method makes the wrappin
           # unnecessary.
           def reference(path = nil, *args)
-            -> { reference(path, *args) }
+            proc { reference(path, *args) }
           end
         end
       end

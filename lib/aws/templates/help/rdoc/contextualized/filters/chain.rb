@@ -13,7 +13,7 @@ module Aws
             class Chain < Rdoc::Contextualized::Filter
               for_entity Templates::Utils::Contextualized::Filter::Chain
 
-              def provide
+              def to_processed
                 sub(text('a chain of the following filters:'), filters)
               end
 

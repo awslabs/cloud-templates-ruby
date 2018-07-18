@@ -11,7 +11,7 @@ module Aws
             class Copy < Rdoc::Contextualized::Filter
               for_entity Templates::Utils::Contextualized::Filter::Copy
 
-              def provide
+              def to_processed
                 sub(text('copy the entire context'))
               end
             end

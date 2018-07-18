@@ -13,7 +13,7 @@ module Aws
           class Parameter < Rdoc::Provider
             for_entity Templates::Utils::Parametrized::Parameter
 
-            def provide
+            def to_processed
               item = sub(description)
 
               unless context.concept.nil? || context.concept.empty?

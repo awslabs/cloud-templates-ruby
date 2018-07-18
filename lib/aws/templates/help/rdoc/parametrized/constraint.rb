@@ -12,7 +12,7 @@ module Aws
           class Constraint < Rdoc::Provider
             for_entity Templates::Utils::Parametrized::Constraint
 
-            def provide
+            def to_processed
               sub do |s|
                 s << super unless add_description(s)
                 condition_description = processed_for(context.pre_condition)

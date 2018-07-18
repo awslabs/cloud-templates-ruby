@@ -31,7 +31,7 @@ module Aws
           @after_providers ||= superclass < Aggregate ? superclass.after_providers.dup : []
         end
 
-        def provide
+        def to_processed
           fragments = _process_through(self.class.before_providers)
                       .push(fragment)
                       .concat(_process_through(self.class.after_providers))
@@ -66,7 +66,7 @@ module Aws
         private
 
         def _process_through(providers)
-          providers.map { |p| p.new(context, parameters).provide }
+          providers.map { |p| p.new(parent, context, parameters).to_processed }
         end
       end
     end

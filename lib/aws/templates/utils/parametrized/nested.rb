@@ -9,6 +9,27 @@ module Aws
         #
         # Wraps hash or object into "parametrized" instance. Used for nested parameter definitions.
         class Nested
+          # Mixin with extensions to class-level methods
+          module Extendable
+            def with(obj = nil, &definition)
+              mix_in(obj || definition)
+            end
+
+            def mix_in(obj)
+              return if obj.nil?
+
+              if obj.is_a?(Module)
+                include(obj)
+              elsif obj.respond_to?(:to_proc)
+                class_eval(&obj)
+              else
+                raise "Invalid module definition #{mod.inspect}"
+              end
+
+              self
+            end
+          end
+
           using Utils::Recursive
           using Utils::Dependency::Refinements
 
@@ -22,12 +43,7 @@ module Aws
           end
 
           def self.create_class
-            ::Class.new(self)
-          end
-
-          def self.with(mod)
-            include mod
-            self
+            ::Class.new(self) { extend Extendable }
           end
 
           def self.inspect

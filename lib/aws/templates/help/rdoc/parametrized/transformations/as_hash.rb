@@ -13,7 +13,7 @@ module Aws
             class AsHash < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsHash
 
-              def provide
+              def to_processed
                 return sub(text('as a hash')) if context.definition.nil?
 
                 sub(text('as a hash where:'), key_value_description)

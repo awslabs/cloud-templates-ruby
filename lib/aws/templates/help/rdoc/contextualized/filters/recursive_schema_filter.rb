@@ -16,7 +16,7 @@ module Aws
                 @description_blurb = str
               end
 
-              def provide
+              def to_processed
                 sub(text(self.class.blurb), processed_for(context.scheme))
               end
             end

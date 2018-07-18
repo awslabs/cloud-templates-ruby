@@ -40,7 +40,7 @@ describe Aws::Templates::Help::Rdoc::Artifact do
     end
   end
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(klass) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(klass) }
 
   let(:blurb) do
     "\e[0m  \n" \

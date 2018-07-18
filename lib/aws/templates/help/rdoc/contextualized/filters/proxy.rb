@@ -13,7 +13,7 @@ module Aws
             class Proxy < Rdoc::Contextualized::Filter
               for_entity Templates::Utils::Contextualized::Filter::Proxy
 
-              def provide
+              def to_processed
                 sub(
                   text('delegates to the following entity:'),
                   processed_for(context.proc)

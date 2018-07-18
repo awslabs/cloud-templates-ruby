@@ -4,7 +4,7 @@ require 'aws/templates/utils'
 describe Aws::Templates::Help::Rdoc::Parametrized::Transformations::AsList do
   let(:parametrized) {}
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(parametrized) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(parametrized) }
 
   context 'with any element' do
     let(:parametrized) do

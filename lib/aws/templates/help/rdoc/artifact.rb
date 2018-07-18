@@ -14,7 +14,7 @@ module Aws
         class Artifact < Help::Aggregate
           include Rdoc::Texting
 
-          register_in Rdoc
+          register_in Rdoc::Processor
           for_entity Templates::Artifact
 
           after Templates::Help::Dsl, Templates::Utils::Parametrized, Templates::Utils::Default

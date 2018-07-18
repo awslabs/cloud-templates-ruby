@@ -19,14 +19,14 @@ module Aws
             class Chain < Rdoc::Provider
               for_entity Templates::Utils::Parametrized::Concept::Chain
 
-              def provide
+              def to_processed
                 list(:BULLET) do |l|
                   concepts.each { |concept| l << processed_for(concept) }
                 end
               end
             end
 
-            def provide
+            def to_processed
               sub(
                 list(:BULLET) do |l|
                   add_transformation(l)

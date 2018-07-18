@@ -12,7 +12,7 @@ module Aws
           class Nested < Help::Aggregate
             include Rdoc::Texting
 
-            register_in Rdoc
+            register_in Rdoc::Processor
             for_entity Templates::Utils::Parametrized::Nested
 
             after Templates::Utils::Parametrized, Templates::Utils::Default

@@ -9,7 +9,7 @@ module Aws
         #
         # Outputs description blurb attached to the object in a separate text block.
         class Dsl < Rdoc::Provider
-          def provide
+          def to_processed
             return if context.help.nil?
             sub(text('_Description_'), parsed_for(context.help))
           end

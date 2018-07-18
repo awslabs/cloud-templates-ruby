@@ -10,11 +10,11 @@ module Aws
       # mechanism.
       module Inspectable
         def to_s
-          Render::Utils::Stringify.view_for(self).to_rendered
+          Templates::Rendering::Utils::Stringify.process(self)
         end
 
         def inspect
-          Render::Utils::Inspect.view_for(self).to_rendered
+          Templates::Rendering::Utils::Inspect.process(self)
         end
       end
     end

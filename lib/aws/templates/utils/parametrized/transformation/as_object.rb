@@ -52,14 +52,14 @@ module Aws
               @klass = if klass.nil?
                 Parametrized::Nested.create_class
               elsif klass.is_a?(Class)
-                klass
+                klass.create_class
               elsif klass.is_a?(Module)
                 Parametrized::Nested.create_class.with(klass)
               else
                 raise "#{klass} is neither a class nor a module"
               end
 
-              @klass.class_eval(&definition) unless definition.nil?
+              @klass.with(definition) unless definition.nil?
             end
 
             protected

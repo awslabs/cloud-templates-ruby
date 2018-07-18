@@ -11,7 +11,7 @@ module Aws
             class Identity < Rdoc::Contextualized::Filter
               for_entity Templates::Utils::Contextualized::Filter::Identity
 
-              def provide
+              def to_processed
                 sub(text('don not change the context'))
               end
             end

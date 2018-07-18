@@ -6,7 +6,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::Is do
     Module.new { include Aws::Templates::Utils::Parametrized }
   end
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(parametrized) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(parametrized) }
 
   context 'with class and attributes' do
     let(:parametrized) do

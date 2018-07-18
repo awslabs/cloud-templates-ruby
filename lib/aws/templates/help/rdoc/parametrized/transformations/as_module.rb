@@ -13,7 +13,7 @@ module Aws
             class AsModule < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsModule
 
-              def provide
+              def to_processed
                 sub(text('lookup as a module'))
               end
             end

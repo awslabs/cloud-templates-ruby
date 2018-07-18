@@ -13,7 +13,7 @@ module Aws
           class Provider < Rdoc::Provider
             for_entity Templates::Utils::Default
 
-            def provide
+            def to_processed
               definition = processed_for(context.defaults_definition)
               definition && sub(text('_Defaults_'), definition)
             end

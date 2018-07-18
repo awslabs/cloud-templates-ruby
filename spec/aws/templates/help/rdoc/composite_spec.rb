@@ -37,7 +37,7 @@ describe Aws::Templates::Help::Rdoc::Composite do
     "    * merge the context with the following override:\n"
   end
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(RdocTestComposite) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(RdocTestComposite) }
 
   it 'generates help blurb correctly' do
     expect(help.include?(blurb)).to be true

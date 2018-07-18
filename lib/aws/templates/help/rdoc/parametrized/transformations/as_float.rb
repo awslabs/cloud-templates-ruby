@@ -11,10 +11,9 @@ module Aws
             #
             # Just prints the blurb since the transformation is not parametrizable.
             class AsFloat < Rdoc::Parametrized::Transformation
-              register_in Rdoc
               for_entity Templates::Utils::Parametrized::Transformation::AsFloat
 
-              def provide
+              def to_processed
                 sub(text('to float'))
               end
             end

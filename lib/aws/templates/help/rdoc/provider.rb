@@ -7,10 +7,10 @@ module Aws
         ##
         # Abstract Rdoc provider
         class Provider < Help::Provider
-          register_in Rdoc
+          register_in Rdoc::Processor
           include Rdoc::Texting
 
-          def provide
+          def to_processed
             text "#{context.class.name} (No specific documentation found)"
           end
         end

@@ -9,7 +9,7 @@ describe Aws::Templates::Help::Rdoc::Parametrized::Constraints::SatisfiesConditi
     end
   end
 
-  let(:help) { Aws::Templates::Help::Rdoc.show(parametrized) }
+  let(:help) { Aws::Templates::Help::Rdoc::Processor.process(parametrized) }
 
   it 'prints documentation' do
     expect(help).to match(/satisfies_field.*less than 10/m)

@@ -17,10 +17,10 @@ module Aws
             #
             # Doesn't provide actually anything. Returns nil.
             class Empty < Definition
-              register_in Rdoc
+              register_in Rdoc::Processor
               for_entity Templates::Utils::Default::Definition::Empty
 
-              def provide; end
+              def to_processed; end
             end
 
             ##
@@ -28,10 +28,10 @@ module Aws
             #
             # Composes left and right component of the pair into a documentation block.
             class Pair < Definition
-              register_in Rdoc
+              register_in Rdoc::Processor
               for_entity Templates::Utils::Default::Definition::Pair
 
-              def provide
+              def to_processed
                 sub do |s|
                   _add_parts(context.one, s)
                   s << text('_overlayed_ _with_')
@@ -53,7 +53,7 @@ module Aws
             class Scalar < Definition
               for_entity Templates::Utils::Default::Definition::Scalar
 
-              def provide
+              def to_processed
                 processed_for(context.value)
               end
             end
@@ -65,7 +65,7 @@ module Aws
             class Calculable < Definition
               for_entity Templates::Utils::Default::Definition::Calculable
 
-              def provide
+              def to_processed
                 processed_for(context.block)
               end
             end
@@ -77,7 +77,7 @@ module Aws
             class Scheme < Definition
               for_entity Templates::Utils::Default::Definition::Scheme
 
-              def provide
+              def to_processed
                 processed_for(context.scheme)
               end
             end

@@ -1,14 +1,13 @@
 require 'spec_helper'
 require 'aws/templates/utils/parametrized'
-require 'aws/templates/render'
+require 'aws/templates/rendering/render'
 require 'polyglot'
 require 'treetop'
 require 'test_grammar'
 
-module TestRender
-  extend Aws::Templates::Render
-  StringView = Class.new(Aws::Templates::Render::BasicView) do
-    def to_rendered
+class TestRender < Aws::Templates::Rendering::Render
+  StringView = Class.new(Aws::Templates::Rendering::BasicView) do
+    def to_processed
       _stringify(instance)
     end
 
@@ -17,6 +16,7 @@ module TestRender
       obj.to_hash.map { |k, v| [_stringify(k), _stringify(v)] }.to_h
     end
   end
+
   StringView.register_in self
   StringView.artifact ::Object
 end
@@ -166,11 +166,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
   end
 
   describe 'as_rendered' do
-    let(:render) { TestRender }
+    let(:render_class) { TestRender }
 
     let(:test_class) do
       klass = Class.new(parametrized_class)
-      klass.parameter :something, transform: klass.as_rendered(render)
+      klass.parameter :something, transform: klass.as_rendered(render_class)
       klass
     end
 

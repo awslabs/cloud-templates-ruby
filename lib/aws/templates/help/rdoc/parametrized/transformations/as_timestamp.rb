@@ -13,7 +13,7 @@ module Aws
             class AsTimestamp < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsTimestamp
 
-              def provide
+              def to_processed
                 sub(text('to timestamp'))
               end
             end

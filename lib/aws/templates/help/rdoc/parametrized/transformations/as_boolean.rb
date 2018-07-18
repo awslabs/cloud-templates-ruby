@@ -13,7 +13,7 @@ module Aws
             class AsBoolean < Rdoc::Parametrized::Transformation
               for_entity Templates::Utils::Parametrized::Transformation::AsBoolean
 
-              def provide
+              def to_processed
                 sub(text('to boolean'))
               end
             end

@@ -196,10 +196,10 @@ describe UserDirectory do
   end
 
   describe 'etc render' do
-    let(:rendered) { UserDirectory::Render::Etc.view_for(directory).to_rendered }
+    let(:rendered) { UserDirectory::Rendering::Etc::Render.process(directory) }
 
     let(:expected) do
-      UserDirectory::Render::Etc::Diff.new(
+      UserDirectory::Rendering::Etc::Diff.new(
         [
           'wcorner:x:1000:120:Will Corner (wcorner),,+13434345656:/home/wcorner:/bin/sh',
           'ptsmth:x:1001:120:Peter Smith (ptsmth),,+13434343434:/home/ptsmth:/bin/sh',
@@ -239,7 +239,7 @@ describe UserDirectory do
   end
 
   describe 'ldap render' do
-    let(:rendered) { UserDirectory::Render::Ldap.view_for(directory).to_rendered }
+    let(:rendered) { UserDirectory::Rendering::Ldap::Render.process(directory) }
 
     let(:expected) do
       [

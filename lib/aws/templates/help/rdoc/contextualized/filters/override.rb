@@ -14,7 +14,7 @@ module Aws
             class Override < Rdoc::Contextualized::Filter
               for_entity Templates::Utils::Contextualized::Filter::Override
 
-              def provide
+              def to_processed
                 sub(
                   text('merge the context with the following override:'),
                   processed_for(context.override)

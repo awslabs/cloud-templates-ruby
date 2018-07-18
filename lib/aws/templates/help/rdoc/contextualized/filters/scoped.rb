@@ -13,7 +13,7 @@ module Aws
             class Scoped < Contextualized::Filter
               for_entity Templates::Utils::Contextualized::Filter::Scoped
 
-              def provide
+              def to_processed
                 sub(
                   text('scoped filter'),
                   processed_for(context.scoped_filter),
