@@ -29,7 +29,7 @@ module Aws
         ##
         # == operator
         #
-        # The idea is the same as for eql? However == used instead to accomodate the cases when
+        # The idea is the same as for eql? However == used instead to accommodate the cases when
         # == and eql? are not the same
         def ==(other)
           _equality_with(other)
