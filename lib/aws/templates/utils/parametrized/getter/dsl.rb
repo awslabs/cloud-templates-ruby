@@ -18,7 +18,8 @@ module Aws
                      Getter::Value, # Calculate value of parameter
                      Getter::Path, # Look up value of the parameter with path
                      Getter::OneOf, # Choose one non-nil value from nested getters
-                     Getter::Index # Look up value of the parameter with index
+                     Getter::Index, # Look up value of the parameter with index
+                     Getter::LateBound # Parameter value is late bound
           end
         end
       end
