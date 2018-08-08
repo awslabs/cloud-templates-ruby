@@ -25,8 +25,6 @@ module Aws
           #    i = Piece.new(expression: 'x > 1')
           #    i.expression # => <parsed>
           class AsParsed < self
-            using Utils::Dependency::Refinements
-
             attr_reader :parser
             attr_reader :parameters
 
@@ -39,7 +37,7 @@ module Aws
 
             def transform(value, instance)
               return if value.nil?
-              _with_links(_parse(value, instance), value.links)
+              _parse(value, instance)
             end
 
             private
@@ -48,10 +46,6 @@ module Aws
               result = parser.parse(value.to_s, _compute_parser_parameters(instance))
               raise parser.failure_reason if result.nil?
               result
-            end
-
-            def _with_links(result, links)
-              links.empty? ? result : result.as_a_dependency.to(links)
             end
 
             def _compute_parser_parameters(instance)

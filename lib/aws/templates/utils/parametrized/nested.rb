@@ -31,7 +31,6 @@ module Aws
           end
 
           using Utils::Recursive
-          using Utils::Dependency::Refinements
 
           include Parametrized
           include Utils::Default
@@ -54,25 +53,16 @@ module Aws
             '<Nested object definition>'
           end
 
-          def dependency?
-            true
-          end
-
           def root
             parent.root
           end
 
           attr_reader :parent
 
-          def links
-            @links ||= ::Set.new
-          end
-
           protected
 
           def initialize(parent, obj)
             @parent = parent
-            @links = obj.links if obj.dependency?
             @options = Utils::Options.new(defaults, obj.to_recursive)
           end
         end

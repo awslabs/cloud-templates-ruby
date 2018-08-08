@@ -23,14 +23,11 @@ module Aws
           #    i = Piece.new(:param => 23)
           #    i.param # => '23'
           class AsString < self
-            using Utils::Dependency::Refinements
-
             protected
 
             def transform(value, _)
               return if value.nil?
-              result = String(value)
-              value.dependency? ? result.as_a_dependency.to(value) : result
+              String(value)
             end
           end
         end

@@ -21,6 +21,8 @@ module Aws
         class Transformation
           include Utils::Dsl::Element
 
+          using Utils::Dependency::Refinements
+
           ##
           # Creates closure with transformation invocation
           #
@@ -53,7 +55,7 @@ module Aws
           # * +instance+ - the instance the value originates from; used for context-dependent
           #                calculations
           def transform_wrapper(value, instance)
-            transform(value, instance)
+            _with_links(transform(value, instance), value.links)
           rescue StandardError
             raise Templates::Exception::ParameterTransformException.new(self, instance, value)
           end
@@ -66,6 +68,12 @@ module Aws
           # * +value+ - parameter value to be transformed
           # * +instance+ - the instance value is transform
           def transform(value, instance); end
+
+          private
+
+          def _with_links(value, links)
+            links.empty? ? value : value.as_a_dependency.to(links)
+          end
         end
       end
     end
