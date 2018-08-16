@@ -2,7 +2,7 @@ require 'aws/templates/utils'
 
 module Aws
   module Templates
-    module Processing
+    module Utils
       ##
       # Routing DSL
       #
@@ -13,7 +13,7 @@ module Aws
         #
         # All handlers and corresponding entities in a processor are stored in a registry.
         def registry
-          @registry ||= Processing::Registry.new
+          @registry ||= Utils::Registry.new
         end
 
         ##

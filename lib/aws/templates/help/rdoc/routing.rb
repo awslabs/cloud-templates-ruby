@@ -9,7 +9,7 @@ module Aws
         #
         # It is used to avoid loading too much code into the memory even when it's not required.
         module Routing
-          extend Templates::Processing::Routing
+          extend Templates::Utils::Routing
 
           register Templates.lazy::Help::Dsl, Rdoc.lazy::Dsl
           register Templates.lazy::Artifact, Rdoc.lazy::Artifact

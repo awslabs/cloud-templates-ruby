@@ -2,7 +2,7 @@ require 'aws/templates/utils'
 
 module Aws
   module Templates
-    module Processing
+    module Utils
       ##
       # Handler registry
       #
@@ -11,9 +11,7 @@ module Aws
       # to lookup proper Handler for a given entity.
       class Registry
         # Handler registry accessor
-        def registry
-          @registry ||= ::Concurrent::Map.new
-        end
+        attr_reader :registry
 
         ##
         # Register pair entity-handler
@@ -61,6 +59,10 @@ module Aws
         end
 
         alias handler? include?
+
+        def initialize
+          @registry = ::Concurrent::Map.new
+        end
 
         private
 

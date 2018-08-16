@@ -10,7 +10,7 @@ module Aws
       # functionality required to register an entity handler and look-up the registry when the
       # entity is processed.
       class Processor
-        extend Processing::Routing
+        extend Utils::Routing
 
         class <<self
           ##
