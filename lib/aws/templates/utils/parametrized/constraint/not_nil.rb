@@ -25,6 +25,14 @@ module Aws
               self.if(Constraint::Condition.any)
             end
 
+            def transform_as(_transform, _instance)
+              self
+            end
+
+            def satisfied_by?(other)
+              other.is_a?(self.class)
+            end
+
             protected
 
             def check(value, _)

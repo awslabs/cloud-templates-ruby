@@ -23,6 +23,10 @@ module Aws
           #    i = Piece.new(:param => '23.0')
           #    i.param # => 23.0
           class AsFloat < self
+            def compatible_with?(other)
+              other.is_a?(self.class)
+            end
+
             protected
 
             def transform(value, _)

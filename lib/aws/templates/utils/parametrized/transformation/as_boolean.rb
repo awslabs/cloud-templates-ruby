@@ -26,7 +26,9 @@ module Aws
           #    i = Piece.new(:param => 0)
           #    i.param # => true
           class AsBoolean < self
-            extend Utils::Singleton
+            def compatible_with?(other)
+              other.is_a?(self.class)
+            end
 
             protected
 

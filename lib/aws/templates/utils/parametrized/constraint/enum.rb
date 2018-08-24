@@ -21,10 +21,21 @@ module Aws
           #    i = Piece.new(:param1 => 4)
           #    i.param1 # throws ParameterValueInvalid
           class Enum < self
+            using Parametrized::Transformation::Refinements
+
             attr_reader :set
 
             def initialize(*list)
-              @set = Set.new(list.flatten(1))
+              @set = ::Set.new(list.flatten(1))
+            end
+
+            def satisfied_by?(other)
+              return false unless other.is_a?(self.class)
+              set >= other.set
+            end
+
+            def transform_as(transform, instance)
+              self.class.new(*(set.map { |option| instance.instance_exec(option, &transform) }))
             end
 
             protected

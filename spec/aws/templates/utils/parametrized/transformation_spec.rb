@@ -163,6 +163,31 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
         expect(exception.cause.cause.message).to match(/Celestial image/)
       end
     end
+
+    describe 'analytical comparison' do
+      let(:stricter_transform) { test_class.get_parameter(:something_else).concept.transform }
+      let(:loosened_transform) { test_class.get_parameter(:something).concept.transform }
+      let(:nonunique_transform) { test_class.get_parameter(:something_else).concept.transform }
+      let(:unique_transform) do
+        test_class.get_parameter(:something_without_duplicates).concept.transform
+      end
+
+      it 'satisfies loosened constraint' do
+        expect(stricter_transform.processable_by?(loosened_transform)).to be_truthy
+      end
+
+      it 'doesn\'t satisfies stricter constraint' do
+        expect(loosened_transform.processable_by?(stricter_transform)).to be_falsey
+      end
+
+      it 'allows unique list where uniquiness not required' do
+        expect(unique_transform.processable_by?(nonunique_transform)).to be_truthy
+      end
+
+      it 'is not compatible with non-unique list where uniquiness is required' do
+        expect(nonunique_transform.processable_by?(unique_transform)).to be_falsey
+      end
+    end
   end
 
   describe 'as_rendered' do
@@ -251,6 +276,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       i = test_class.new(something: [])
       expect { i.something }.to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_integer }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_integer)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_falsey
+      end
+    end
   end
 
   describe 'as_float' do
@@ -274,6 +311,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       i = test_class.new(something: [])
       expect { i.something }.to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_float }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_float)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_falsey
+      end
+    end
   end
 
   describe 'as_string' do
@@ -291,6 +340,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'allows nil value' do
       i = test_class.new({})
       expect(i.something).to be_nil
+    end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_string }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_string)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_falsey
+      end
     end
   end
 
@@ -324,6 +385,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'allows nil value' do
       i = test_class.new({})
       expect(i.something).to be_nil
+    end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_boolean }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+      end
     end
   end
 
@@ -407,6 +480,161 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
         expect(exception.cause.cause.message).to match(/Just a number/)
       end
     end
+
+    describe 'analytical comparison' do
+      context 'when unrestricted' do
+        let(:transform) { parametrized_class.as_hash }
+
+        it 'is processable by itself' do
+          expect(parametrized_class.as_hash.processable_by?(transform)).to be_truthy
+        end
+
+        context 'with restricted target' do
+          let(:key_concept) { {} }
+          let(:value_concept) { {} }
+
+          let(:target_transform) do
+            kconcept = key_concept
+            vconcept = value_concept
+
+            parametrized_class.as_hash do
+              key kconcept
+              value vconcept
+            end
+          end
+
+          context 'where key concept is defined' do
+            let(:key_concept) do
+              { transform: parametrized_class.as_integer }
+            end
+
+            it 'can process' do
+              expect(target_transform.processable_by?(transform)).to be_truthy
+            end
+
+            it 'can\'t be processed by' do
+              expect(transform.processable_by?(target_transform)).to be_falsey
+            end
+
+            context 'together with value concept' do
+              let(:value_concept) do
+                { transform: parametrized_class.as_integer }
+              end
+
+              it 'can process' do
+                expect(target_transform.processable_by?(transform)).to be_truthy
+              end
+
+              it 'can\'t be processed by' do
+                expect(transform.processable_by?(target_transform)).to be_falsey
+              end
+            end
+          end
+        end
+      end
+
+      context 'restricted' do
+        let(:description) do
+          proc do
+            key name: :key,
+                description: 'String key',
+                constraint: not_nil,
+                transform: as_string
+            value name: :number,
+                  description: 'Just a number',
+                  constraint: not_nil,
+                  transform: as_integer
+          end
+        end
+
+        let(:transform) { parametrized_class.as_hash(&description) }
+
+        it 'is processable by itself' do
+          expect(parametrized_class.as_hash(&description).processable_by?(transform)).to be_truthy
+        end
+
+        context 'with unrestricted target' do
+          it 'passes' do
+            expect(transform.processable_by?(parametrized_class.as_hash)).to be_truthy
+          end
+        end
+
+        context 'with restricted target' do
+          let(:key_concept) { {} }
+          let(:value_concept) { {} }
+
+          let(:target_transform) do
+            kconcept = key_concept
+            vconcept = value_concept
+
+            parametrized_class.as_hash do
+              key kconcept
+              value vconcept
+            end
+          end
+
+          context 'where key concept is defined' do
+            context 'when the concept is compatible with the original' do
+              let(:key_concept) do
+                { transform: parametrized_class.as_string }
+              end
+
+              it 'can be processed by' do
+                expect(transform.processable_by?(target_transform)).to be_truthy
+              end
+
+              it 'can\'t process' do
+                expect(target_transform.processable_by?(transform)).to be_falsey
+              end
+
+              context 'together with value concept' do
+                context 'when the concept is compatible with the original' do
+                  let(:value_concept) do
+                    { transform: parametrized_class.as_integer }
+                  end
+
+                  it 'can\'t process' do
+                    expect(target_transform.processable_by?(transform)).to be_falsey
+                  end
+
+                  it 'can be processed by' do
+                    expect(transform.processable_by?(target_transform)).to be_truthy
+                  end
+                end
+
+                context 'when the concept is incompatible with the original' do
+                  let(:value_concept) do
+                    { transform: parametrized_class.as_float }
+                  end
+
+                  it 'can\'t process' do
+                    expect(target_transform.processable_by?(transform)).to be_falsey
+                  end
+
+                  it 'can\'t be processed by' do
+                    expect(transform.processable_by?(target_transform)).to be_falsey
+                  end
+                end
+              end
+            end
+
+            context 'when the concept is incompatible with the original' do
+              let(:key_concept) do
+                { transform: parametrized_class.as_float }
+              end
+
+              it 'can\'t be processed by' do
+                expect(transform.processable_by?(target_transform)).to be_falsey
+              end
+
+              it 'can\'t process' do
+                expect(target_transform.processable_by?(transform)).to be_falsey
+              end
+            end
+          end
+        end
+      end
+    end
   end
 
   describe 'as_json' do
@@ -430,6 +658,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       i = test_class.new(something: '{"q":1}')
       expect(i.something).to be == { 'q' => 1 }
     end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_json }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_json)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+      end
+    end
   end
 
   describe 'as_timestamp' do
@@ -447,6 +687,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'looks up class name' do
       i = test_class.new(something: '2018-05-01T10:00:00Z')
       expect(i.something.to_s).to be == '2018-05-01 10:00:00 UTC'
+    end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_timestamp }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_timestamp)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+      end
     end
   end
 
@@ -476,6 +728,18 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       i = test_class.new(something: 'Object/Object/Object/Array')
       expect(i.something).to be == Array
     end
+
+    describe 'analytical comparison' do
+      let(:transform) { parametrized_class.as_module }
+
+      it 'can be processed by itself' do
+        expect(transform.processable_by?(parametrized_class.as_module)).to be_truthy
+      end
+
+      it 'can\'t be processed by arbitrary transform' do
+        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+      end
+    end
   end
 
   describe 'as_chain' do
@@ -489,6 +753,40 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
     it 'applies all transformations' do
       i = test_class.new(something: [[:rule, 1]])
       expect(i.something.rule).to be == 1
+    end
+
+    describe 'analytical comparison' do
+      let(:transform) do
+        parametrized_class.instance_eval do
+          as_chain(as_float, as_integer, as_string)
+        end
+      end
+
+      let(:another_transform) do
+        parametrized_class.instance_eval do
+          as_chain(as_string, as_integer, as_boolean)
+        end
+      end
+
+      it 'can be processed by a chain with input-output compatibility' do
+        expect(transform.processable_by?(another_transform)).to be_truthy
+      end
+
+      it 'can process input type' do
+        expect(parametrized_class.as_float.processable_by?(transform)).to be_truthy
+      end
+
+      it 'can be processed as output type' do
+        expect(transform.processable_by?(parametrized_class.as_string)).to be_truthy
+      end
+
+      it 'can\'t be processed as intermediate type' do
+        expect(parametrized_class.as_integer.processable_by?(transform)).to be_falsey
+      end
+
+      it 'can\'t process intermediate type' do
+        expect(transform.processable_by?(parametrized_class.as_integer)).to be_falsey
+      end
     end
   end
 

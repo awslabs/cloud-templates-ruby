@@ -20,25 +20,13 @@ module Aws
         # all concrete getter classes.
         class Getter
           include Utils::Dsl::Element
+          include Utils::Functor
 
-          ##
-          # Creates closure with getter invocation
-          #
-          # It's an interface method required for Getter to expose
-          # functor properties. It encloses invocation of Getter get_wrapper
-          # method into a closure. The closure itself is executed in the context
-          # of Parametrized instance which provides proper set "self" variable.
-          #
-          # The closure itself accepts 1 parameters
-          # * +parameter+ - the Parameter object which the getter is executed for
-          # ...where instance is assumed from self
-          def to_proc
-            getter = self
-
-            lambda do |parameter|
-              getter.get_wrapper(parameter, self)
-            end
+          def invoke(instance, parameter)
+            get_wrapper(parameter, instance)
           end
+
+          protected
 
           ##
           # Wraps getter-dependent method
@@ -53,8 +41,6 @@ module Aws
           rescue StandardError
             raise Templates::Exception::ParameterGetterException.new(self)
           end
-
-          protected
 
           ##
           # Getter method

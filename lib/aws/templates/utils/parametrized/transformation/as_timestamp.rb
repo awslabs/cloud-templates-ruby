@@ -24,6 +24,10 @@ module Aws
           #    i = Piece.new(:param => '01 May 2018 10:00:00')
           #    i.param # => <Time>
           class AsTimestamp < self
+            def compatible_with?(other)
+              other.is_a?(self.class)
+            end
+
             protected
 
             def transform(value, _)

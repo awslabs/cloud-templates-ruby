@@ -24,6 +24,10 @@ module Aws
           #    i = Piece.new(:param => 'Object')
           #    i.param # => Object
           class AsModule < self
+            def compatible_with?(other)
+              other.is_a?(self.class)
+            end
+
             protected
 
             def transform(value, _)

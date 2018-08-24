@@ -39,6 +39,10 @@ module Aws
               @description = description
             end
 
+            def satisfied_by?(other)
+              other.is_a?(self.class) && (condition == other.condition)
+            end
+
             protected
 
             def check(value, instance)

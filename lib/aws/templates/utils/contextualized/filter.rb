@@ -19,7 +19,10 @@ module Aws
         # It provides protected method filter which should be overriden in
         # all concrete filter classes.
         class Filter
+          include Utils::Functor
+
           using Contextualized::Refinements
+
           ##
           # Chain filters
           def &(other)
@@ -28,21 +31,8 @@ module Aws
             Chain.new(self, fltr)
           end
 
-          ##
-          # Creates closure with filter invocation
-          #
-          # It's an interface method required for Filter to expose
-          # functor properties. It encloses invocation of Filter
-          # filter method into a closure. The closure itself is
-          # executed in the context of Filtered instance which provides
-          # proper set "self" variable.
-          #
-          # The closure itself accepts just one parameter:
-          # * +opts+ - input hash to be filtered
-          # ...where instance is assumed from self
-          def to_proc
-            fltr = self
-            ->(opts, memo = {}) { fltr.filter(opts, memo, self) }
+          def invoke(scope, opts, memo = {})
+            filter(opts, memo, scope)
           end
 
           ##

@@ -30,6 +30,8 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     k
   end
 
+  let(:arbitrary_object) { Object.new }
+
   describe 'not_nil' do
     let(:constraint) { Constraints.not_nil }
 
@@ -40,6 +42,52 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     it 'throws error when parameter is not specified' do
       expect { test_class.new(something_else: 1).something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
+    end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(constraint.satisfies?(Constraints.not_nil)).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(constraint.satisfies?(Constraints.all_of(Constraints.not_nil))).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with boolean transformation' do
+        let(:transformation) { Constraints.as_boolean }
+
+        it 'doesn\'t change' do
+          expect(transfomed.satisfies?(Constraints.not_nil)).to be_truthy
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t change' do
+          expect(transfomed.satisfies?(Constraints.not_nil)).to be_truthy
+        end
+      end
     end
   end
 
@@ -57,6 +105,60 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     it 'throws an error when a value is specified which is not a member of the enumeration' do
       expect { test_class.new(something: 5).something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
+    end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(constraint.satisfies?(Constraints.enum(1, 2, 3))).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies loosened constraint' do
+        expect(constraint.satisfies?(Constraints.enum(1, 2, 3, 4, 5))).to be_truthy
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.enum(1, 2, 3, 4, 5))
+          )
+        ).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with float transformation' do
+        let(:transformation) { Constraints.as_float }
+
+        it 'transforms options' do
+          expect(transfomed.satisfies?(Constraints.enum(1.0, 2.0, 3.0))).to be_truthy
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t change' do
+          expect(transfomed.satisfies?(Constraints.enum('1', '2', '3'))).to be_truthy
+        end
+      end
     end
   end
 
@@ -76,6 +178,92 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       expect { test_class.new(something: 5).something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
+          )
+        ).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'satisfies single constraint from the set' do
+        expect(constraint.satisfies?(Constraints.not_nil)).to be_truthy
+      end
+
+      it 'satisfies loosened single constraint from the set' do
+        expect(constraint.satisfies?(Constraints.enum(1, 2, 3, 4, 5))).to be_truthy
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.enum(1, 2, 3, 4, 5))
+          )
+        ).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2))
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with float transformation' do
+        let(:transformation) { Constraints.as_float }
+
+        it 'transforms options' do
+          expect(
+            transfomed.satisfies?(
+              Constraints.all_of(Constraints.not_nil, Constraints.enum(1.0, 2.0, 3.0))
+            )
+          ).to be_truthy
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'transforms options' do
+          expect(
+            transfomed.satisfies?(
+              Constraints.all_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
+            )
+          ).to be_truthy
+        end
+      end
+
+      context 'when a non-transformable constraint is present in the chain' do
+        let(:constraint) do
+          Constraints.all_of(
+            Constraints.not_nil,
+            Constraints.enum(1, 2, 3),
+            Constraints.is?(::Numeric)
+          )
+        end
+
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t survive the transformation' do
+          expect(
+            transfomed.satisfies?(
+              Constraints.all_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
+            )
+          ).to be_truthy
+        end
+      end
+    end
   end
 
   describe 'requires' do
@@ -85,6 +273,8 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         parameter :requirement, description: 'Nothing'
       end
     end
+
+    let(:constraint) { test_class.parameters[:something].concept.constraint }
 
     it 'passes when requirement is satisfied' do
       expect(test_class.new(something: 2, requirement: 1).something).to be == 2
@@ -97,6 +287,56 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     it 'throws an error when requirement is not satisfied' do
       expect { test_class.new(something: 5).something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
+    end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(constraint.satisfies?(Constraints.requires(:requirement))).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.requires(:requirement))
+          )
+        ).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.not_nil, Constraints.requires(:requirement))
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with boolean transformation' do
+        let(:transformation) { Constraints.as_boolean }
+
+        it 'doesn\'t change' do
+          expect(transfomed.satisfies?(Constraints.requires(:requirement))).to be_truthy
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t change' do
+          expect(transfomed.satisfies?(Constraints.requires(:requirement))).to be_truthy
+        end
+      end
     end
   end
 
@@ -112,6 +352,8 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         parameter :condition, description: 'Nothing'
       end
     end
+
+    let(:constraint) { test_class.parameters[:something].concept.constraint }
 
     it 'passes when nil' do
       expect(test_class.new({}).something).to be_nil
@@ -131,6 +373,107 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       expect(test_class.new(something: :requirement, requirement: 2).something)
         .to be == :requirement
     end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(
+          constraint.satisfies?(
+            Constraints.depends_on_value(
+              requirement: Constraints.requires(:requirement),
+              condition: Constraints.requires(:condition)
+            )
+          )
+        ).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies loosened constraint' do
+        expect(
+          constraint.satisfies?(
+            Constraints.depends_on_value(
+              requirement: Constraints.requires(:requirement),
+              condition: Constraints.requires(:condition),
+              obligation: Constraints.requires(:obligation)
+            )
+          )
+        ).to be_truthy
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(
+              Constraints.depends_on_value(
+                requirement: Constraints.requires(:requirement),
+                condition: Constraints.requires(:condition)
+              )
+            )
+          )
+        ).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(
+              Constraints.not_nil,
+              Constraints.depends_on_value(
+                requirement: Constraints.requires(:requirement),
+                condition: Constraints.requires(:condition)
+              )
+            )
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transformed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'transforms selectors and constraints' do
+          expect(
+            transformed.satisfies?(
+              Constraints.depends_on_value(
+                'requirement' => Constraints.requires(:requirement),
+                'condition' => Constraints.requires(:condition)
+              )
+            )
+          ).to be_truthy
+        end
+      end
+
+      context 'when a non-transformable constraint is present in the chain' do
+        let(:constraint) do
+          Constraints.depends_on_value(
+            requirement: Constraints.requires(:requirement),
+            condition: Constraints.is?(::Symbol)
+          )
+        end
+
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t survive the transformation' do
+          expect(
+            transformed.satisfies?(
+              Constraints.depends_on_value(
+                'requirement' => Constraints.requires(:requirement),
+                'condition' => nil
+              )
+            )
+          ).to be_truthy
+        end
+      end
+    end
   end
 
   describe 'satisfies' do
@@ -148,6 +491,61 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       expect { test_class.new(something: 1).something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
     end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(
+          constraint.satisfies?(Constraints.satisfies('some', &constraint.condition))
+        ).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.satisfies('some', &constraint.condition))
+          )
+        ).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(
+              Constraints.not_nil,
+              Constraints.satisfies('some', &constraint.condition)
+            )
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with boolean transformation' do
+        let(:transformation) { Constraints.as_boolean }
+
+        it 'doesn\'t survive' do
+          expect(transfomed).to be_nil
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t survive' do
+          expect(transfomed).to be_nil
+        end
+      end
+    end
   end
 
   describe 'matches' do
@@ -164,6 +562,61 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     it 'throws an error when condition is not satisfied' do
       expect { test_class.new(something: 'rooster').something }
         .to raise_error Aws::Templates::Exception::ParameterProcessingException
+    end
+
+    describe 'analytical calculations' do
+      it 'satisfies itself' do
+        expect(
+          constraint.satisfies?(Constraints.matches(/[Tt]$/))
+        ).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies composite with a single element' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(Constraints.matches(/[Tt]$/))
+          )
+        ).to be_truthy
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(
+              Constraints.matches(/[Tt]$/),
+              Constraints.not_nil
+            )
+          )
+        ).to be_falsey
+      end
+    end
+
+    describe 'transformation' do
+      let(:transformed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with boolean transformation' do
+        let(:transformation) { Constraints.as_boolean }
+
+        it 'doesn\'t survive' do
+          expect(transformed).to be_nil
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t change' do
+          expect(transformed.satisfies?(Constraints.matches(/[Tt]$/))).to be_truthy
+        end
+      end
     end
   end
 
@@ -195,12 +648,32 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
           )
         end
 
-        it 'fails constraint exception' do
+        it 'fails with constraint exception' do
           expect(exception.cause).to be_a Aws::Templates::Exception::ParameterConstraintException
         end
 
         it 'fails with correct message' do
           expect(exception.cause.cause.message).to match(/Object.*is not/)
+        end
+      end
+
+      describe 'transformation' do
+        let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+        context 'with boolean transformation' do
+          let(:transformation) { Constraints.as_boolean }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+
+        context 'with string transformation' do
+          let(:transformation) { Constraints.as_string }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
         end
       end
     end
@@ -240,6 +713,64 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
           expect(exception.cause.cause.message).to match(/BasicObject is not a child of Object/)
         end
       end
+
+      describe 'transformation' do
+        let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+        context 'with boolean transformation' do
+          let(:transformation) { Constraints.as_boolean }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+
+        context 'with string transformation' do
+          let(:transformation) { Constraints.as_string }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+      end
+    end
+
+    describe 'analytical calculations' do
+      let(:constraint) { Constraints.module?(::Enumerable) }
+      let(:wildcard_constraint) { Constraints.module? }
+
+      it 'satisfies itself' do
+        expect(
+          constraint.satisfies?(Constraints.module?(::Enumerable))
+        ).to be_truthy
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint.satisfies?(nil)).to be_truthy
+      end
+
+      it 'doesn\'t satisfy arbitrary constraint' do
+        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+      end
+
+      it 'satisfies composite with a loosened constraint' do
+        expect(constraint.satisfies?(Constraints.all_of(wildcard_constraint))).to be_truthy
+      end
+
+      it 'baseless constraint does not satisfy based one' do
+        expect(wildcard_constraint.satisfies?(constraint)).to be_falsey
+      end
+
+      it 'doesn\'t satisfy stricter composite' do
+        expect(
+          constraint.satisfies?(
+            Constraints.all_of(
+              Constraints.module?(::Enumerable),
+              Constraints.not_nil
+            )
+          )
+        ).to be_falsey
+      end
     end
   end
 
@@ -259,9 +790,76 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         expect { test_class.new(something: 123).something }
           .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
+
+      describe 'analytical calculations' do
+        let(:constraint) { Constraints.is?(::Array) }
+
+        it 'satisfies itself' do
+          expect(
+            constraint.satisfies?(Constraints.is?(::Array))
+          ).to be_truthy
+        end
+
+        it 'satisfies empty constraint' do
+          expect(constraint.satisfies?(nil)).to be_truthy
+        end
+
+        it 'satisfies composite with a loosened constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.is?(::Enumerable)))
+          ).to be_truthy
+        end
+
+        it 'doesn\'t satisfy composite with an incopatible constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.is?(::String)))
+          ).to be_falsey
+        end
+
+        it 'doesn\'t satisfy composite with a stricter constraint' do
+          expect(
+            constraint.satisfies?(Constraints.is?(::Enumerable => Constraints.not_nil))
+          ).to be_falsey
+        end
+
+        it 'doesn\'t satisfy arbitrary constraint' do
+          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        end
+
+        it 'doesn\'t satisfy stricter composite' do
+          expect(
+            constraint.satisfies?(
+              Constraints.all_of(
+                Constraints.is?(::Enumerable),
+                Constraints.not_nil
+              )
+            )
+          ).to be_falsey
+        end
+      end
+
+      describe 'transformation' do
+        let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+        context 'with boolean transformation' do
+          let(:transformation) { Constraints.as_boolean }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+
+        context 'with string transformation' do
+          let(:transformation) { Constraints.as_string }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+      end
     end
 
-    context 'with class and attributes' do
+    context 'with class and constraints' do
       let(:constraint) do
         Constraints.is?(
           ::String => Constraints.satisfies('big') { |v| v.to_s.length > 5 }
@@ -285,6 +883,73 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         expect { test_class.new(something: 123_456).something }
           .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
+
+      describe 'analytical calculations' do
+        let(:constraint) { Constraints.is?(::Array => Constraints.not_nil) }
+
+        it 'satisfies itself' do
+          expect(
+            constraint.satisfies?(Constraints.is?(::Array => Constraints.not_nil))
+          ).to be_truthy
+        end
+
+        it 'satisfies empty constraint' do
+          expect(constraint.satisfies?(nil)).to be_truthy
+        end
+
+        it 'satisfies composite with a loosened constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.is?(::Enumerable)))
+          ).to be_truthy
+        end
+
+        it 'doesn\'t satisfy composite with an incopatible constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.is?(::String)))
+          ).to be_falsey
+        end
+
+        it 'satisfies composite with a similar constraint' do
+          expect(
+            constraint.satisfies?(Constraints.is?(::Enumerable => Constraints.not_nil))
+          ).to be_truthy
+        end
+
+        it 'doesn\'t satisfy arbitrary constraint' do
+          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        end
+
+        it 'doesn\'t satisfy stricter composite' do
+          expect(
+            constraint.satisfies?(
+              Constraints.all_of(
+                Constraints.is?(::Enumerable),
+                Constraints.not_nil
+              )
+            )
+          ).to be_falsey
+        end
+      end
+
+      describe 'transformation' do
+        let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+        context 'with boolean transformation' do
+          let(:transformation) { Constraints.as_boolean }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+
+        context 'with string transformation' do
+          let(:transformation) { Constraints.as_string }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+      end
     end
   end
 
@@ -304,6 +969,71 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         expect { test_class.new(something: true).something }
           .to raise_error Aws::Templates::Exception::ParameterProcessingException
       end
+
+      describe 'analytical calculations' do
+        it 'satisfies itself' do
+          expect(
+            constraint.satisfies?(Constraints.has?(:to_str))
+          ).to be_truthy
+        end
+
+        it 'satisfies empty constraint' do
+          expect(constraint.satisfies?(nil)).to be_truthy
+        end
+
+        it 'satisfies composite with a loosened constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.has?(:to_str)))
+          ).to be_truthy
+        end
+
+        it 'doesn\'t satisfy composite with an incopatible constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.has?(:to_s)))
+          ).to be_falsey
+        end
+
+        it 'doesn\'t satisfy composite with a stricter constraint' do
+          expect(
+            constraint.satisfies?(Constraints.has?(to_str: Constraints.not_nil))
+          ).to be_falsey
+        end
+
+        it 'doesn\'t satisfy arbitrary constraint' do
+          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        end
+
+        it 'doesn\'t satisfy stricter composite' do
+          expect(
+            constraint.satisfies?(
+              Constraints.all_of(
+                Constraints.has?(:to_str),
+                Constraints.not_nil
+              )
+            )
+          ).to be_falsey
+        end
+      end
+
+      describe 'transformation' do
+        let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+        context 'with boolean transformation' do
+          let(:transformation) { Constraints.as_boolean }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+
+        context 'with string transformation' do
+          let(:transformation) { Constraints.as_string }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+      end
     end
 
     context 'with field constraints' do
@@ -322,6 +1052,77 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       it 'fails when the field fails the constraint' do
         expect { test_class.new(something: '123').something }
           .to raise_error Aws::Templates::Exception::ParameterProcessingException
+      end
+
+      describe 'analytical calculations' do
+        let(:constraint) do
+          Constraints.has?(
+            to_str: Constraints.not_nil,
+            to_s: Constraints.not_nil
+          )
+        end
+
+        it 'satisfies itself' do
+          expect(
+            constraint.satisfies?(
+              Constraints.has?(
+                to_str: Constraints.not_nil,
+                to_s: Constraints.not_nil
+              )
+            )
+          ).to be_truthy
+        end
+
+        it 'satisfies empty constraint' do
+          expect(constraint.satisfies?(nil)).to be_truthy
+        end
+
+        it 'satisfies composite with a loosened constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.has?([:to_str, :to_s])))
+          ).to be_truthy
+        end
+
+        it 'doesn\'t satisfy composite with an incopatible constraint' do
+          expect(
+            constraint.satisfies?(Constraints.all_of(Constraints.has?(:to_badger)))
+          ).to be_falsey
+        end
+
+        it 'doesn\'t satisfy arbitrary constraint' do
+          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        end
+
+        it 'doesn\'t satisfy stricter composite' do
+          expect(
+            constraint.satisfies?(
+              Constraints.all_of(
+                Constraints.has?(:to_str),
+                Constraints.not_nil
+              )
+            )
+          ).to be_falsey
+        end
+      end
+
+      describe 'transformation' do
+        let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+        context 'with boolean transformation' do
+          let(:transformation) { Constraints.as_boolean }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
+
+        context 'with string transformation' do
+          let(:transformation) { Constraints.as_string }
+
+          it 'doesn\'t survive' do
+            expect(transfomed).to be_nil
+          end
+        end
       end
     end
   end

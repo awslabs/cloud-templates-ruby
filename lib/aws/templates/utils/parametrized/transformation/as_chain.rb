@@ -26,10 +26,25 @@ module Aws
           #    i = Piece.new(param: [:name, 'Rex'])
           #    i.param.name # => 'Rex'
           class AsChain < self
+            using Transformation::Refinements
+
             attr_reader :components
 
             def initialize(*components)
               @components = _check_components(components)
+            end
+
+            def invoke(instance, value)
+              transform_wrapper(value, instance)
+            end
+
+            def compatible_with?(other)
+              return true if components.empty?
+              other.processable_by?(components.first)
+            end
+
+            def processable_by?(other)
+              components.last.processable_by?(other)
             end
 
             protected

@@ -30,6 +30,15 @@ module Aws
               @expression = Regexp.new(rex)
             end
 
+            def transform_as(transform, _instance)
+              #TODO: eyebleed. Tight coupling between transforms and constraints
+              transform.is_a?(Parametrized::Transformation::AsString) ? self : nil
+            end
+
+            def satisfied_by?(other)
+              other.is_a?(self.class) && (expression == other.expression)
+            end
+
             protected
 
             def check(value, _)

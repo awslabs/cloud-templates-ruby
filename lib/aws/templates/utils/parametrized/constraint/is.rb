@@ -27,6 +27,7 @@ module Aws
           #    i.param1 # raise ParameterValueInvalid
           class Is < self
             include Utils::Schemed
+            using Constraint::Refinements
 
             as_dsl :is?
 
@@ -35,6 +36,19 @@ module Aws
                 raise "#{obj.inspect}(#{obj.class}) is not a Module" unless obj.is_a?(::Module)
                 next if c.nil?
                 raise "#{c.inspect}(#{c.class}) is not a proc" unless c.respond_to?(:to_proc)
+              end
+            end
+
+            def satisfied_by?(other)
+              return false unless other.is_a?(self.class)
+
+              other_schema = other.schema
+
+              modules = schema.keys.to_set
+
+              other.schema.all? do |type, constraint|
+                anchors = type.ancestors.select { |mod| modules.include?(mod) }
+                !anchors.empty? && anchors.any? { |anchor| constraint.satisfies?(schema[anchor]) }
               end
             end
 

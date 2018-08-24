@@ -38,6 +38,11 @@ module Aws
               @definition = Transformation::AsHashDefinition.new(&blk) if blk
             end
 
+            def compatible_with?(other)
+              return false unless other.is_a?(self.class)
+              definition.nil? || definition.compatible_with?(other.definition)
+            end
+
             protected
 
             def transform(value, instance)

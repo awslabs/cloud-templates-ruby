@@ -29,11 +29,40 @@ module Aws
           #    i = Piece.new(:param1 => 50)
           #    i.param1 # => 50
           class AllOf < self
+            using Parametrized::Transformation::Refinements
+            using Constraint::Refinements
+
             attr_reader :constraints
 
             def initialize(*constraints)
               @constraints = constraints
               self.if(Constraint::Condition.any)
+            end
+
+            def transform_as(transform, instance)
+              transformed = constraints
+                .map { |constraint| instance.instance_exec(constraint, &transform) }
+                .reject(&:nil?)
+
+              return if transformed.empty?
+              return transformed.first if (transformed.size == 1)
+
+              self.class.new(*transformed)
+            end
+
+            def satisfied_by?(other)
+              if other.is_a?(self.class)
+                constraints.all? do |my_constraint|
+                  other.constraints.any? { |constraint| constraint.satisfies?(my_constraint) }
+                end
+              else
+                constraints.all? { |constraint| other.satisfies?(constraint) }
+              end
+            end
+
+            def satisfies?(other)
+              other.nil? || other.satisfied_by?(self) ||
+                constraints.any? { |constraint| constraint.satisfies?(other) }
             end
 
             protected

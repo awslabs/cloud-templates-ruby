@@ -11,121 +11,111 @@ module Aws
         # includes type constraint and transformation. Concepts can be chained together to represent
         # increasingly complex transformation and constraints.
         class Concept
-          extend Utils::Parametrized::Constraint::Dsl
-          extend Utils::Parametrized::Transformation::Dsl
+          include Utils::Functor
 
-          ##
-          # Identity concept
-          #
-          # Empty concept.
-          class Empty
-            include ::Singleton
-
-            def &(other)
-              other
-            end
-
-            def process_value(_, value)
-              value
-            end
-
-            def empty?
-              true
+          #TODO: eyebleed. Callback hell's gates
+          module Refinements
+            refine ::BasicObject do
+              def apply_concept(concept, instance)
+                return self if concept.nil?
+                concept.process_value(instance, self)
+              end
             end
           end
 
-          ##
-          # Chained concept
-          #
-          # Concept which consists of a few chained concept as a value processing pipeline.
-          class Chain
-            attr_reader :concepts
+          module Processable
+            refine ::Proc do
+              def compatible_with?(other)
+                eql?(other)
+              end
 
-            def initialize(concepts)
-              concepts.each { |concept| _check_concept(concept) }
-              @concepts = concepts
-            end
-
-            def &(other)
-              self.class.new(
-                if other.is_as?(self.class)
-                  concepts + other.concepts
-                else
-                  concepts.dup << other
-                end
-              )
-            end
-
-            def process_value(instance, original_value)
-              concepts.inject(original_value) do |value, concept|
-                concept.process_value(instance, value)
+              def processable_by?(other)
+                other.compatible_with?(self)
               end
             end
 
-            def empty?
-              false
+            refine ::NilClass do
+              def compatible_with?(other)
+                true
+              end
+
+              def processable_by?(other)
+                other.nil? || other.compatible_with?(self)
+              end
             end
 
-            private
+            using self
 
-            def _check_concept(concept)
-              return if concept.respond_to?(:process_value)
-              raise "#{parent.inspect} is not a concept"
+            def processable_by?(other)
+              other.nil? || other.compatible_with?(self)
+            end
+          end
+
+          using Refinements
+          using Utils::Parametrized::Constraint::Refinements
+          using Utils::Parametrized::Transformation::Refinements
+          include Processable
+
+          class Definition
+            include Utils::Parametrized::Constraint::Dsl
+            include Utils::Parametrized::Transformation::Dsl
+
+            def define(transform: nil, constraint: nil)
+              {
+                transform: transform,
+                constraint: constraint
+              }
             end
           end
 
           def self.from(obj = nil, &blk)
-            return obj if obj.respond_to?(:process_value)
-            return with_parameters(obj.to_hash) if obj.respond_to?(:to_hash)
-            return with_parameters(instance_eval(&blk).to_hash) if block_given?
-            return Empty.instance if obj.nil?
-            raise "#{obj.inspect} can't be transformed to a concept"
+            parameters = blk.nil? ? {} : Definition.new.instance_eval(&blk).to_hash
+
+            if obj.nil?
+              return Empty.new if parameters.empty?
+              return Defined.as(parameters)
+            elsif obj.respond_to?(:to_hash)
+              return Defined.as(obj.to_hash.merge(parameters))
+            elsif obj.respond_to?(:to_proc)
+              return obj
+            end
+
+            raise "#{obj} is not a concept definition"
           end
 
-          def self.with_parameters(transform: nil, constraint: nil)
-            return Empty.instance if transform.nil? && constraint.nil?
-            new(transform: transform, constraint: constraint)
+          def transform
+            nil
           end
 
-          attr_reader :transform
-          attr_reader :constraint
-
-          def initialize(transform: nil, constraint: nil)
-            @transform = _check_transform(transform)
-            @constraint = _check_constraint(constraint)
-          end
-
-          def process_value(instance, value)
-            _check_value(instance, _transform_value(instance, value))
-          end
-
-          def &(other)
-            Chain.new([self, other])
+          def constraint
+            nil
           end
 
           def empty?
-            false
+            transform.nil? && constraint.nil?
           end
 
-          private
+          def compatible_with?(other)
+            return true if empty?
+            return false unless other.is_a?(Concept)
 
-          def _check_transform(transform)
-            return transform if transform.nil? || transform.respond_to?(:to_proc)
-            raise "#{transform.inspect} can't be used as transformation"
+            (
+              other.transform.processable_by?(transform) &&
+              other.constraint.satisfies?(constraint)
+            )
           end
 
-          def _check_constraint(constraint)
-            return constraint if constraint.nil? || constraint.respond_to?(:to_proc)
-            raise "#{constraint.inspect} can't be used as constraint"
+          def &(other)
+            return self if other.nil? || other.empty?
+            return other if empty?
+            Chain.for(self, other)
           end
 
-          def _transform_value(instance, value)
-            return value if transform.nil?
-            instance.instance_exec(value, &transform)
+          def invoke(scope, value)
+            value.apply_concept(self, scope)
           end
 
-          def _check_value(instance, value)
-            instance.instance_exec(value, &constraint) if constraint
+          def process_value(_, value)
             value
           end
         end

@@ -1,4 +1,5 @@
 require 'aws/templates/utils'
+require 'set'
 
 module Aws
   module Templates
@@ -32,6 +33,14 @@ module Aws
 
             def initialize(*dependencies)
               @dependencies = dependencies
+            end
+
+            def transform_as(_transform, _instance)
+              self
+            end
+
+            def satisfied_by?(other)
+              other.is_a?(self.class) && (dependencies.to_set <= other.dependencies.to_set)
             end
 
             protected

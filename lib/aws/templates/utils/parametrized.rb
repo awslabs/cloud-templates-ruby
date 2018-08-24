@@ -78,7 +78,7 @@ module Aws
           end
 
           def process_value(instance, value)
-            concept.process_value(instance, value)
+            instance.instance_exec(value, &concept)
           rescue Templates::Exception::ParameterRuntimeException
             raise Templates::Exception::ParameterProcessingException.new(instance, self)
           end
@@ -161,9 +161,7 @@ module Aws
           # The list includes both the class parameters and all ancestor
           # parameters.
           def list_all_parameter_names
-            ancestors_with(Parametrized).inject(::Set.new) do |parameter_collection, mod|
-              parameter_collection.merge(mod.parameters.keys)
-            end
+            Set.new(all_parameters.keys)
           end
 
           ##
@@ -175,6 +173,12 @@ module Aws
             @parameters ||= {}
           end
 
+          def all_parameters
+            @all_parameters ||= ancestors_with(Parametrized).inject({}) do |parameters_hash, mod|
+              parameters_hash.merge!(mod.parameters)
+            end
+          end
+
           ##
           # Get parameter object by name
           #
@@ -182,10 +186,7 @@ module Aws
           # inheritance hierarchy.
           # * +parameter_alias+ - parameter name
           def get_parameter(parameter_alias)
-            ancestor = ancestors_with(Parametrized)
-                       .find { |mod| mod.parameters.key?(parameter_alias) }
-
-            ancestor.parameters[parameter_alias] if ancestor
+            all_parameters[parameter_alias]
           end
 
           ##

@@ -23,6 +23,10 @@ module Aws
           #    i = Piece.new(:param => '23')
           #    i.param # => 23
           class AsInteger < self
+            def compatible_with?(other)
+              other.is_a?(self.class)
+            end
+
             protected
 
             def transform(value, _)

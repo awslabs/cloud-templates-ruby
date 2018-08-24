@@ -34,6 +34,9 @@ module Aws
           class DependsOnValue < self
             include Utils::Schemed
 
+            using Parametrized::Transformation::Refinements
+            using Constraint::Refinements
+
             def initialize(*args)
               super
               self.if(Constraint::Condition.any)
@@ -43,6 +46,35 @@ module Aws
               schema.each_value.reject(&:nil?).each do |c|
                 raise "#{c.inspect}(#{c.class}) is not a proc" unless c.respond_to?(:to_proc)
               end
+            end
+
+            def satisfied_by?(other)
+              return false unless other.is_a?(self.class)
+
+              other_schema = other.schema
+              schema_keys_set = schema.keys.to_set
+              other_schema_keys_set = other_schema.keys.to_set
+
+              return false if schema_keys_set < other_schema_keys_set
+
+              if schema_keys_set >= other_schema_keys_set
+                other_schema.all? { |value, constraint| constraint.satisfies?(schema[value]) }
+              else
+                return false
+              end
+            end
+
+            def transform_as(transform, instance)
+              transformed = Hash[
+                schema
+                  .map do |k, v|
+                    [instance.instance_exec(k, &transform), instance.instance_exec(v, &transform)]
+                  end
+              ]
+
+              return if transformed.empty?
+
+              self.class.new(transformed)
             end
 
             protected

@@ -24,6 +24,7 @@ module Aws
           #    i.param1 # raise ParameterValueInvalid
           class Has < self
             include Utils::Schemed
+            using Constraint::Refinements
 
             as_dsl :has?
 
@@ -32,6 +33,22 @@ module Aws
                 _raise_wrong_type(field, 'field name') unless field.respond_to?(:to_sym)
                 next if constraint.nil?
                 _raise_wrong_type(constraint, 'constraint') unless constraint.respond_to?(:to_proc)
+              end
+            end
+
+            def satisfied_by?(other)
+              return false unless other.is_a?(self.class)
+
+              other_schema = other.schema
+              schema_keys_set = schema.keys.to_set
+              other_schema_keys_set = other_schema.keys.to_set
+
+              return false if schema_keys_set > other_schema_keys_set
+
+              if schema_keys_set <= other_schema_keys_set
+                other_schema.all? { |value, constraint| constraint.satisfies?(schema[value]) }
+              else
+                return false
               end
             end
 

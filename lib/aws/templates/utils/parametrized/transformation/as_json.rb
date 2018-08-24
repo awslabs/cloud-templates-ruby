@@ -24,6 +24,10 @@ module Aws
           #    i = Piece.new(:param => {q: 1})
           #    i.param # => '{"q":1}'
           class AsJson < self
+            def compatible_with?(other)
+              other.is_a?(self.class)
+            end
+
             protected
 
             def transform(value, _)

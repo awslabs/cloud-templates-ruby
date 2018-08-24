@@ -85,6 +85,17 @@ module Aws
               )
             end
 
+            def compatible_with?(other)
+              return false unless other.is_a?(self.class)
+
+              (
+                sub_parameter.nil? ||
+                sub_parameter.concept.compatible_with?(other.sub_parameter.concept)
+              ) && (
+                (!unique?) || other.unique?
+              )
+            end
+
             protected
 
             def transform(value, instance)

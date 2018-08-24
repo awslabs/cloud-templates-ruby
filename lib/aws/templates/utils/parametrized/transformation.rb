@@ -20,29 +20,43 @@ module Aws
         # all concrete transformation classes.
         class Transformation
           include Utils::Dsl::Element
-
+          include Utils::Functor
           using Utils::Dependency::Refinements
 
-          ##
-          # Creates closure with transformation invocation
-          #
-          # It's an interface method required for Transformation to expose
-          # functor properties. It encloses invocation of Transformation
-          # transform_wrapper method into a closure. The closure itself is
-          # executed in the context of Parametrized instance which provides
-          # proper set "self" variable.
-          #
-          # The closure itself accepts 2 parameters:
-          # * +parameter+ - the Parameter object which the transformation
-          #                 will be performed for
-          # * +value+ - parameter value to be transformed
-          # ...where instance is assumed from self
-          def to_proc
-            transform = self
-
-            lambda do |value|
-              transform.transform_wrapper(value, self)
+          #TODO: eyebleed. Callback hell's gates
+          module Refinements
+            refine ::BasicObject do
+              def transform_as(transform, instance)
+                return self if transform.nil?
+                transform.transform_wrapper(self, instance)
+              end
             end
+
+            refine ::Proc do
+              def compatible_with?(other)
+                eql?(other)
+              end
+
+              def processable_by?(other)
+                other.compatible_with?(self)
+              end
+            end
+
+            refine ::NilClass do
+              def compatible_with?(other)
+                true
+              end
+
+              def processable_by?(other)
+                other.nil? || other.compatible_with?(self)
+              end
+            end
+          end
+
+          using Refinements
+
+          def invoke(instance, value)
+            value.transform_as(self, instance)
           end
 
           ##
@@ -58,6 +72,14 @@ module Aws
             _with_links(transform(value, instance), value.links)
           rescue StandardError
             raise Templates::Exception::ParameterTransformException.new(self, instance, value)
+          end
+
+          def compatible_with?(other)
+            eql?(other)
+          end
+
+          def processable_by?(other)
+            other.compatible_with?(self)
           end
 
           protected

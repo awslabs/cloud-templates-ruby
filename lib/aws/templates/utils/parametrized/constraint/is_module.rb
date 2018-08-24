@@ -25,6 +25,9 @@ module Aws
             ##
             # Simple check if something is a Module
             class Baseless < self
+              def satisfied_by?(other)
+                other.is_a?(IsModule)
+              end
             end
 
             ##
@@ -35,6 +38,10 @@ module Aws
               def initialize(base)
                 _check_if_module(base)
                 @base = base
+              end
+
+              def satisfied_by?(other)
+                other.is_a?(self.class) && (base >= other.base)
               end
 
               protected

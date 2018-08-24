@@ -34,6 +34,7 @@ module Aws
           class AsHashDefinition
             include Parametrized::Constraint::Dsl
             include Parametrized::Transformation::Dsl
+            using Parametrized::Concept::Processable
 
             attr_reader :key_parameter
             attr_reader :value_parameter
@@ -48,6 +49,19 @@ module Aws
 
             def initialize(&blk)
               instance_eval(&blk)
+            end
+
+            def compatible_with?(other)
+              return false unless other.is_a?(self.class)
+
+              (
+                (
+                  other.key_parameter && other.key_parameter.concept
+                ).processable_by?(key_parameter && key_parameter.concept) &&
+                (
+                  other.value_parameter && other.value_parameter.concept
+                ).processable_by?(value_parameter && value_parameter.concept)
+              )
             end
 
             private

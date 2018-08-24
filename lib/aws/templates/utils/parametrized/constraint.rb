@@ -19,41 +19,39 @@ module Aws
         # all concrete constraint classes.
         class Constraint
           include Utils::Dsl::Element
+          include Utils::Functor
 
-          ##
-          # Creates closure with checker invocation
-          #
-          # It's an interface method required for Constraint to expose
-          # functor properties. It encloses invocation of Constraint check_wrapper
-          # method into a closure. The closure itself is executed in the context
-          # of Parametrized instance which provides proper set "self" variable.
-          #
-          # The closure itself accepts 2 parameters:
-          # * +parameter+ - the Parameter object which the constraint is evaluated
-          #                 against
-          # * +value+ - parameter value to be checked
-          # ...where instance is assumed from self
-          def to_proc
-            constraint = self
+          #TODO: eyebleed. Callback hell's gates
+          module Refinements
+            refine ::BasicObject do
+              def check_constraint(constraint, instance)
+                return if constraint.nil?
+                constraint.check_wrapper(self, instance)
+              end
+            end
 
-            lambda do |value|
-              constraint.check_wrapper(value, self)
+            refine ::Proc do
+              def satisfied_by?(other)
+                eql?(other)
+              end
+
+              def satisfies?(other)
+                other.nil? || other.satisfied_by?(self)
+              end
+            end
+
+            refine ::NilClass do
+              def satisfied_by?(other)
+                true
+              end
+
+              def satisfies?(other)
+                other.nil? || other.satisfied_by?(self)
+              end
             end
           end
 
-          ##
-          # Wraps constraint-dependent method
-          #
-          # It wraps constraint-dependent "check" method into a rescue block
-          # to standardize exception type and information provided by failed
-          # constraint validation
-          # * +value+ - parameter value to be checked
-          # * +instance+ - the instance value is checked for
-          def check_wrapper(value, instance)
-            check(value, instance) if pre_condition.check(value, instance)
-          rescue StandardError
-            raise Templates::Exception::ParameterConstraintException.new(self, instance, value)
-          end
+          using Refinements
 
           ##
           # Change precondition of the constraint
@@ -78,13 +76,41 @@ module Aws
             @pre_condition ||= Condition.not_nil
           end
 
+          def transform_as(_transform, _instance)
+            nil
+          end
+
+          def invoke(instance, value)
+            value.check_constraint(self, instance)
+          end
+
+          def satisfied_by?(other)
+            eql?(other)
+          end
+
+          def satisfies?(other)
+            other.nil? || other.satisfied_by?(self)
+          end
+
+          ##
+          # Wraps constraint-dependent method
+          #
+          # It wraps constraint-dependent "check" method into a rescue block
+          # to standardize exception type and information provided by failed
+          # constraint validation
+          # * +value+ - parameter value to be checked
+          # * +instance+ - the instance value is checked for
+          def check_wrapper(value, instance)
+            check(value, instance) if pre_condition.check(value, instance)
+          rescue StandardError
+            raise Templates::Exception::ParameterConstraintException.new(self, instance, value)
+          end
+
           protected
 
           ##
           # Constraint-dependent check
           #
-          # * +parameter+ - the Parameter object which the constraint is evaluated
-          #                 against
           # * +value+ - parameter value to be checked
           # * +instance+ - the instance value is checked for
           def check(value, instance); end
