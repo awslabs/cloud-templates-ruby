@@ -230,8 +230,8 @@ module Aws
           end
 
           include Getter::Dsl
-          include Constraint::Dsl
           include Transformation::Dsl
+          include Constraint::Dsl
         end
 
         instance_scope do

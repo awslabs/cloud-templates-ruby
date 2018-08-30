@@ -59,7 +59,7 @@ module Aws
             end
           end
 
-          refine ::Aws::Templates::Artifact do
+          refine ::Aws::Templates::BasicArtifact do
             # mark the object as a dependency
             def as_a_dependency
               ::Aws::Templates::Utils::Dependency::Wrapper.new(self)
