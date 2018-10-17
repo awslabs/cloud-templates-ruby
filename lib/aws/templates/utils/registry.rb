@@ -29,6 +29,7 @@ module Aws
         def handler_for(entity)
           handler = self[entity]
           raise "Handler is not found for #{entity}" unless handler
+
           handler.reduce
         end
 
@@ -36,6 +37,7 @@ module Aws
         # Merge map with another recursive
         def merge(recursive)
           raise "#{recursive} is not recursive" unless Utils.recursive?(recursive)
+
           recursive.keys.each { |k| register(k, recursive[k]) }
           self
         end
@@ -49,6 +51,7 @@ module Aws
         # Look-up the handler
         def [](entity)
           return registry[entity] unless entity.is_a?(Module)
+
           registry[entity.name] || registry[entity]
         end
 
@@ -68,6 +71,7 @@ module Aws
 
         def _process_entity(entity)
           return entity unless entity.is_a?(Module)
+
           entity.name || entity.reduce
         end
       end

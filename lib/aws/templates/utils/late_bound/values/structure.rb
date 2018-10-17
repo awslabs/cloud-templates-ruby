@@ -5,6 +5,11 @@ module Aws
     module Utils
       module LateBound
         module Values
+          ##
+          # Late-bound structure
+          #
+          # Structure contains a few defined methods/fields which produce linked late-bound values
+          # while invoked.
           class Structure < Value
             attr_reader :klass
 
@@ -25,6 +30,7 @@ module Aws
               # Returns late bound field by name
               def [](key)
                 return unless include?(key)
+
                 target.send(key)
               end
 
@@ -53,12 +59,13 @@ module Aws
               _get_late_bound_for(name)
             end
 
-            def respond_to_missing?(name, include_private = false)
+            def respond_to_missing?(name, _include_private = false)
               parameter_names.include?(name)
             end
 
             def transform_as(transform, instance)
               return self if transform.nil?
+
               transform.transform_wrapper(self, instance)
             end
 
@@ -68,11 +75,6 @@ module Aws
 
             def to_recursive
               RecursiveAdapter.new(self)
-            end
-
-            def initialize(link, klass, constraint)
-              super(link, constraint)
-              @klass = klass
             end
 
             private

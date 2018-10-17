@@ -10,6 +10,8 @@ module Aws
       # functionality required to register an entity handler and look-up the registry when the
       # entity is processed.
       class Processor
+        include Templates::Utils::Default
+
         extend Utils::Routing
 
         class <<self
@@ -57,7 +59,7 @@ module Aws
         attr_reader :options
 
         def initialize(params = nil)
-          @options = params
+          @options = Templates::Utils::Options.new(defaults, params)
         end
 
         # Creates handler instance for given class with given context and parameters

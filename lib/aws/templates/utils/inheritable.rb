@@ -36,7 +36,9 @@ module Aws
           end
 
           def _class_scope
-            @_class_scope ||= ::Module.new
+            return @_class_scope if @_class_scope
+
+            @_class_scope = ::Module.new
           end
         end
 

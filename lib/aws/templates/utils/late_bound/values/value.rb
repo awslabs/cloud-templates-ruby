@@ -5,6 +5,8 @@ module Aws
     module Utils
       module LateBound
         module Values
+          ##
+          # Basic class for all non-container values
           class Value < BasicValue
             using Utils::Parametrized::Constraint::Refinements
 

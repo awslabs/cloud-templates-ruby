@@ -58,31 +58,40 @@ describe Aws::Templates::Artifact do
       it 'root is not empty' do
         expect(instance.root).not_to be_nil
       end
+
       it 'doesn\'t have any dependencies' do
         expect(instance.dependencies).to be_empty
       end
     end
+
     context 'with label' do
       before { params[:label] = 'b' }
+
       it 'contains passed label' do
         expect(instance.label).to be == 'b'
       end
     end
+
     context 'with root' do
       before { params[:root] = 1 }
+
       it 'contains one dependency' do
         expect(instance.dependencies).to be == [just_object.new(1)].to_set
       end
+
       it 'contains passed root' do
         expect(instance.root).to be == 1
       end
     end
+
     context 'with different root' do
       before { params[:root] = 2 }
+
       it 'contains one dependency' do
         expect(instance.dependencies).to be == [just_object.new(2)].to_set
       end
     end
+
     context 'without overrides' do
       before { params.merge!(root: 3, label: 'thing') }
 
@@ -106,6 +115,7 @@ describe Aws::Templates::Artifact do
         expect(instance.options.to_hash).to be == expected
       end
     end
+
     context 'with override' do
       before { params.merge!(root: 3, label: 'thing', a: 'rty') }
 

@@ -14,6 +14,7 @@ module Aws
 
       def self.to_s
         return super unless name.nil?
+
         "<Subclass of (#{superclass}) with features #{features}>"
       end
 

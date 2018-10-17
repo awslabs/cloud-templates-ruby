@@ -13,16 +13,28 @@ module Aws
         class Concept
           include Utils::Functor
 
-          #TODO: eyebleed. Callback hell's gates
+          # TODO: eyebleed. Callback hell's gates
+
+          ##
+          # Processing hook definition for refinements
+          #
+          # apply_concept is invoked for objects while processing them through a concept.
+          # The default implementation is to just process the object.
           module Refinements
             refine ::BasicObject do
               def apply_concept(concept, instance)
                 return self if concept.nil?
+
                 concept.process_value(instance, self)
               end
             end
           end
 
+          ##
+          # Allow Proc and NilClass to be concepts too
+          #
+          # Default rimplementation for concept test methods for NilClass and Proc so they are
+          # compatible wiht regular concept objects.
           module Processable
             refine ::Proc do
               def compatible_with?(other)
@@ -35,7 +47,7 @@ module Aws
             end
 
             refine ::NilClass do
-              def compatible_with?(other)
+              def compatible_with?(_other)
                 true
               end
 
@@ -56,6 +68,11 @@ module Aws
           using Utils::Parametrized::Transformation::Refinements
           include Processable
 
+          ##
+          # Concept definition DSL
+          #
+          # Nothing more than syntax sugar combining Constraint and Transformation DSL elements
+          # into a single language closure. Used in static from method.
           class Definition
             include Utils::Parametrized::Constraint::Dsl
             include Utils::Parametrized::Transformation::Dsl
@@ -73,6 +90,7 @@ module Aws
 
             if obj.nil?
               return Empty.new if parameters.empty?
+
               return Defined.as(parameters)
             elsif obj.respond_to?(:to_hash)
               return Defined.as(obj.to_hash.merge(parameters))
@@ -108,6 +126,7 @@ module Aws
           def &(other)
             return self if other.nil? || other.empty?
             return other if empty?
+
             Chain.for(self, other)
           end
 

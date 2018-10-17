@@ -17,6 +17,7 @@ module Aws
         class Inheritable < Rdoc::Provider
           def self.header(header = nil)
             return @header if header.nil?
+
             @header = header
           end
 

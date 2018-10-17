@@ -34,6 +34,7 @@ module Aws
 
             def transform(value, _)
               return if value.nil?
+
               !value.to_s.casecmp('false').zero?
             end
           end

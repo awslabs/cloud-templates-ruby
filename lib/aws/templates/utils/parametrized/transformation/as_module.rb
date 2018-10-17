@@ -34,6 +34,7 @@ module Aws
               return if value.nil?
               return value if value.is_a?(Module)
               return Utils.lookup_module(value.to_s) if value.respond_to?(:to_s)
+
               raise "#{value} can't be transformed to a class"
             end
           end

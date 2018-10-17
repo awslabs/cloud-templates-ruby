@@ -47,6 +47,7 @@ module Aws
 
             def check(value, instance)
               return if instance.instance_exec(value, &condition)
+
               raise "#{value.inspect} doesn't satisfy the condition \"#{description}\""
             end
           end

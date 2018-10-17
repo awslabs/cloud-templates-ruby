@@ -11,6 +11,7 @@ module Aws
         class Dsl < Rdoc::Provider
           def to_processed
             return if context.help.nil?
+
             sub(text('_Description_'), parsed_for(context.help))
           end
         end

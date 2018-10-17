@@ -66,6 +66,7 @@ module Aws
 
             def transform(value, instance)
               return if value.nil?
+
               klass.new(instance, value)
             end
           end

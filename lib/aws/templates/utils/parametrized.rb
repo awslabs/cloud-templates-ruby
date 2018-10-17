@@ -174,9 +174,9 @@ module Aws
           end
 
           def all_parameters
-            @all_parameters ||= ancestors_with(Parametrized).inject({}) do |parameters_hash, mod|
-              parameters_hash.merge!(mod.parameters)
-            end
+            @all_parameters ||=
+              ancestors_with(Parametrized)
+              .inject(Utils::Options.new) { |collection, mod| collection.merge!(mod.parameters) }
           end
 
           ##
@@ -215,6 +215,8 @@ module Aws
             parameters[name] = parameter_object
 
             define_method(name) { guarded_get(self, parameter_object) }
+
+            parameter_object
           end
 
           def raise_already_exists(name)

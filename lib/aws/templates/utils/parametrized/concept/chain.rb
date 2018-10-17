@@ -5,6 +5,12 @@ module Aws
     module Utils
       module Parametrized
         class Concept
+          ##
+          # Chain of concepts
+          #
+          # The class exposes interface of a normal concept. It puts a few concepts into a
+          # processing pipeline processes each value through the chain according to the specified
+          # order. The functionality is used indirectly in & concept operator.
           class Chain
             include Utils::Functor
             using Concept::Processable
@@ -12,9 +18,9 @@ module Aws
             attr_reader :concepts
 
             def self.for(*args)
-              concepts = args
-                .flatten
-                .map { |concept| concept.is_a?(self) ? concept.concepts : concept }
+              concepts = args.flatten.map do |concept|
+                concept.is_a?(self) ? concept.concepts : concept
+              end
 
               concepts.flatten!
               concepts.reject!(&:empty?)

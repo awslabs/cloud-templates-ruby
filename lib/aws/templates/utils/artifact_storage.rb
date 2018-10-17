@@ -68,6 +68,7 @@ module Aws
         # Associate label to the object
         def []=(key, value)
           raise 'nil artifacts are not supported' if value.nil?
+
           @set << value unless @set.include?(value)
           @map[key] = value
         end

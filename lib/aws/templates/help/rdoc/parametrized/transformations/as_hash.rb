@@ -31,6 +31,7 @@ module Aws
 
               def description_for(name, value)
                 return sub(text("_#{name}_ can be anything")) if value.nil?
+
                 processed_for(value)
               end
             end

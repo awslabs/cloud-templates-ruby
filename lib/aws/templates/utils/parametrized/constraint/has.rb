@@ -32,6 +32,7 @@ module Aws
               schema.each_pair do |field, constraint|
                 _raise_wrong_type(field, 'field name') unless field.respond_to?(:to_sym)
                 next if constraint.nil?
+
                 _raise_wrong_type(constraint, 'constraint') unless constraint.respond_to?(:to_proc)
               end
             end
@@ -45,11 +46,9 @@ module Aws
 
               return false if schema_keys_set > other_schema_keys_set
 
-              if schema_keys_set <= other_schema_keys_set
-                other_schema.all? { |value, constraint| constraint.satisfies?(schema[value]) }
-              else
-                return false
-              end
+              return false unless schema_keys_set <= other_schema_keys_set
+
+              other_schema.all? { |value, constraint| constraint.satisfies?(schema[value]) }
             end
 
             protected
@@ -58,6 +57,7 @@ module Aws
               schema.each_pair do |field, constraint|
                 _raise_no_field(value, field) unless value.respond_to?(field)
                 next if constraint.nil?
+
                 method = value.method(field)
                 _raise_wrong_arity(value, method) if method.arity > 0
                 value.instance_exec(value.send(field), &constraint)

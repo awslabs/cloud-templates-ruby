@@ -95,6 +95,7 @@ module Aws
           # If no parameters are passed at all, ArgumentError will be thrown.
           def contextualize(fltr)
             raise ArgumentError.new('Proc should be specified') unless fltr
+
             @module_context = module_context & fltr
           end
         end

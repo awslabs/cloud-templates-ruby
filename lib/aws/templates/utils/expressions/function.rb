@@ -19,6 +19,7 @@ module Aws
           def self.function_name
             return @function_name if @function_name
             return if lastname.nil? || self == Function
+
             @function_name ||= lastname.pathize
           end
 
@@ -41,6 +42,7 @@ module Aws
           def self.new(name, *args)
             raise 'You can\'t instantiate anonymous function' if function_name.nil?
             raise "#{name} is not #{function_name}" if name != function_name
+
             super(*args)
           end
         end

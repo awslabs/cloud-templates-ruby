@@ -31,7 +31,7 @@ module Aws
             end
 
             def transform_as(transform, _instance)
-              #TODO: eyebleed. Tight coupling between transforms and constraints
+              # TODO: eyebleed. Tight coupling between transforms and constraints
               transform.is_a?(Parametrized::Transformation::AsString) ? self : nil
             end
 
@@ -43,6 +43,7 @@ module Aws
 
             def check(value, _)
               return if expression =~ value.to_s
+
               raise "#{value} doesn't match #{expression}"
             end
           end

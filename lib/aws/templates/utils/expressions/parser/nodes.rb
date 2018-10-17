@@ -87,6 +87,7 @@ module Aws
 
               def clean
                 return left if _right.empty?
+
                 self
               end
 
@@ -120,6 +121,7 @@ module Aws
 
               def clean
                 return _left.clean if _rest.empty?
+
                 self
               end
 

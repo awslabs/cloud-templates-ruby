@@ -44,10 +44,10 @@ module Aws
               location = context.source_location
 
               message = begin
-                "Calculated in #{context.binding.receiver}"
-              rescue ArgumentError
-                'Calculated'
-              end
+                          "Calculated in #{context.binding.receiver}"
+                        rescue ArgumentError
+                          'Calculated'
+                        end
 
               location.nil? ? message : "#{message} (#{location.join(':')})"
             end
@@ -64,6 +64,7 @@ module Aws
 
             def to_processed
               return _recursive if Utils.recursive?(context)
+
               _inspection
             end
 
@@ -71,6 +72,7 @@ module Aws
 
             def _inspection
               return '*deleted*' if context == Templates::Utils::Default.deleted
+
               str = context.inspect
               sub(parameters.nil? ? text(str) : text("_#{parameters}_ #{str}"))
             end
@@ -100,7 +102,9 @@ module Aws
           private
 
           def _formatter
-            @_formatter ||= if options && options.include?(:formatter)
+            return @_formatter if @_formatter
+
+            @_formatter = if options && options.include?(:formatter)
               Templates::Utils.lookup_module(options[:formatter]).new
             else
               RDoc::Markup::ToAnsi.new

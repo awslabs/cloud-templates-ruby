@@ -37,6 +37,7 @@ module Aws
 
             def transform(value, instance)
               return if value.nil?
+
               _parse(value, instance)
             end
 
@@ -45,6 +46,7 @@ module Aws
             def _parse(value, instance)
               result = parser.parse(value.to_s, _compute_parser_parameters(instance))
               raise parser.failure_reason if result.nil?
+
               result
             end
 

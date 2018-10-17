@@ -40,12 +40,13 @@ module Aws
             end
 
             def transform_as(transform, instance)
-              transformed = constraints
+              transformed =
+                constraints
                 .map { |constraint| instance.instance_exec(constraint, &transform) }
                 .reject(&:nil?)
 
               return if transformed.empty?
-              return transformed.first if (transformed.size == 1)
+              return transformed.first if transformed.size == 1
 
               self.class.new(*transformed)
             end

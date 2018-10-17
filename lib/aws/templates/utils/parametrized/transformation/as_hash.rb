@@ -40,6 +40,7 @@ module Aws
 
             def compatible_with?(other)
               return false unless other.is_a?(self.class)
+
               definition.nil? || definition.compatible_with?(other.definition)
             end
 
@@ -70,6 +71,7 @@ module Aws
 
             def _process_value(parameter, instance, value)
               return value if parameter.nil?
+
               parameter.process_value(instance, value)
             end
           end

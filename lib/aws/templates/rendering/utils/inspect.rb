@@ -90,6 +90,7 @@ module Aws
           define_view(Templates::Utils::Parametrized, InspectView) do
             def to_processed
               return instance.to_s unless depth > 0
+
               "#{instance}" \
                 "{parameters: #{processed_for(instance.parameters_map, depth)}," \
                 " dependencies: #{processed_for(instance.dependencies, depth)}}"

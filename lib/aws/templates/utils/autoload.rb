@@ -205,6 +205,7 @@ module Aws
 
         def initialize(parent, short_name = nil)
           raise ScriptError.new("#{parent} is not a module") unless parent.is_a?(Module)
+
           @parent = parent
           @short_name = short_name
         end

@@ -5,6 +5,12 @@ module Aws
     module Utils
       module LateBound
         module Values
+          ##
+          # Untyped unconstrained late-bound value
+          #
+          # The values doesn't satisfy any non-nil constraints and not transformable by any
+          # transformations (since we don't have any attached type information we can't guarantee
+          # it would)
           class Empty < BasicValue
             def self.for(link, _instance, _transform, _constraint)
               new(link)

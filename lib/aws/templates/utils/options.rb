@@ -58,12 +58,12 @@ module Aws
         def [](*path)
           structures.reverse_each.inject(nil) do |memo, container|
             ret = begin
-              Utils.lookup(container, path.dup)
-            rescue Exception::OptionValueDeleted, Exception::OptionScalarOnTheWay
-              # we discovered that this layer either have value deleted or parent was overriden
-              # by a scalar. Either way we just return what we have in the memo
-              break memo
-            end
+                    Utils.lookup(container, path.dup)
+                  rescue Exception::OptionValueDeleted, Exception::OptionScalarOnTheWay
+                    # we discovered that this layer either have value deleted or parent
+                    # was overriden by a scalar. Either way we just return what we have in the memo
+                    break memo
+                  end
 
             # if current container doesn't have this value - let's go to the next iteration
             next memo if ret.nil?

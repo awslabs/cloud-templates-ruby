@@ -6,7 +6,14 @@ module Aws
       module LateBound
         module Values
           module Containers
+            ##
+            # Late-bound list
+            #
+            # The container supports index operator which can be supplied with either concrete index
+            # value or late-bound one and produces typed late-bound "element" value with the link
+            # set to point to the list as a parent.
             class List < Container
+              # List index link class
               class Index < LateBound::Link
                 alias index selector
 
@@ -17,12 +24,12 @@ module Aws
                 end
               end
 
-              INDEX_CONCEPT = Utils::Parametrized::Concept.from {
+              INDEX_CONCEPT = Utils::Parametrized::Concept.from do
                 {
                   constraint: not_nil,
                   transform: as_integer
                 }
-              }
+              end
 
               def key_concept
                 INDEX_CONCEPT

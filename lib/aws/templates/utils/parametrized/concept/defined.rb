@@ -5,9 +5,16 @@ module Aws
     module Utils
       module Parametrized
         class Concept
+          ##
+          # Defined concept
+          #
+          # "Defined" concept has constraint or transformation or both defined and processes
+          # the target value through the transformation first and then check the resulkt against
+          # the constraint.
           class Defined < self
             def self.as(transform: nil, constraint: nil)
               return Concept::Empty.new if transform.nil? && constraint.nil?
+
               new(transform: transform, constraint: constraint)
             end
 
@@ -27,16 +34,19 @@ module Aws
 
             def _check_transform(transform)
               return transform if transform.nil? || transform.respond_to?(:to_proc)
+
               raise "#{transform.inspect} can't be used as transformation"
             end
 
             def _check_constraint(constraint)
               return constraint if constraint.nil? || constraint.respond_to?(:to_proc)
+
               raise "#{constraint.inspect} can't be used as constraint"
             end
 
             def _transform_value(instance, value)
               return value if transform.nil?
+
               instance.instance_exec(value, &transform)
             end
 

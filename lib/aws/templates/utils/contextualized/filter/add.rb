@@ -52,6 +52,7 @@ module Aws
             def _scheme_add(opts, memo, schm)
               schm.each_pair do |field, sub_scheme|
                 next unless opts.include?(field)
+
                 memo[field] = if sub_scheme.nil?
                   Utils.merge(memo[field], opts[field])
                 else

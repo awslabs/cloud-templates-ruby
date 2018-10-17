@@ -13,6 +13,7 @@ class TestRender < Aws::Templates::Rendering::Render
 
     def _stringify(obj)
       return obj.to_s unless obj.respond_to?(:to_hash)
+
       obj.to_hash.map { |k, v| [_stringify(k), _stringify(v)] }.to_h
     end
   end
@@ -173,19 +174,19 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       end
 
       it 'satisfies loosened constraint' do
-        expect(stricter_transform.processable_by?(loosened_transform)).to be_truthy
+        expect(stricter_transform).to be_processable_by loosened_transform
       end
 
       it 'doesn\'t satisfies stricter constraint' do
-        expect(loosened_transform.processable_by?(stricter_transform)).to be_falsey
+        expect(loosened_transform).not_to be_processable_by stricter_transform
       end
 
       it 'allows unique list where uniquiness not required' do
-        expect(unique_transform.processable_by?(nonunique_transform)).to be_truthy
+        expect(unique_transform).to be_processable_by nonunique_transform
       end
 
       it 'is not compatible with non-unique list where uniquiness is required' do
-        expect(nonunique_transform.processable_by?(unique_transform)).to be_falsey
+        expect(nonunique_transform).not_to be_processable_by unique_transform
       end
     end
   end
@@ -281,11 +282,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_integer }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_integer)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_integer
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_boolean
       end
     end
   end
@@ -316,11 +317,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_float }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_float)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_float
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_boolean
       end
     end
   end
@@ -346,11 +347,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_string }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_string)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_string
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_boolean
       end
     end
   end
@@ -391,11 +392,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_boolean }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_boolean)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_boolean
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_string
       end
     end
   end
@@ -486,7 +487,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
         let(:transform) { parametrized_class.as_hash }
 
         it 'is processable by itself' do
-          expect(parametrized_class.as_hash.processable_by?(transform)).to be_truthy
+          expect(parametrized_class.as_hash).to be_processable_by transform
         end
 
         context 'with restricted target' do
@@ -503,37 +504,37 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
             end
           end
 
-          context 'where key concept is defined' do
+          context 'with key concept is defined' do
             let(:key_concept) do
               { transform: parametrized_class.as_integer }
             end
 
             it 'can process' do
-              expect(target_transform.processable_by?(transform)).to be_truthy
+              expect(target_transform).to be_processable_by transform
             end
 
             it 'can\'t be processed by' do
-              expect(transform.processable_by?(target_transform)).to be_falsey
+              expect(transform).not_to be_processable_by target_transform
             end
 
-            context 'together with value concept' do
+            context 'with value concept defined' do
               let(:value_concept) do
                 { transform: parametrized_class.as_integer }
               end
 
               it 'can process' do
-                expect(target_transform.processable_by?(transform)).to be_truthy
+                expect(target_transform).to be_processable_by transform
               end
 
               it 'can\'t be processed by' do
-                expect(transform.processable_by?(target_transform)).to be_falsey
+                expect(transform).not_to be_processable_by target_transform
               end
             end
           end
         end
       end
 
-      context 'restricted' do
+      context 'when key and value are restricted by constraints' do
         let(:description) do
           proc do
             key name: :key,
@@ -550,12 +551,12 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
         let(:transform) { parametrized_class.as_hash(&description) }
 
         it 'is processable by itself' do
-          expect(parametrized_class.as_hash(&description).processable_by?(transform)).to be_truthy
+          expect(parametrized_class.as_hash(&description)).to be_processable_by transform
         end
 
         context 'with unrestricted target' do
           it 'passes' do
-            expect(transform.processable_by?(parametrized_class.as_hash)).to be_truthy
+            expect(transform).to be_processable_by parametrized_class.as_hash
           end
         end
 
@@ -573,32 +574,32 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
             end
           end
 
-          context 'where key concept is defined' do
+          context 'when key concept is defined' do
             context 'when the concept is compatible with the original' do
               let(:key_concept) do
                 { transform: parametrized_class.as_string }
               end
 
               it 'can be processed by' do
-                expect(transform.processable_by?(target_transform)).to be_truthy
+                expect(transform).to be_processable_by target_transform
               end
 
               it 'can\'t process' do
-                expect(target_transform.processable_by?(transform)).to be_falsey
+                expect(target_transform).not_to be_processable_by transform
               end
 
-              context 'together with value concept' do
+              context 'with value concept defined' do
                 context 'when the concept is compatible with the original' do
                   let(:value_concept) do
                     { transform: parametrized_class.as_integer }
                   end
 
                   it 'can\'t process' do
-                    expect(target_transform.processable_by?(transform)).to be_falsey
+                    expect(target_transform).not_to be_processable_by transform
                   end
 
                   it 'can be processed by' do
-                    expect(transform.processable_by?(target_transform)).to be_truthy
+                    expect(transform).to be_processable_by target_transform
                   end
                 end
 
@@ -608,11 +609,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
                   end
 
                   it 'can\'t process' do
-                    expect(target_transform.processable_by?(transform)).to be_falsey
+                    expect(target_transform).not_to be_processable_by transform
                   end
 
                   it 'can\'t be processed by' do
-                    expect(transform.processable_by?(target_transform)).to be_falsey
+                    expect(transform).not_to be_processable_by target_transform
                   end
                 end
               end
@@ -624,11 +625,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
               end
 
               it 'can\'t be processed by' do
-                expect(transform.processable_by?(target_transform)).to be_falsey
+                expect(transform).not_to be_processable_by target_transform
               end
 
               it 'can\'t process' do
-                expect(target_transform.processable_by?(transform)).to be_falsey
+                expect(target_transform).not_to be_processable_by transform
               end
             end
           end
@@ -663,11 +664,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_json }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_json)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_json
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_string
       end
     end
   end
@@ -693,11 +694,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_timestamp }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_timestamp)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_timestamp
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_string
       end
     end
   end
@@ -733,11 +734,11 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       let(:transform) { parametrized_class.as_module }
 
       it 'can be processed by itself' do
-        expect(transform.processable_by?(parametrized_class.as_module)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_module
       end
 
       it 'can\'t be processed by arbitrary transform' do
-        expect(transform.processable_by?(parametrized_class.as_string)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_string
       end
     end
   end
@@ -769,23 +770,23 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
       end
 
       it 'can be processed by a chain with input-output compatibility' do
-        expect(transform.processable_by?(another_transform)).to be_truthy
+        expect(transform).to be_processable_by another_transform
       end
 
       it 'can process input type' do
-        expect(parametrized_class.as_float.processable_by?(transform)).to be_truthy
+        expect(parametrized_class.as_float).to be_processable_by transform
       end
 
       it 'can be processed as output type' do
-        expect(transform.processable_by?(parametrized_class.as_string)).to be_truthy
+        expect(transform).to be_processable_by parametrized_class.as_string
       end
 
       it 'can\'t be processed as intermediate type' do
-        expect(parametrized_class.as_integer.processable_by?(transform)).to be_falsey
+        expect(parametrized_class.as_integer).not_to be_processable_by transform
       end
 
       it 'can\'t process intermediate type' do
-        expect(transform.processable_by?(parametrized_class.as_integer)).to be_falsey
+        expect(transform).not_to be_processable_by parametrized_class.as_integer
       end
     end
   end

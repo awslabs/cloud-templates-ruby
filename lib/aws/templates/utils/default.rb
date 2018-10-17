@@ -143,6 +143,7 @@ module Aws
 
             def _process_value(value, instance)
               return value if value.override? || Utils.recursive?(value)
+
               _process_value(instance.instance_eval(&value), instance)
             end
           end
@@ -156,6 +157,7 @@ module Aws
               def [](one, another)
                 return another if another.override? || one.override? || one == Definition.empty
                 return one if another.nil? || another == Definition.empty
+
                 _unite(one, another)
               end
 
@@ -183,6 +185,7 @@ module Aws
             def for(instance)
               eval_b = another.for(instance)
               return eval_b if eval_b.override? && !eval_b.nil?
+
               eval_a = one.for(instance)
               return eval_b if eval_a.override?
 
@@ -208,6 +211,7 @@ module Aws
           def merge(another)
             return another if another.override?
             return self if another == Definition.empty
+
             Pair[self, another]
           end
 
@@ -232,8 +236,10 @@ module Aws
         class Instantiation
           def value
             return @value if @value
+
             @value = @entry.to_definition.for(@context)
             raise "#{@value.inspect} is not recursive" if @value.override?
+
             @value
           end
 
@@ -285,6 +291,7 @@ module Aws
           # Creates wrapper object with attached hash and context to evaluate lambdas in
           def initialize(ent, ctx)
             raise "#{ent.inspect} is not recursive" if ent.override?
+
             @entry = ent
             @context = ctx
           end
@@ -354,6 +361,7 @@ module Aws
           # in one single definition object
           def defaults_definition
             return @defaults if @defaults
+
             @defaults = ancestors_with(Default)
                         .inject(Definition.empty) do |acc, elem|
                           acc.merge(elem.module_defaults_definition)

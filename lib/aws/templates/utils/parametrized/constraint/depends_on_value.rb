@@ -57,19 +57,16 @@ module Aws
 
               return false if schema_keys_set < other_schema_keys_set
 
-              if schema_keys_set >= other_schema_keys_set
-                other_schema.all? { |value, constraint| constraint.satisfies?(schema[value]) }
-              else
-                return false
-              end
+              return false unless schema_keys_set >= other_schema_keys_set
+
+              other_schema.all? { |value, constraint| constraint.satisfies?(schema[value]) }
             end
 
             def transform_as(transform, instance)
               transformed = Hash[
-                schema
-                  .map do |k, v|
-                    [instance.instance_exec(k, &transform), instance.instance_exec(v, &transform)]
-                  end
+                schema.map do |k, v|
+                  [instance.instance_exec(k, &transform), instance.instance_exec(v, &transform)]
+                end
               ]
 
               return if transformed.empty?
@@ -82,6 +79,7 @@ module Aws
             def check(value, instance)
               unless schema.key?(value)
                 return if value.nil?
+
                 raise "#{value.inspect} not present in selector"
               end
 

@@ -13,6 +13,7 @@ module Aws
             class RecursiveSchemaFilter < Contextualized::Filter
               def self.blurb(str = nil)
                 return @description_blurb if str.nil?
+
                 @description_blurb = str
               end
 

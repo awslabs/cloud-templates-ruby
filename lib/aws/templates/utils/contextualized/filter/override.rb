@@ -48,6 +48,7 @@ module Aws
 
             def _check_override_type(ovrr)
               raise "Wrong override value: #{ovrr.inspect}" unless _proper_override_type?(ovrr)
+
               ovrr
             end
 

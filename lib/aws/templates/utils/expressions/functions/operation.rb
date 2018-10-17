@@ -23,6 +23,7 @@ module Aws
 
             def self.new(*args)
               raise "Operation sign is not defined for #{self}" if op_sign.nil?
+
               super(*args)
             end
 

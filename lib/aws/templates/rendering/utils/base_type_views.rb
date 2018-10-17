@@ -113,6 +113,7 @@ module Aws
           def initialize_base_type_views_for(*classes)
             classes.each do |k|
               raise "Can't find default view for class #{k}" unless DEFAULT_RENDERING_MAP.key?(k)
+
               define_view(k, DEFAULT_RENDERING_MAP[k])
             end
           end

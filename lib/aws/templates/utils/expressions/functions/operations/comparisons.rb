@@ -38,6 +38,7 @@ module Aws
 
                 def wrap(arg)
                   return "(#{arg})" if arg.is_a?(Functions::Operation)
+
                   arg
                 end
               end

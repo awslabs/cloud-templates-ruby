@@ -48,6 +48,7 @@ module Aws
             def check(value, instance)
               dependencies.each do |pname|
                 next unless instance.send(pname).nil?
+
                 raise "#{pname} is required when the parameter value is set to #{value.inspect}"
               end
             end

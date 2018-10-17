@@ -14,6 +14,7 @@ module Aws
         def guarded_for(instance, entity)
           current_call = Call.new(instance, entity)
           return unless trace.add?(current_call)
+
           ret = yield
           trace.delete(current_call)
           ret

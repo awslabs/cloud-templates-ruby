@@ -21,11 +21,20 @@ module Aws
           include Utils::Dsl::Element
           include Utils::Functor
 
-          #TODO: eyebleed. Callback hell's gates
+          # TODO: eyebleed. Callback hell's gates
+
+          ##
+          # Constraint adaptors
+          #
+          # Default method implementations for
+          # * BasicObject - adds default check_constraint hook implementation which just checks
+          #                 the values against the passed constraint
+          # * Proc, NilClass - makes the types compatible with test methods of constraint class
           module Refinements
             refine ::BasicObject do
               def check_constraint(constraint, instance)
                 return if constraint.nil?
+
                 constraint.check_wrapper(self, instance)
               end
             end
@@ -41,7 +50,7 @@ module Aws
             end
 
             refine ::NilClass do
-              def satisfied_by?(other)
+              def satisfied_by?(_other)
                 true
               end
 
@@ -63,6 +72,7 @@ module Aws
             @pre_condition = Condition.for(
               if params.empty?
                 raise 'Block must be specified' unless block_given?
+
                 blk
               else
                 params.first

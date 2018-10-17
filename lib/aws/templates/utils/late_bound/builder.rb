@@ -4,7 +4,14 @@ module Aws
   module Templates
     module Utils
       module LateBound
+        ##
+        # Late bound value's builder
+        #
+        # Value builder is a special object which is handled differently from a regular value.
+        # It hooks into the process of value calculation through apply_concept method and produces
+        # late bound value with attached constraint and transformation.
         class Builder
+          # Point of origin for the value being built
           attr_reader :link
 
           def apply_concept(concept, instance)

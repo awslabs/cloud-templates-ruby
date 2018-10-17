@@ -124,6 +124,7 @@ module Aws
 
       def self.hashify(value)
         return value unless Utils.recursive?(value)
+
         value.keys.each_with_object({}) { |k, hsh| hsh[k] = hashify(value[k]) }
       end
 
@@ -208,6 +209,7 @@ module Aws
 
         last_branch = path.inject(container) do |obj, current_key|
           raise Exception::OptionScalarOnTheWay.new(obj, path) unless Utils.recursive?(obj)
+
           if obj.include?(current_key)
             obj[current_key]
           else

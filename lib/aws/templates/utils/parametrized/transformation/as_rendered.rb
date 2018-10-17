@@ -65,6 +65,7 @@ module Aws
 
             def transform(value, instance)
               return if value.nil?
+
               render.process(value, _compute_render_parameters(instance))
             end
 

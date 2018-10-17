@@ -40,6 +40,7 @@ module Aws
 
             def compatible_with?(other)
               return true if components.empty?
+
               other.processable_by?(components.first)
             end
 
@@ -51,6 +52,7 @@ module Aws
 
             def transform(value, instance)
               return if value.nil?
+
               components.inject(value) { |acc, elem| instance.instance_exec(acc, &elem) }
             end
 

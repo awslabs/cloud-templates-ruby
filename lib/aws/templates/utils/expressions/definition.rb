@@ -21,6 +21,7 @@ module Aws
 
           def variables(map)
             raise "#{map} is not a hash" unless map.respond_to?(:to_hash)
+
             @definitions.merge!(map.to_hash)
           end
 
@@ -32,6 +33,7 @@ module Aws
           def instantiate(name, *args)
             return DEFAULTS[name].new(name, *args) if DEFAULTS.include?(name)
             raise "#{name} is not defined" unless @definitions.include?(name)
+
             @definitions[name].new(name, *args)
           end
 
@@ -77,10 +79,13 @@ module Aws
 
           def _define_function_from_hash(spec, &blk)
             raise "#{spec} is not a hash" unless spec.respond_to?(:to_hash)
+
             hsh = spec.to_hash
             raise "#{hsh} definition format should be <name>: <type>" unless spec.size == 1
+
             type = hsh.values.first
             raise "#{type} is not a type" unless type.is_a?(::Module)
+
             name = hsh.keys.first.to_sym
 
             Expressions::Function.with(name, type, &blk)

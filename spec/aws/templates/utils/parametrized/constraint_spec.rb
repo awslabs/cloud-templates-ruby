@@ -46,27 +46,25 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     describe 'analytical calculations' do
       it 'satisfies itself' do
-        expect(constraint.satisfies?(Constraints.not_nil)).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.not_nil)
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies(Constraints.matches(/Aa/))
       end
 
       it 'satisfies composite with a single element' do
-        expect(constraint.satisfies?(Constraints.all_of(Constraints.not_nil))).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.all_of(Constraints.not_nil))
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies(
+          Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
+        )
       end
     end
 
@@ -77,7 +75,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_boolean }
 
         it 'doesn\'t change' do
-          expect(transfomed.satisfies?(Constraints.not_nil)).to be_truthy
+          expect(transfomed).to be_satisfies(Constraints.not_nil)
         end
       end
 
@@ -85,7 +83,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'doesn\'t change' do
-          expect(transfomed.satisfies?(Constraints.not_nil)).to be_truthy
+          expect(transfomed).to be_satisfies(Constraints.not_nil)
         end
       end
     end
@@ -109,35 +107,31 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     describe 'analytical calculations' do
       it 'satisfies itself' do
-        expect(constraint.satisfies?(Constraints.enum(1, 2, 3))).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.enum(1, 2, 3))
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies(Constraints.matches(/Aa/))
       end
 
       it 'satisfies loosened constraint' do
-        expect(constraint.satisfies?(Constraints.enum(1, 2, 3, 4, 5))).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.enum(1, 2, 3, 4, 5))
       end
 
       it 'satisfies composite with a single element' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.enum(1, 2, 3, 4, 5))
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies(
+          Constraints.all_of(Constraints.enum(1, 2, 3, 4, 5))
+        )
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies(
+          Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
+        )
       end
     end
 
@@ -148,7 +142,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_float }
 
         it 'transforms options' do
-          expect(transfomed.satisfies?(Constraints.enum(1.0, 2.0, 3.0))).to be_truthy
+          expect(transfomed).to be_satisfies(Constraints.enum(1.0, 2.0, 3.0))
         end
       end
 
@@ -156,7 +150,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'doesn\'t change' do
-          expect(transfomed.satisfies?(Constraints.enum('1', '2', '3'))).to be_truthy
+          expect(transfomed).to be_satisfies(Constraints.enum('1', '2', '3'))
         end
       end
     end
@@ -181,39 +175,33 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     describe 'analytical calculations' do
       it 'satisfies itself' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies(
+          Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2, 3))
+        )
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'satisfies single constraint from the set' do
-        expect(constraint.satisfies?(Constraints.not_nil)).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.not_nil)
       end
 
       it 'satisfies loosened single constraint from the set' do
-        expect(constraint.satisfies?(Constraints.enum(1, 2, 3, 4, 5))).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.enum(1, 2, 3, 4, 5))
       end
 
       it 'satisfies composite with a single element' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.enum(1, 2, 3, 4, 5))
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies(
+          Constraints.all_of(Constraints.enum(1, 2, 3, 4, 5))
+        )
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2))
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies(
+          Constraints.all_of(Constraints.not_nil, Constraints.enum(1, 2))
+        )
       end
     end
 
@@ -224,11 +212,9 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_float }
 
         it 'transforms options' do
-          expect(
-            transfomed.satisfies?(
-              Constraints.all_of(Constraints.not_nil, Constraints.enum(1.0, 2.0, 3.0))
-            )
-          ).to be_truthy
+          expect(transfomed).to be_satisfies(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum(1.0, 2.0, 3.0))
+          )
         end
       end
 
@@ -236,11 +222,9 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'transforms options' do
-          expect(
-            transfomed.satisfies?(
-              Constraints.all_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
-            )
-          ).to be_truthy
+          expect(transfomed).to be_satisfies(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
+          )
         end
       end
 
@@ -256,11 +240,9 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'doesn\'t survive the transformation' do
-          expect(
-            transfomed.satisfies?(
-              Constraints.all_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
-            )
-          ).to be_truthy
+          expect(transfomed).to be_satisfies(
+            Constraints.all_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
+          )
         end
       end
     end
@@ -291,31 +273,27 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     describe 'analytical calculations' do
       it 'satisfies itself' do
-        expect(constraint.satisfies?(Constraints.requires(:requirement))).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.requires(:requirement))
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies(Constraints.matches(/Aa/))
       end
 
       it 'satisfies composite with a single element' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.requires(:requirement))
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies(
+          Constraints.all_of(Constraints.requires(:requirement))
+        )
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.not_nil, Constraints.requires(:requirement))
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies(
+          Constraints.all_of(Constraints.not_nil, Constraints.requires(:requirement))
+        )
       end
     end
 
@@ -326,7 +304,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_boolean }
 
         it 'doesn\'t change' do
-          expect(transfomed.satisfies?(Constraints.requires(:requirement))).to be_truthy
+          expect(transfomed).to be_satisfies(Constraints.requires(:requirement))
         end
       end
 
@@ -334,7 +312,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'doesn\'t change' do
-          expect(transfomed.satisfies?(Constraints.requires(:requirement))).to be_truthy
+          expect(transfomed).to be_satisfies(Constraints.requires(:requirement))
         end
       end
     end
@@ -375,62 +353,39 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     end
 
     describe 'analytical calculations' do
+      let(:itself) do
+        Constraints.depends_on_value(
+          requirement: Constraints.requires(:requirement),
+          condition: Constraints.requires(:condition)
+        )
+      end
+
       it 'satisfies itself' do
-        expect(
-          constraint.satisfies?(
-            Constraints.depends_on_value(
-              requirement: Constraints.requires(:requirement),
-              condition: Constraints.requires(:condition)
-            )
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies itself
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies(Constraints.matches(/Aa/))
       end
 
       it 'satisfies loosened constraint' do
-        expect(
-          constraint.satisfies?(
-            Constraints.depends_on_value(
-              requirement: Constraints.requires(:requirement),
-              condition: Constraints.requires(:condition),
-              obligation: Constraints.requires(:obligation)
-            )
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies Constraints.depends_on_value(
+          requirement: Constraints.requires(:requirement),
+          condition: Constraints.requires(:condition),
+          obligation: Constraints.requires(:obligation)
+        )
       end
 
       it 'satisfies composite with a single element' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(
-              Constraints.depends_on_value(
-                requirement: Constraints.requires(:requirement),
-                condition: Constraints.requires(:condition)
-              )
-            )
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies Constraints.all_of(itself)
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(
-              Constraints.not_nil,
-              Constraints.depends_on_value(
-                requirement: Constraints.requires(:requirement),
-                condition: Constraints.requires(:condition)
-              )
-            )
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies Constraints.all_of(Constraints.not_nil, itself)
       end
     end
 
@@ -441,14 +396,10 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'transforms selectors and constraints' do
-          expect(
-            transformed.satisfies?(
-              Constraints.depends_on_value(
-                'requirement' => Constraints.requires(:requirement),
-                'condition' => Constraints.requires(:condition)
-              )
-            )
-          ).to be_truthy
+          expect(transformed).to be_satisfies Constraints.depends_on_value(
+            'requirement' => Constraints.requires(:requirement),
+            'condition' => Constraints.requires(:condition)
+          )
         end
       end
 
@@ -463,14 +414,10 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'doesn\'t survive the transformation' do
-          expect(
-            transformed.satisfies?(
-              Constraints.depends_on_value(
-                'requirement' => Constraints.requires(:requirement),
-                'condition' => nil
-              )
-            )
-          ).to be_truthy
+          expect(transformed).to be_satisfies Constraints.depends_on_value(
+            'requirement' => Constraints.requires(:requirement),
+            'condition' => nil
+          )
         end
       end
     end
@@ -494,36 +441,28 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     describe 'analytical calculations' do
       it 'satisfies itself' do
-        expect(
-          constraint.satisfies?(Constraints.satisfies('some', &constraint.condition))
-        ).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.satisfies('some', &constraint.condition))
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies(Constraints.matches(/Aa/))
       end
 
       it 'satisfies composite with a single element' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.satisfies('some', &constraint.condition))
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies Constraints.all_of(
+          Constraints.satisfies('some', &constraint.condition)
+        )
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(
-              Constraints.not_nil,
-              Constraints.satisfies('some', &constraint.condition)
-            )
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies Constraints.all_of(
+          Constraints.not_nil,
+          Constraints.satisfies('some', &constraint.condition)
+        )
       end
     end
 
@@ -566,36 +505,26 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
     describe 'analytical calculations' do
       it 'satisfies itself' do
-        expect(
-          constraint.satisfies?(Constraints.matches(/[Tt]$/))
-        ).to be_truthy
+        expect(constraint).to be_satisfies Constraints.matches(/[Tt]$/)
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies Constraints.matches(/Aa/)
       end
 
       it 'satisfies composite with a single element' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(Constraints.matches(/[Tt]$/))
-          )
-        ).to be_truthy
+        expect(constraint).to be_satisfies Constraints.all_of(Constraints.matches(/[Tt]$/))
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(
-              Constraints.matches(/[Tt]$/),
-              Constraints.not_nil
-            )
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies Constraints.all_of(
+          Constraints.matches(/[Tt]$/),
+          Constraints.not_nil
+        )
       end
     end
 
@@ -614,7 +543,7 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:transformation) { Constraints.as_string }
 
         it 'doesn\'t change' do
-          expect(transformed.satisfies?(Constraints.matches(/[Tt]$/))).to be_truthy
+          expect(transformed).to be_satisfies Constraints.matches(/[Tt]$/)
         end
       end
     end
@@ -740,36 +669,30 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
       let(:wildcard_constraint) { Constraints.module? }
 
       it 'satisfies itself' do
-        expect(
-          constraint.satisfies?(Constraints.module?(::Enumerable))
-        ).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.module?(::Enumerable))
       end
 
       it 'satisfies empty constraint' do
-        expect(constraint.satisfies?(nil)).to be_truthy
+        expect(constraint).to be_satisfies(nil)
       end
 
       it 'doesn\'t satisfy arbitrary constraint' do
-        expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+        expect(constraint).not_to be_satisfies Constraints.matches(/Aa/)
       end
 
       it 'satisfies composite with a loosened constraint' do
-        expect(constraint.satisfies?(Constraints.all_of(wildcard_constraint))).to be_truthy
+        expect(constraint).to be_satisfies(Constraints.all_of(wildcard_constraint))
       end
 
       it 'baseless constraint does not satisfy based one' do
-        expect(wildcard_constraint.satisfies?(constraint)).to be_falsey
+        expect(wildcard_constraint).not_to be_satisfies constraint
       end
 
       it 'doesn\'t satisfy stricter composite' do
-        expect(
-          constraint.satisfies?(
-            Constraints.all_of(
-              Constraints.module?(::Enumerable),
-              Constraints.not_nil
-            )
-          )
-        ).to be_falsey
+        expect(constraint).not_to be_satisfies Constraints.all_of(
+          Constraints.module?(::Enumerable),
+          Constraints.not_nil
+        )
       end
     end
   end
@@ -795,46 +718,36 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:constraint) { Constraints.is?(::Array) }
 
         it 'satisfies itself' do
-          expect(
-            constraint.satisfies?(Constraints.is?(::Array))
-          ).to be_truthy
+          expect(constraint).to be_satisfies(Constraints.is?(::Array))
         end
 
         it 'satisfies empty constraint' do
-          expect(constraint.satisfies?(nil)).to be_truthy
+          expect(constraint).to be_satisfies(nil)
         end
 
         it 'satisfies composite with a loosened constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.is?(::Enumerable)))
-          ).to be_truthy
+          expect(constraint).to be_satisfies(Constraints.all_of(Constraints.is?(::Enumerable)))
         end
 
         it 'doesn\'t satisfy composite with an incopatible constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.is?(::String)))
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(Constraints.is?(::String))
         end
 
         it 'doesn\'t satisfy composite with a stricter constraint' do
-          expect(
-            constraint.satisfies?(Constraints.is?(::Enumerable => Constraints.not_nil))
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.is?(
+            ::Enumerable => Constraints.not_nil
+          )
         end
 
         it 'doesn\'t satisfy arbitrary constraint' do
-          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.matches(/Aa/)
         end
 
         it 'doesn\'t satisfy stricter composite' do
-          expect(
-            constraint.satisfies?(
-              Constraints.all_of(
-                Constraints.is?(::Enumerable),
-                Constraints.not_nil
-              )
-            )
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(
+            Constraints.is?(::Enumerable),
+            Constraints.not_nil
+          )
         end
       end
 
@@ -888,46 +801,34 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         let(:constraint) { Constraints.is?(::Array => Constraints.not_nil) }
 
         it 'satisfies itself' do
-          expect(
-            constraint.satisfies?(Constraints.is?(::Array => Constraints.not_nil))
-          ).to be_truthy
+          expect(constraint).to be_satisfies Constraints.is?(::Array => Constraints.not_nil)
         end
 
         it 'satisfies empty constraint' do
-          expect(constraint.satisfies?(nil)).to be_truthy
+          expect(constraint).to be_satisfies(nil)
         end
 
         it 'satisfies composite with a loosened constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.is?(::Enumerable)))
-          ).to be_truthy
+          expect(constraint).to be_satisfies(Constraints.all_of(Constraints.is?(::Enumerable)))
         end
 
         it 'doesn\'t satisfy composite with an incopatible constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.is?(::String)))
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(Constraints.is?(::String))
         end
 
         it 'satisfies composite with a similar constraint' do
-          expect(
-            constraint.satisfies?(Constraints.is?(::Enumerable => Constraints.not_nil))
-          ).to be_truthy
+          expect(constraint).to be_satisfies Constraints.is?(::Enumerable => Constraints.not_nil)
         end
 
         it 'doesn\'t satisfy arbitrary constraint' do
-          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.matches(/Aa/)
         end
 
         it 'doesn\'t satisfy stricter composite' do
-          expect(
-            constraint.satisfies?(
-              Constraints.all_of(
-                Constraints.is?(::Enumerable),
-                Constraints.not_nil
-              )
-            )
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(
+            Constraints.is?(::Enumerable),
+            Constraints.not_nil
+          )
         end
       end
 
@@ -972,46 +873,34 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
       describe 'analytical calculations' do
         it 'satisfies itself' do
-          expect(
-            constraint.satisfies?(Constraints.has?(:to_str))
-          ).to be_truthy
+          expect(constraint).to be_satisfies Constraints.has?(:to_str)
         end
 
         it 'satisfies empty constraint' do
-          expect(constraint.satisfies?(nil)).to be_truthy
+          expect(constraint).to be_satisfies(nil)
         end
 
         it 'satisfies composite with a loosened constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.has?(:to_str)))
-          ).to be_truthy
+          expect(constraint).to be_satisfies Constraints.all_of(Constraints.has?(:to_str))
         end
 
         it 'doesn\'t satisfy composite with an incopatible constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.has?(:to_s)))
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(Constraints.has?(:to_s))
         end
 
         it 'doesn\'t satisfy composite with a stricter constraint' do
-          expect(
-            constraint.satisfies?(Constraints.has?(to_str: Constraints.not_nil))
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.has?(to_str: Constraints.not_nil)
         end
 
         it 'doesn\'t satisfy arbitrary constraint' do
-          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.matches(/Aa/)
         end
 
         it 'doesn\'t satisfy stricter composite' do
-          expect(
-            constraint.satisfies?(
-              Constraints.all_of(
-                Constraints.has?(:to_str),
-                Constraints.not_nil
-              )
-            )
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(
+            Constraints.has?(:to_str),
+            Constraints.not_nil
+          )
         end
       end
 
@@ -1063,45 +952,33 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
         end
 
         it 'satisfies itself' do
-          expect(
-            constraint.satisfies?(
-              Constraints.has?(
-                to_str: Constraints.not_nil,
-                to_s: Constraints.not_nil
-              )
-            )
-          ).to be_truthy
+          expect(constraint).to be_satisfies Constraints.has?(
+            to_str: Constraints.not_nil,
+            to_s: Constraints.not_nil
+          )
         end
 
         it 'satisfies empty constraint' do
-          expect(constraint.satisfies?(nil)).to be_truthy
+          expect(constraint).to be_satisfies(nil)
         end
 
         it 'satisfies composite with a loosened constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.has?([:to_str, :to_s])))
-          ).to be_truthy
+          expect(constraint).to be_satisfies Constraints.all_of(Constraints.has?(%i[to_str to_s]))
         end
 
         it 'doesn\'t satisfy composite with an incopatible constraint' do
-          expect(
-            constraint.satisfies?(Constraints.all_of(Constraints.has?(:to_badger)))
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(Constraints.has?(:to_badger))
         end
 
         it 'doesn\'t satisfy arbitrary constraint' do
-          expect(constraint.satisfies?(Constraints.matches(/Aa/))).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.matches(/Aa/)
         end
 
         it 'doesn\'t satisfy stricter composite' do
-          expect(
-            constraint.satisfies?(
-              Constraints.all_of(
-                Constraints.has?(:to_str),
-                Constraints.not_nil
-              )
-            )
-          ).to be_falsey
+          expect(constraint).not_to be_satisfies Constraints.all_of(
+            Constraints.has?(:to_str),
+            Constraints.not_nil
+          )
         end
       end
 

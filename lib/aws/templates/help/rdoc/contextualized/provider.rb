@@ -18,6 +18,7 @@ module Aws
 
             def description_for(mod)
               return if mod.module_context.is_a?(Templates::Utils::Contextualized::Filter::Identity)
+
               processed_for(mod.module_context)
             end
           end

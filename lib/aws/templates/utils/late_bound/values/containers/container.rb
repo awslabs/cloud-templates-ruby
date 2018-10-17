@@ -6,6 +6,12 @@ module Aws
       module LateBound
         module Values
           module Containers
+            ##
+            # Generic late-bound container
+            #
+            # It defines index operator and common utilities for late-bound value containers
+            # (late-bound values which are containers). Also, it defines a few reverse-of-control
+            # methods to be overriden by concrete implementations
             class Container < Values::Value
               attr_reader :instance
               attr_reader :constraint
@@ -50,7 +56,7 @@ module Aws
 
               protected
 
-              def link_for(key)
+              def link_for(_key)
                 raise 'Must be overriden'
               end
 
@@ -62,11 +68,13 @@ module Aws
 
               def _process_key(key)
                 return key if key_concept.nil?
+
                 instance.instance_exec(key, &key_concept)
               end
 
               def _value_reference_for(key)
                 return Values::Empty.new(link_for(key)) if value_concept.nil?
+
                 instance.instance_exec(LateBound.build_from(link_for(key)), &value_concept)
               end
             end

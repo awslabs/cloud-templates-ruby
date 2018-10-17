@@ -55,12 +55,8 @@ module Aws
               return false unless other.is_a?(self.class)
 
               (
-                (
-                  other.key_parameter && other.key_parameter.concept
-                ).processable_by?(key_parameter && key_parameter.concept) &&
-                (
-                  other.value_parameter && other.value_parameter.concept
-                ).processable_by?(value_parameter && value_parameter.concept)
+                _compatible?(key_parameter, other.key_parameter) &&
+                _compatible?(value_parameter, other.value_parameter)
               )
             end
 
@@ -81,6 +77,10 @@ module Aws
                 transform: transform,
                 constraint: constraint
               )
+            end
+
+            def _compatible?(a_param, b_param)
+              (b_param && b_param.concept).processable_by?(a_param && a_param.concept)
             end
           end
         end

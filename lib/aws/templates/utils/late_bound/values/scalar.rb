@@ -5,6 +5,11 @@ module Aws
     module Utils
       module LateBound
         module Values
+          ##
+          # Simple scalar late-bound value
+          #
+          # Contains transformation and constraint attached. Does simple equality checks for both
+          # while getting checked and transformed.
           class Scalar < Value
             using Utils::Parametrized::Transformation::Refinements
 

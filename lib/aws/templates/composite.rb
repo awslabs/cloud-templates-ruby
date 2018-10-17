@@ -73,6 +73,8 @@ module Aws
       # composite's artifacts declaratively with using standard language
       # features.
       def self.components(*args, &blk)
+        return self if blk.nil?
+
         define_method(:create_components) do
           super()
           instance_exec(*args, &blk)

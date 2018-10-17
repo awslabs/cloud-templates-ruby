@@ -88,17 +88,16 @@ module Aws
         # Process the object
         #
         # Processes passed object with the handler default processor
-        def processed_for(obj, parameters_override = nil)
-          handler = handler_for(obj, parameters_override.nil? ? parameters : parameters_override)
-          handler.to_processed
+        def processed_for(*args)
+          handler_for(*args).to_processed
         end
 
         ##
         # Get handler for the entity
         #
         # Returns registered handler for the entity
-        def handler_for(*args)
-          parent.handler_for(*args)
+        def handler_for(obj, parameters_override = nil)
+          parent.handler_for(obj, parameters_override.nil? ? parameters : parameters_override)
         end
 
         def to_processed

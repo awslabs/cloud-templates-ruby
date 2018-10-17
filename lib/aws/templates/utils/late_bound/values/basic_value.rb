@@ -5,9 +5,14 @@ module Aws
     module Utils
       module LateBound
         module Values
+          ##
+          # Basic late bound value class
+          #
+          # Basic class for all late bound values. It introduces special magic stringification and
+          # inspection methods and general interface of all sub-classes.
           class BasicValue
-            OPENING_SEQUENCE = "\u{e001}"
-            CLOSING_SEQUENCE = "\u{e007}"
+            OPENING_SEQUENCE = "\u{e001}".freeze
+            CLOSING_SEQUENCE = "\u{e007}".freeze
 
             attr_reader :link
 

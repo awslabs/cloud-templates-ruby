@@ -21,6 +21,7 @@ module Aws
         class_scope do
           def help(str = nil)
             return @help if str.nil?
+
             @help = str.unindent
           end
         end

@@ -95,12 +95,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :wildcard
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end
@@ -121,7 +121,7 @@ describe Aws::Templates::Utils::LateBound do
 
       describe 'constraint' do
         it 'has correct constraint attached' do
-          expect(value.constraint.satisfies?(constraint)).to be_truthy
+          expect(value.constraint).to be_satisfies(constraint)
         end
 
         it 'can be processed with constraint functor' do
@@ -151,12 +151,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :constrained
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end
@@ -177,7 +177,7 @@ describe Aws::Templates::Utils::LateBound do
 
       describe 'transform' do
         it 'has correct constraint attached' do
-          expect(value.transform.processable_by?(transform)).to be_truthy
+          expect(value.transform).to be_processable_by(transform)
         end
 
         it 'can be processed with transform functor' do
@@ -209,12 +209,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :typed
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end
@@ -235,7 +235,7 @@ describe Aws::Templates::Utils::LateBound do
 
       describe 'transform' do
         it 'has correct transform attached' do
-          expect(value.transform.processable_by?(transform)).to be_truthy
+          expect(value.transform).to be_processable_by(transform)
         end
 
         it 'can be processed with transform functor' do
@@ -250,7 +250,7 @@ describe Aws::Templates::Utils::LateBound do
 
       describe 'constraint' do
         it 'has correct constraint attached' do
-          expect(value.constraint.satisfies?(constraint)).to be_truthy
+          expect(value.constraint).to be_satisfies(constraint)
         end
 
         it 'can be processed with constraint functor' do
@@ -273,12 +273,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :typed_and_constrained
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end
@@ -299,7 +299,7 @@ describe Aws::Templates::Utils::LateBound do
 
       describe 'transform' do
         it 'has correct transform attached' do
-          expect(value.transform.processable_by?(transform)).to be_truthy
+          expect(value.transform).to be_processable_by(transform)
         end
 
         it 'can be processed with transform functor' do
@@ -349,7 +349,7 @@ describe Aws::Templates::Utils::LateBound do
 
           describe 'transform' do
             it 'has correct transform attached' do
-              expect(element.transform.processable_by?(klass.as_integer)).to be_truthy
+              expect(element.transform).to be_processable_by(klass.as_integer)
             end
 
             it 'can be processed with transform functor' do
@@ -364,7 +364,7 @@ describe Aws::Templates::Utils::LateBound do
 
           describe 'constraint' do
             it 'has correct constraint attached' do
-              expect(element.constraint.satisfies?(klass.not_nil)).to be_truthy
+              expect(element.constraint).to be_satisfies(klass.not_nil)
             end
 
             it 'can be processed with constraint functor' do
@@ -393,8 +393,8 @@ describe Aws::Templates::Utils::LateBound do
               expect(link.parent).to be == value
             end
 
-            it 'should not be root' do
-              expect(link.root?).to be_falsey
+            it 'is not root' do
+              expect(link).not_to be_root
             end
 
             it 'has correct path' do
@@ -406,24 +406,25 @@ describe Aws::Templates::Utils::LateBound do
         context 'with late bound index' do
           let(:element) { value[instance.late_index] }
 
+          let(:stringified) do
+            'Object\\(\\d+\\)\\.method\\(:late_list\\)\\.index\\(' \
+              'LateBound\\(Object\\(\\d+\\)\\.method\\(:late_index\\)\\)' \
+            '\\)'
+          end
+
           it 'has correct class' do
             expect(element).to be_a(Aws::Templates::Utils::LateBound::Values::Scalar)
           end
 
           it 'transforms into the correct string' do
-            expect(element.to_s)
-              .to match(
-                'Object\\(\\d+\\)\\.method\\(:late_list\\)\\.index\\(' \
-                  'LateBound\\(Object\\(\\d+\\)\\.method\\(:late_index\\)\\)' \
-                '\\)'
-              )
+            expect(element.to_s).to match(stringified)
           end
         end
       end
 
       describe 'constraint' do
         it 'has correct constraint attached' do
-          expect(value.constraint.satisfies?(constraint)).to be_truthy
+          expect(value.constraint).to be_satisfies(constraint)
         end
 
         it 'can be processed with constraint functor' do
@@ -446,12 +447,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :late_list
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end
@@ -472,7 +473,7 @@ describe Aws::Templates::Utils::LateBound do
 
       describe 'transform' do
         it 'has correct transform attached' do
-          expect(value.transform.processable_by?(transform)).to be_truthy
+          expect(value.transform).to be_processable_by(transform)
         end
 
         it 'can be processed with transform functor' do
@@ -560,7 +561,7 @@ describe Aws::Templates::Utils::LateBound do
 
           describe 'transform' do
             it 'has correct transform attached' do
-              expect(element.transform.processable_by?(klass.as_integer)).to be_truthy
+              expect(element.transform).to be_processable_by(klass.as_integer)
             end
 
             it 'can be processed with transform functor' do
@@ -575,7 +576,7 @@ describe Aws::Templates::Utils::LateBound do
 
           describe 'constraint' do
             it 'has correct constraint attached' do
-              expect(element.constraint.satisfies?(klass.not_nil)).to be_truthy
+              expect(element.constraint).to be_satisfies(klass.not_nil)
             end
 
             it 'can be processed with constraint functor' do
@@ -604,8 +605,8 @@ describe Aws::Templates::Utils::LateBound do
               expect(link.parent).to be == value
             end
 
-            it 'should not be root' do
-              expect(link.root?).to be_falsey
+            it 'is not root' do
+              expect(link).not_to be_root
             end
 
             it 'has correct path' do
@@ -617,24 +618,25 @@ describe Aws::Templates::Utils::LateBound do
         context 'with late bound index' do
           let(:element) { value[instance.typed_and_constrained] }
 
+          let(:stringified) do
+            'Object\\(\\d+\\)\\.method\\(:late_map\\)\\.key\\(' \
+              'LateBound\\(Object\\(\\d+\\)\\.method\\(:typed_and_constrained\\)\\)' \
+            '\\)'
+          end
+
           it 'has correct class' do
             expect(element).to be_a(Aws::Templates::Utils::LateBound::Values::Scalar)
           end
 
           it 'transforms into the correct string' do
-            expect(element.to_s)
-              .to match(
-                'Object\\(\\d+\\)\\.method\\(:late_map\\)\\.key\\(' \
-                  'LateBound\\(Object\\(\\d+\\)\\.method\\(:typed_and_constrained\\)\\)' \
-                '\\)'
-              )
+            expect(element.to_s).to match(stringified)
           end
         end
       end
 
       describe 'constraint' do
         it 'has correct constraint attached' do
-          expect(value.constraint.satisfies?(constraint)).to be_truthy
+          expect(value.constraint).to be_satisfies(constraint)
         end
 
         it 'can be processed with constraint functor' do
@@ -657,12 +659,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :late_map
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end
@@ -722,7 +724,7 @@ describe Aws::Templates::Utils::LateBound do
 
             describe 'constraint' do
               it 'has correct constraint attached' do
-                expect(field.constraint.satisfies?(klass.not_nil)).to be_truthy
+                expect(field.constraint).to be_satisfies(klass.not_nil)
               end
 
               it 'can be processed with constraint functor' do
@@ -758,7 +760,7 @@ describe Aws::Templates::Utils::LateBound do
 
             describe 'transform' do
               it 'has correct constraint attached' do
-                expect(field.transform.processable_by?(klass.as_string)).to be_truthy
+                expect(field.transform).to be_processable_by(klass.as_string)
               end
 
               it 'can be processed with transform functor' do
@@ -853,12 +855,12 @@ describe Aws::Templates::Utils::LateBound do
         expect(link.name).to be == :late_struct
       end
 
-      it 'has correct field name' do
+      it 'has correct parent' do
         expect(link.parent).to be == instance
       end
 
-      it 'should be root' do
-        expect(link.root?).to be_truthy
+      it 'is root' do
+        expect(link).to be_root
       end
     end
   end

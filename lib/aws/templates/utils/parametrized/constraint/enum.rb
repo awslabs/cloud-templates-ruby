@@ -31,6 +31,7 @@ module Aws
 
             def satisfied_by?(other)
               return false unless other.is_a?(self.class)
+
               set >= other.set
             end
 
@@ -42,6 +43,7 @@ module Aws
 
             def check(value, _)
               return if set.include?(value)
+
               raise "Value #{value.inspect} is not in the set of allowed values #{set.inspect}"
             end
           end

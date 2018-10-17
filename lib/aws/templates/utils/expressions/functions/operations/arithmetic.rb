@@ -57,6 +57,7 @@ module Aws
 
                 def wrap(arg)
                   return "(#{arg})" if arg.is_a?(Operations::Unary)
+
                   arg
                 end
               end
@@ -90,6 +91,7 @@ module Aws
 
                 def wrap(arg)
                   return super unless arg.is_a?(Expressions::Functions::Operation)
+
                   arg.is_a?(Multiplicative) ? super : "(#{super})"
                 end
               end

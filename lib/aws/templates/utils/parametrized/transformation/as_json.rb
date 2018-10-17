@@ -34,6 +34,7 @@ module Aws
               return if value.nil?
               return JSON.parse(value.to_str) if value.respond_to?(:to_str)
               raise "#{value} can't be transformed to JSON" unless value.respond_to?(:to_json)
+
               JSON.parse(value.to_json)
             end
           end

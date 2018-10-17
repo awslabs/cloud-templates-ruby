@@ -32,6 +32,7 @@ module Aws
 
             def _check_filter(fltr)
               raise "#{fltr} is not a filter" unless fltr.respond_to?(:to_proc)
+
               fltr
             end
           end

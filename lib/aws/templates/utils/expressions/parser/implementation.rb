@@ -22,6 +22,7 @@ module Aws
             def parse(str)
               result = parser.parse(str)
               raise parser.failure_reason if result.nil?
+
               result.clean.to_dsl(definition)
             end
           end

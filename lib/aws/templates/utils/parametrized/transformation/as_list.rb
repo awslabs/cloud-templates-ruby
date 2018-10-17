@@ -92,7 +92,7 @@ module Aws
                 sub_parameter.nil? ||
                 sub_parameter.concept.compatible_with?(other.sub_parameter.concept)
               ) && (
-                (!unique?) || other.unique?
+                !unique? || other.unique?
               )
             end
 
@@ -121,6 +121,7 @@ module Aws
 
               result.each do |element|
                 raise "#{element.inspect} is not unique" if set.include?(element)
+
                 set << element
               end
             end

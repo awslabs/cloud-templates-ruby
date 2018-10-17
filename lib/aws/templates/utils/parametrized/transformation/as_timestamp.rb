@@ -33,6 +33,7 @@ module Aws
             def transform(value, _)
               return if value.nil?
               return value if value.is_a?(Time)
+
               Time.parse(value.to_s)
             end
           end

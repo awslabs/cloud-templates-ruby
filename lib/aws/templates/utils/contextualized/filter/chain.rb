@@ -46,6 +46,7 @@ module Aws
 
             def _as_flattened_filters(flt)
               return flt unless flt.is_a?(self.class)
+
               flt.filters.flat_map { |obj| _as_flattened_filters(obj) }
             end
           end

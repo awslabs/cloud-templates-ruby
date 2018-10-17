@@ -46,13 +46,16 @@ module Aws
             def transform(value, _)
               return if value.nil?
               return _parser.parse(value) if value.respond_to?(:to_str)
+
               value.to_boxed_expression
             end
 
             private
 
             def _parser
-              @_parser ||= Utils::Expressions::Parser.with(definition)
+              return @_parser if @_parser
+
+              @_parser = Utils::Expressions::Parser.with(definition)
             end
           end
         end

@@ -6,7 +6,14 @@ module Aws
       module LateBound
         module Values
           module Containers
+            ##
+            # Late-bound map
+            #
+            # The container supports index operator which can be supplied with either concrete key
+            # value or late-bound one and produces typed late-bound "value" with the link set to
+            # point to the map as a parent.
             class Map < Container
+              # Map index link class
               class Index < LateBound::Link
                 alias key selector
 

@@ -22,6 +22,7 @@ module Aws
 
             def transform(value, _)
               raise "#{value.inspect} is not an expression" unless value.boxable_expression?
+
               value.to_boxed_expression
             end
           end

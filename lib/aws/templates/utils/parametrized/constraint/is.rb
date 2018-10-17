@@ -42,13 +42,13 @@ module Aws
             def satisfied_by?(other)
               return false unless other.is_a?(self.class)
 
-              other_schema = other.schema
-
               modules = schema.keys.to_set
 
               other.schema.all? do |type, constraint|
-                anchors = type.ancestors.select { |mod| modules.include?(mod) }
-                !anchors.empty? && anchors.any? { |anchor| constraint.satisfies?(schema[anchor]) }
+                type
+                  .ancestors
+                  .select { |mod| modules.include?(mod) }
+                  .any? { |anchor| constraint.satisfies?(schema[anchor]) }
               end
             end
 
@@ -64,6 +64,7 @@ module Aws
             def _find_ancestor(obj)
               key = obj.class.ancestors.find { |klass| schema.include?(klass) }
               raise "#{obj.inspect} has invalid type #{obj.class}" if key.nil?
+
               key
             end
           end

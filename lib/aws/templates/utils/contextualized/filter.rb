@@ -28,6 +28,7 @@ module Aws
           def &(other)
             fltr = other.to_filter
             return self if fltr.is_a?(Identity)
+
             Chain.new(self, fltr)
           end
 

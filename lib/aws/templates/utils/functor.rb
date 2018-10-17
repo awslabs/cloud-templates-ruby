@@ -12,7 +12,7 @@ module Aws
           proc { |*args| its_me.invoke(self, *args) }
         end
 
-        def invoke(scope, *args)
+        def invoke(_scope, *_args)
           raise 'Must be overriden'
         end
       end

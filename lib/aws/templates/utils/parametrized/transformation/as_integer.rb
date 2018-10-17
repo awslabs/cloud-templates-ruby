@@ -31,6 +31,7 @@ module Aws
 
             def transform(value, _)
               return if value.nil?
+
               Integer(value)
             end
           end

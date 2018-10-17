@@ -23,11 +23,20 @@ module Aws
           include Utils::Functor
           using Utils::Dependency::Refinements
 
-          #TODO: eyebleed. Callback hell's gates
+          # TODO: eyebleed. Callback hell's gates
+
+          ##
+          # Transformation adaptors
+          #
+          # Default method implementations for
+          # * BasicObject - adds default transform_as hook implementation which just transforms
+          #                 the values with the given transformation
+          # * Proc, NilClass - makes the types compatible with test methods of transform class
           module Refinements
             refine ::BasicObject do
               def transform_as(transform, instance)
                 return self if transform.nil?
+
                 transform.transform_wrapper(self, instance)
               end
             end
@@ -43,7 +52,7 @@ module Aws
             end
 
             refine ::NilClass do
-              def compatible_with?(other)
+              def compatible_with?(_other)
                 true
               end
 
