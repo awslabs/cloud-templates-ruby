@@ -35,9 +35,7 @@ module Aws
       #
       # Accessor returning dictionary of artifacts currently residing in
       # composite instance with labels as keys
-      def artifacts
-        @artifacts ||= Templates::Utils::ArtifactStorage.new
-      end
+      attr_reader :artifacts
 
       ##
       # Shortcut for accessing artifacts by their labels
@@ -143,6 +141,7 @@ module Aws
       # Provisions parameters and initializes nested artifacts
       def initialize(*params, &blk)
         super(*params)
+        @artifacts = Templates::Utils::ArtifactStorage.new
         create_components
         instance_exec(&blk) if blk
       end
