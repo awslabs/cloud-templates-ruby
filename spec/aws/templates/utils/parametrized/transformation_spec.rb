@@ -792,40 +792,87 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
   end
 
   describe 'as_expression' do
-    let(:test_class) do
-      Class.new(parametrized_class) do
-        include Aws::Templates::Utils::Expressions::Mixin
+    context 'without context-dependent block' do
+      let(:test_class) do
+        Class.new(parametrized_class) do
+          include Aws::Templates::Utils::Expressions::Mixin
 
-        define_expressions do
-          variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+          definition = Aws::Templates::Utils::Expressions::Definition.new do
+            variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+          end
+
+          parameter :something,
+                    transform: as_expression(definition)
+        end
+      end
+
+      it 'works with boxable expressions' do
+        i = test_class.new(something: 1)
+        expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(1)
+      end
+
+      context 'with operations' do
+        let(:expected) do
+          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
+            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+            1
+          )
         end
 
-        parameter :something,
-                  transform: as_expression(expressions_definition)
+        it 'works with expressions in general' do
+          i = test_class.new(something: test_class.expression { x + 1 })
+          expect(i.something).to be_eql expected
+        end
+
+        it 'parses strings' do
+          i = test_class.new(something: 'x + 1')
+          expect(i.something).to be_eql expected
+        end
       end
     end
 
-    it 'works with boxable expressions' do
-      i = test_class.new(something: 1)
-      expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(1)
-    end
+    context 'with context-dependent block' do
+      let(:test_class) do
+        Class.new(parametrized_class) do
+          include Aws::Templates::Utils::Expressions::Mixin
 
-    context 'with operations' do
-      let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          1
-        )
+          parameter :variables,
+                    constraint: not_nil,
+                    transform: as_list
+
+          parameter :something,
+                    transform: as_expression { |i|
+                      variables Hash[
+                        i.variables.map do |name|
+                          [name, Aws::Templates::Utils::Expressions::Variables::Arithmetic]
+                        end
+                      ]
+                    }
+        end
       end
 
-      it 'works with expressions in general' do
-        i = test_class.new(something: test_class.expression { x + 1 })
-        expect(i.something).to be_eql expected
+      it 'works with boxable expressions' do
+        i = test_class.new(variables: [:x], something: 1)
+        expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(1)
       end
 
-      it 'parses strings' do
-        i = test_class.new(something: 'x + 1')
-        expect(i.something).to be_eql expected
+      context 'with operations' do
+        let(:expected) do
+          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
+            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+            1
+          )
+        end
+
+        it 'works with expressions in general' do
+          i = test_class.new(variables: [:x], something: proc { x + 1 })
+          expect(i.something).to be_eql expected
+        end
+
+        it 'parses strings' do
+          i = test_class.new(variables: [:x], something: 'x + 1')
+          expect(i.something).to be_eql expected
+        end
       end
     end
   end

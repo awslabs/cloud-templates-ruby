@@ -5,7 +5,7 @@ module Aws
         ##
         # Expression mixin
         #
-        # Adds instance and class methods which allows user to define per-class expressions context.
+        # Adds instance and class methods which allows user to define expressions.
         #
         # Example:
         #
@@ -20,6 +20,26 @@ module Aws
         #    A.expression('x + 1')
         #    A.new.expression { x + 1 }
         module Mixin
+          ##
+          # Expression wrapper
+          #
+          # Simple adapter which wraps objects or code blocks. In some parts of the framework usage
+          # of Proc objects is already reserved and hence the need to wrap the code blocks with DSL
+          # expresions so they are not misinterpreted. It's not visible to the end user.
+          class Wrapper
+            using Utils::Expressions::Refinements
+
+            attr_reader :target
+
+            def initialize(obj = nil, &blk)
+              @target = obj || blk
+            end
+
+            def to_expression_by(definition)
+              target.to_expression_by(definition)
+            end
+          end
+
           include Utils::Inheritable
 
           instance_scope do
@@ -29,26 +49,8 @@ module Aws
           end
 
           class_scope do
-            def expressions_definition
-              @expressions_definition ||= if superclass < Mixin
-                superclass.expressions_definition
-              else
-                Expressions::Definition.new
-              end
-            end
-
-            def define_expressions(*args, &blk)
-              @expressions_definition = expressions_definition.extend(*args, &blk)
-            end
-
             def expression(str = nil, &blk)
-              if str
-                @expressions_parser ||= Expressions::Parser.with(expressions_definition)
-                @expressions_parser.parse(str)
-              else
-                @expressions_dsl ||= Expressions::Dsl.new(expressions_definition)
-                @expressions_dsl.expression(&blk)
-              end
+              Mixin::Wrapper.new(str, &blk)
             end
           end
         end

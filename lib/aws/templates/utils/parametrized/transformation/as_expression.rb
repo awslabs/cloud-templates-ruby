@@ -32,30 +32,29 @@ module Aws
             using Utils::Expressions::Refinements
 
             attr_reader :definition
+            attr_reader :extender
 
             def initialize(definition = nil, &blk)
-              @definition = if definition
-                definition.extend(&blk)
-              else
-                Utils::Expressions::Definition.new(&blk)
-              end
+              @extender = blk
+              @definition = definition || Utils::Expressions::Definition.new
             end
 
             protected
 
-            def transform(value, _)
+            def transform(value, instance)
               return if value.nil?
-              return _parser.parse(value) if value.respond_to?(:to_str)
 
-              value.to_boxed_expression
+              value.to_expression_by(_definition_within(instance))
             end
 
             private
 
-            def _parser
-              return @_parser if @_parser
+            def _parser_within(instance)
+              Utils::Expressions::Parser.with(_definition_within(instance))
+            end
 
-              @_parser = Utils::Expressions::Parser.with(definition)
+            def _definition_within(instance)
+              extender.nil? ? definition : definition.extend(nil, instance, &extender)
             end
           end
         end

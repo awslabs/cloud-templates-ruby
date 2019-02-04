@@ -41,12 +41,12 @@ module Aws
             DEFAULTS.include?(name) || @definitions.include?(name)
           end
 
-          def initialize(spec = nil, &blk)
+          def initialize(spec = nil, context = nil, &blk)
             @definitions = spec.dup || {}
-            instance_eval(&blk) if block_given?
+            instance_exec(context, &blk) if block_given?
           end
 
-          def extend(spec = nil, &blk)
+          def extend(spec = nil, context = nil, &blk)
             return self if spec.nil? && blk.nil?
 
             new_definitions = if spec.nil?
@@ -55,7 +55,7 @@ module Aws
               definitions.merge(spec.is_a?(self.class) ? spec.definitions : spec)
             end
 
-            self.class.new(new_definitions, &blk)
+            self.class.new(new_definitions, context, &blk)
           end
 
           def dsl(&blk)

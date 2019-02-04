@@ -15,6 +15,22 @@ module Aws
             def boxable_expression?
               false
             end
+
+            def to_expression_by(_)
+              to_boxed_expression
+            end
+          end
+
+          refine ::String do
+            def to_expression_by(definition)
+              Expressions::Parser.with(definition).parse(self)
+            end
+          end
+
+          refine ::Proc do
+            def to_expression_by(definition)
+              Expressions::Dsl.new(definition).expression(&self)
+            end
           end
 
           refine ::Numeric do
