@@ -150,6 +150,19 @@ module Aws
               end
             end
 
+            # List node
+            class List < Treetop::Runtime::SyntaxNode
+              include Clean
+
+              def to_dsl(definition)
+                return [] if _first.empty?
+
+                [_first.clean.to_dsl(definition)].concat(
+                  _rest.elements.map { |element| element._argument.clean.to_dsl(definition) }
+                )
+              end
+            end
+
             # Function node
             class Function < Treetop::Runtime::SyntaxNode
               include Clean

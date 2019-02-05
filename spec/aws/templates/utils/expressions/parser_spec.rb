@@ -23,7 +23,7 @@ describe Aws::Templates::Utils::Expressions::Parser do
   end
 
   let(:expression) do
-    parser.parse('(x + f(1)) * fg(45, 34) + gh(45)')
+    parser.parse('(x + f([1, 2, 3, 4])) * fg(45, 34) + gh(45)')
   end
 
   it 'parses without exception' do
@@ -32,7 +32,7 @@ describe Aws::Templates::Utils::Expressions::Parser do
 
   it 'parses the text into a correct representation' do
     expect(expression).to be_eql(
-      dsl.expression { (x + f(1)) * fg(45, 34) + gh(45) }
+      dsl.expression { (x + f([1, 2, 3, 4])) * fg(45, 34) + gh(45) }
     )
   end
 end

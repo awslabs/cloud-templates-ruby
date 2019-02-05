@@ -63,11 +63,15 @@ module Aws::Templates::Utils::Expressions::Parser
     end
 
     rule expression_primary
-      _argument:(parenthesis / boolean / function / variable / number / string) <Nodes::Wrapper>
+      _argument:(parenthesis / list / boolean / function / variable / number / string) <Nodes::Wrapper>
     end
 
     rule parenthesis
       '(' space? _argument:disjunction space? ')' <Nodes::Wrapper>
+    end
+
+    rule list
+      '[' space? _first:disjunction _rest:(space? ',' space? _argument:disjunction)* space? ']' <Nodes::List>
     end
 
     rule boolean
