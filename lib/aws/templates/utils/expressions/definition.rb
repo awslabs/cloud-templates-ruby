@@ -47,15 +47,16 @@ module Aws
           end
 
           def extend(spec = nil, context = nil, &blk)
+            self.class.new(definitions, context, &blk).extend!(spec)
+          end
+
+          def extend!(spec = nil, context = nil, &blk)
             return self if spec.nil? && blk.nil?
 
-            new_definitions = if spec.nil?
-              definitions
-            else
-              definitions.merge(spec.is_a?(self.class) ? spec.definitions : spec)
-            end
+            definitions.merge!(spec.is_a?(self.class) ? spec.definitions : spec)
+            instance_exec(context, &blk) if block_given?
 
-            self.class.new(new_definitions, context, &blk)
+            self
           end
 
           def dsl(&blk)
