@@ -49,10 +49,6 @@ module Aws
 
             private
 
-            def _parser_within(instance)
-              Utils::Expressions::Parser.with(_definition_within(instance))
-            end
-
             def _definition_within(instance)
               extender.nil? ? definition : definition.extend(nil, instance, &extender)
             end
