@@ -19,6 +19,8 @@ module Aws
                      Constraint::Enum,
                      # Value should satisfy all constraints
                      Constraint::AllOf,
+                     # Value should satisfy any of the constraints
+                     Constraint::AnyOf,
                      # Requires presence of the parameters if condition is satisfied
                      Constraint::Requires,
                      # Constraint depends on value

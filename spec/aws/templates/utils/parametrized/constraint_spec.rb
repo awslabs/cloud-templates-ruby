@@ -248,6 +248,93 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
     end
   end
 
+  describe 'any_of' do
+    let(:constraint) { Constraints.any_of(Constraints.enum(1, 2, 3), Constraints.enum(4, 5)) }
+
+    it 'passes if first constraint is met' do
+      expect(test_class.new(something: 2).something).to be == 2
+    end
+
+    it 'passes if second constraint is met' do
+      expect(test_class.new(something: 5).something).to be == 5
+    end
+
+    it 'throws an error if none of the constraints are met' do
+      expect { test_class.new(something: 6).something }
+        .to raise_error Aws::Templates::Exception::ParameterProcessingException
+    end
+
+    describe 'analytical calculations' do
+      let(:constraint) { Constraints.any_of(Constraints.enum(1, 2, 3), Constraints.enum(4, 5)) }
+
+      it 'satisfies itself' do
+        expect(constraint).to be_satisfies(
+          Constraints.any_of(Constraints.enum(1, 2, 3), Constraints.enum(3, 4, 5))
+        )
+      end
+
+      it 'satisfies empty constraint' do
+        expect(constraint).to be_satisfies(nil)
+      end
+
+      it 'satisfied by a single constraint which satisfies one of the options' do
+        expect(constraint).to be_satisfied_by(Constraints.enum(3))
+      end
+
+      it 'satisfied by a composite with a single element' do
+        expect(constraint).to be_satisfied_by(Constraints.any_of(Constraints.enum(1, 2)))
+      end
+
+      it 'doesn\'t satisfied by a composite containing constraints beyond the specified list' do
+        expect(constraint).not_to be_satisfied_by(
+          Constraints.any_of(Constraints.enum(1, 2, 3), Constraints.enum(5, 6))
+        )
+      end
+    end
+
+    describe 'transformation' do
+      let(:transfomed) { arbitrary_object.instance_exec(constraint, &transformation) }
+
+      context 'with float transformation' do
+        let(:transformation) { Constraints.as_float }
+
+        it 'transforms options' do
+          expect(transfomed).to be_satisfies(
+            Constraints.any_of(Constraints.enum(1.0, 2.0, 3.0), Constraints.enum(4.0, 5.0))
+          )
+        end
+      end
+
+      context 'with string transformation' do
+        let(:transformation) { Constraints.as_string }
+
+        it 'transforms options' do
+          expect(transfomed).to be_satisfies(
+            Constraints.any_of(Constraints.enum('1', '2', '3'), Constraints.enum('4', '5'))
+          )
+        end
+      end
+
+      context 'when a non-transformable constraint is present in the chain' do
+        let(:constraint) do
+          Constraints.any_of(
+            Constraints.not_nil,
+            Constraints.enum(1, 2, 3),
+            Constraints.is?(::Numeric)
+          )
+        end
+
+        let(:transformation) { Constraints.as_string }
+
+        it 'doesn\'t survive the transformation' do
+          expect(transfomed).to be_satisfies(
+            Constraints.any_of(Constraints.not_nil, Constraints.enum('1', '2', '3'))
+          )
+        end
+      end
+    end
+  end
+
   describe 'requires' do
     let(:test_class) do
       Class.new(parametrized_class) do
