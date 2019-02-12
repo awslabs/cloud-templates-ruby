@@ -53,7 +53,7 @@ module Aws
           def extend!(spec = nil, context = nil, &blk)
             return self if spec.nil? && blk.nil?
 
-            definitions.merge!(spec.is_a?(self.class) ? spec.definitions : spec)
+            definitions.merge!(spec.is_a?(self.class) ? spec.definitions : spec) unless spec.nil?
             instance_exec(context, &blk) if block_given?
 
             self
