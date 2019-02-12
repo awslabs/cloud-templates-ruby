@@ -42,7 +42,7 @@ module Aws
           end
 
           def initialize(spec = nil, context = nil, &blk)
-            @definitions = spec.dup || {}
+            @definitions = spec.nil? ? {} : spec.dup
             instance_exec(context, &blk) if block_given?
           end
 
