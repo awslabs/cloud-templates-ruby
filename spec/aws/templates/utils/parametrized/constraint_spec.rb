@@ -786,19 +786,42 @@ describe Aws::Templates::Utils::Parametrized::Constraint do
 
   describe 'is?' do
     context 'with class' do
-      let(:constraint) { Constraints.is?(::Enumerable) }
+      describe 'single variant' do
+        let(:constraint) { Constraints.is?(::Enumerable) }
 
-      it 'passes when nil' do
-        expect(test_class.new({}).something).to be_nil
+        it 'passes when nil' do
+          expect(test_class.new({}).something).to be_nil
+        end
+
+        it 'passes when an instance of the class is passed' do
+          expect(test_class.new(something: []).something).to be == []
+        end
+
+        it 'throws an error when wrong object is passed' do
+          expect { test_class.new(something: 123).something }
+            .to raise_error Aws::Templates::Exception::ParameterProcessingException
+        end
       end
 
-      it 'passes when an instance of the class is passed' do
-        expect(test_class.new(something: []).something).to be == []
-      end
+      describe 'multivariant' do
+        let(:constraint) { Constraints.is?(::Enumerable, ::Numeric) }
 
-      it 'throws an error when wrong object is passed' do
-        expect { test_class.new(something: 123).something }
-          .to raise_error Aws::Templates::Exception::ParameterProcessingException
+        it 'passes when nil' do
+          expect(test_class.new({}).something).to be_nil
+        end
+
+        it 'passes when an instance of the class is passed' do
+          expect(test_class.new(something: []).something).to be == []
+        end
+
+        it 'accepts another variant' do
+          expect(test_class.new(something: 123).something).to be == 123
+        end
+
+        it 'rejects arbitrary value' do
+          expect { test_class.new(something: Object.new).something }
+            .to raise_error Aws::Templates::Exception::ParameterProcessingException
+        end
       end
 
       describe 'analytical calculations' do
