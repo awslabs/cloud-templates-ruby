@@ -30,7 +30,7 @@ module Aws
           def self.with(name, feature = nil, &blk)
             k = feature.is_a?(::Class) ? Class.new(feature) : Class.new(self).featuring(feature)
             k.name_as(name)
-            k.class_eval(&blk)
+            k.class_eval(&blk) if block_given?
             k
           end
 
