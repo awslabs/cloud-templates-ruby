@@ -12,6 +12,7 @@ module Aws
         # is invoked by either DSL module or Parser.
         class Definition
           attr_reader :definitions
+          attr_reader :context
 
           DEFAULTS = {
             range: Expressions::Functions::Range,
@@ -32,6 +33,7 @@ module Aws
 
           def instantiate(name, *args)
             return DEFAULTS[name].new(name, *args) if DEFAULTS.include?(name)
+            return context.send(name, *args) if context.respond_to?(name)
             raise "#{name} is not defined" unless @definitions.include?(name)
 
             @definitions[name].new(name, *args)
@@ -43,6 +45,7 @@ module Aws
 
           def initialize(spec = nil, context = nil, &blk)
             @definitions = spec.nil? ? {} : spec.dup
+            @context = context
             instance_exec(context, &blk) if block_given?
           end
 
