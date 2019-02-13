@@ -78,7 +78,7 @@ module Aws
           # * +instance+ - the instance the value originates from; used for context-dependent
           #                calculations
           def transform_wrapper(value, instance)
-            _with_links(transform(value, instance), value.links)
+            _with_links(transform(value, instance), value)
           rescue StandardError
             raise Templates::Exception::ParameterTransformException.new(self, instance, value)
           end
@@ -102,8 +102,8 @@ module Aws
 
           private
 
-          def _with_links(value, links)
-            links.empty? ? value : value.as_a_dependency.to(links)
+          def _with_links(result, input)
+            input.dependency? ? result.as_a_dependency.to(input) : result
           end
         end
       end
