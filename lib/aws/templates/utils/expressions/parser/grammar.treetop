@@ -63,7 +63,7 @@ module Aws::Templates::Utils::Expressions::Parser
     end
 
     rule expression_primary
-      _argument:(parenthesis / list / boolean / function / variable / number / string) <Nodes::Wrapper>
+      _argument:(string / parenthesis / list / boolean / function / variable / number) <Nodes::Wrapper>
     end
 
     rule parenthesis

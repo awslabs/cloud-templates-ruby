@@ -25,6 +25,20 @@ module Aws
             def to_expression_by(definition)
               Expressions::Parser.with(definition).parse(self)
             end
+
+            def boxable_expression?
+              true
+            end
+
+            def to_boxed_expression
+              copy = dup
+
+              class <<copy
+                include Expressions::Expression
+              end
+
+              copy
+            end
           end
 
           refine ::Proc do
