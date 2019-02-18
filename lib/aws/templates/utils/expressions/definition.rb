@@ -40,7 +40,7 @@ module Aws
           end
 
           def defined?(name)
-            DEFAULTS.include?(name) || @definitions.include?(name)
+            DEFAULTS.include?(name) || @context.respond_to?(name) || @definitions.include?(name)
           end
 
           def initialize(spec = nil, context = nil, &blk)
