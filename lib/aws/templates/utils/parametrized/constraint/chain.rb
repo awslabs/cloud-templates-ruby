@@ -17,7 +17,12 @@ module Aws
             attr_reader :constraints
 
             def initialize(*constraints)
-              @constraints = constraints
+              @constraints = if constraints.empty? && block_given?
+                yield self
+              else
+                constraints
+              end
+
               self.if(Constraint::Condition.any)
             end
 
