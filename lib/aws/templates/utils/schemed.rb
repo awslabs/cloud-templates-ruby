@@ -14,12 +14,18 @@ module Aws
       module Schemed
         attr_reader :schema
 
-        def initialize(*schema)
-          raise ArgumentError.new('At least single arguments required') if schema.empty?
+        def initialize(*schema, &blk)
+          @schema = unbox_schema(
+            if schema.empty?
+              blk || raise(ArgumentError.new('At least single arguments required'))
+            elsif schema.size == 1
+              schema.first
+            else
+              schema
+            end
+          )
 
-          obj = unbox_schema(schema.size == 1 ? schema.first : schema)
-          check_schema(obj)
-          @schema = obj
+          check_schema(@schema)
         end
 
         def unbox_schema(schema)
