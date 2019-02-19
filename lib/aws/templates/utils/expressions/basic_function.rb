@@ -49,6 +49,14 @@ module Aws
             parameters_map == other.parameters_map
           end
 
+          def dependency?
+            true
+          end
+
+          def links
+            dependencies
+          end
+
           def initialize(*args)
             @arguments = args
             validate
