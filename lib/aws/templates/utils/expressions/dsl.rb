@@ -16,18 +16,6 @@ module Aws
         class Dsl
           attr_reader :definition
 
-          def range(lower, upper)
-            Expressions::Functions::Range.new(:range, lower, upper)
-          end
-
-          def inclusive(value)
-            Expressions::Functions::Range::Border::Inclusive.new(:inclusive, value)
-          end
-
-          def exclusive(value)
-            Expressions::Functions::Range::Border::Exclusive.new(:exclusive, value)
-          end
-
           def method_missing(name, *args)
             definition.defined?(name) ? definition.instantiate(name, *args) : super
           end
