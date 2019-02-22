@@ -71,6 +71,7 @@ module Aws
               description: nil,
               transform: nil,
               constraint: nil,
+              concept: nil,
               unique: false
             )
               @is_unique = unique
@@ -80,6 +81,7 @@ module Aws
               @sub_parameter = Parametrized::Parameter.new(
                 name || :element,
                 description: description,
+                concept: concept,
                 transform: transform,
                 constraint: constraint
               )

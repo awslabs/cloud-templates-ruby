@@ -91,7 +91,9 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
                   transform: as_list(
                     name: :element,
                     description: 'Celestial image',
-                    constraint: not_nil,
+                    concept: Aws::Templates::Utils::Parametrized::Concept.from do
+                      { constraint: not_nil }
+                    end,
                     unique: true
                   )
       end
