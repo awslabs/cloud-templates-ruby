@@ -237,15 +237,8 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
         Aws::Templates::Utils::Expressions::Functions::Operations::Range::Outside.new(
           Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
           Aws::Templates::Utils::Expressions::Functions::Range.new(
-            :range,
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(
-              :inclusive,
-              1
-            ),
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(
-              :exclusive,
-              2
-            )
+            Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(1),
+            Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(2)
           )
         )
       end
@@ -266,15 +259,8 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
         Aws::Templates::Utils::Expressions::Functions::Operations::Range::Inside.new(
           Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
           Aws::Templates::Utils::Expressions::Functions::Range.new(
-            :range,
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(
-              :inclusive,
-              1
-            ),
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(
-              :exclusive,
-              2
-            )
+            Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(1),
+            Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(2)
           )
         )
       end
@@ -296,15 +282,8 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
           Aws::Templates::Utils::Expressions::Functions::Operations::Range::Inside.new(
             Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
             Aws::Templates::Utils::Expressions::Functions::Range.new(
-              :range,
-              Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(
-                :inclusive,
-                1
-              ),
-              Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(
-                :exclusive,
-                2
-              )
+              Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(1),
+              Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(2)
             )
           ),
           Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::Greater.new(

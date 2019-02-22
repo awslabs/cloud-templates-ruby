@@ -39,11 +39,11 @@ module Aws
             self
           end
 
-          def self.new(name, *args)
+          def self.instantiate(name, *args)
             raise 'You can\'t instantiate anonymous function' if function_name.nil?
             raise "#{name} is not #{function_name}" if name != function_name
 
-            super(*args)
+            new(*args)
           end
         end
       end

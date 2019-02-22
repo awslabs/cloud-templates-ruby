@@ -6,6 +6,10 @@ describe Aws::Templates::Utils::Expressions::Dsl do
       Aws::Templates::Utils::Expressions::Definition.new do
         variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
         function(PrettyFunction)
+
+        macro :inc do |x|
+          x + 1
+        end
       end
     )
   end
@@ -13,13 +17,13 @@ describe Aws::Templates::Utils::Expressions::Dsl do
   context 'when correct specification is provided' do
     context 'with variable and function' do
       let(:expression) do
-        dsl.expression { x + pretty(1) }
+        dsl.expression { x + pretty(inc(1)) }
       end
 
       let(:expected) do
         Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
           Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          PrettyFunction.new(:pretty, 1)
+          PrettyFunction.new(:pretty, 2)
         )
       end
 
@@ -34,12 +38,15 @@ describe Aws::Templates::Utils::Expressions::Dsl do
 
     context 'with variable and number' do
       let(:expression) do
-        dsl.expression { x + 1 }
+        dsl.expression { inc(x) + 1 }
       end
 
       let(:expected) do
         Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
+            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+            1
+          ),
           1
         )
       end

@@ -23,6 +23,10 @@ module Aws
             definition.to_s
           end
 
+          def self.instantiate(name)
+            new(name)
+          end
+
           def initialize(definition)
             @definition = definition
           end
