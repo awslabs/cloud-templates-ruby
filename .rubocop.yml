@@ -1,5 +1,11 @@
 require: rubocop-rspec
 
+AllCops:
+  TargetRubyVersion: 2.4
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 RSpec/NestedGroups:
   Max: 10
 
@@ -20,6 +26,10 @@ Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
     - 'test/**/*'
+
+Metrics/ParameterLists:
+  Max: 10
+
 Style/RaiseArgs:
   EnforcedStyle: compact
 
