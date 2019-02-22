@@ -11,6 +11,10 @@ describe Aws::Templates::Utils::Expressions::Parser do
         parameter :b
       end
       function(gh: Aws::Templates::Utils::Expressions::Features::Arithmetic) { parameter :a }
+
+      macro :inc do |x|
+        x + 1
+      end
     end
   end
 
@@ -23,7 +27,7 @@ describe Aws::Templates::Utils::Expressions::Parser do
   end
 
   let(:expression) do
-    parser.parse('(x + f([1, 2, "3", 4])) * fg(45, 34) + gh(45)')
+    parser.parse('(x + f([inc(1), 2, "3", 4])) * fg(45, 34) + gh(45)')
   end
 
   it 'parses without exception' do
@@ -32,7 +36,7 @@ describe Aws::Templates::Utils::Expressions::Parser do
 
   it 'parses the text into a correct representation' do
     expect(expression).to be_eql(
-      dsl.expression { (x + f([1, 2, '3', 4])) * fg(45, 34) + gh(45) }
+      dsl.expression { (x + f([2, 2, '3', 4])) * fg(45, 34) + gh(45) }
     )
   end
 end

@@ -8,6 +8,9 @@ describe Aws::Templates::Utils::Expressions::Definition do
       function(:b) { parameter :a }
       function(PrettyFunction)
       function(c: PrettyFunction) { parameter :z }
+      macro :two do |x|
+        x + 2
+      end
     end
   end
 
@@ -69,6 +72,20 @@ describe Aws::Templates::Utils::Expressions::Definition do
 
       it 'contains parameter c' do
         expect(function.get_parameter(:z)).to be_a Aws::Templates::Utils::Parametrized::Parameter
+      end
+    end
+
+    describe 'macro two' do
+      let(:macro) do
+        definition.definitions[:two]
+      end
+
+      it 'is the PrettyFunction' do
+        expect(macro).to be_a Proc
+      end
+
+      it 'contains parameter c' do
+        expect(macro.arity).to be == 1
       end
     end
   end
