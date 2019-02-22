@@ -45,7 +45,7 @@ module Aws
 
           define_view(::BasicObject, InspectView) do
             def to_processed
-              depth > 0 ? instance.inspect : instance.to_s
+              depth.positive? ? instance.inspect : instance.to_s
             end
           end
 
@@ -57,7 +57,7 @@ module Aws
 
           define_view(::Hash, InspectView) do
             def to_processed
-              if depth > 0
+              if depth.positive?
                 "{#{instance.map { |k, v| render_pair(k, v) }.join(',')}}"
               else
                 instance.empty? ? '{}' : '{...}'
@@ -71,7 +71,7 @@ module Aws
 
           define_view(::Enumerable, InspectView) do
             def to_processed
-              if depth > 0
+              if depth.positive?
                 "#{instance.class}[#{instance.map { |elem| processed_for(elem, depth) }.join(',')}]"
               else
                 "#{instance.class}#{instance.empty? ? '[]' : '[...]'}"
@@ -89,7 +89,7 @@ module Aws
 
           define_view(Templates::Utils::Parametrized, InspectView) do
             def to_processed
-              return instance.to_s unless depth > 0
+              return instance.to_s unless depth.positive?
 
               "#{instance}" \
                 "{parameters: #{processed_for(instance.parameters_map, depth)}," \

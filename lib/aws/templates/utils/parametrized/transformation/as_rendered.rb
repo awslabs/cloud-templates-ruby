@@ -75,7 +75,7 @@ module Aws
               unless render.respond_to?(:process)
                 raise(
                   "Wrong render type object #{render}. " \
-                  'The instance should have #view_for method.'
+                  'The instance should have #process method.'
                 )
               end
 

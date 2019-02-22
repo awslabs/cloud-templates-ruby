@@ -26,7 +26,7 @@ module UserDirectory
         end
 
         def path_for(obj)
-          obj && obj.path
+          obj&.path
         end
       end
     end

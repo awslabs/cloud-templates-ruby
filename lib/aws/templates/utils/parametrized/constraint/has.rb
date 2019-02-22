@@ -59,7 +59,7 @@ module Aws
                 next if constraint.nil?
 
                 method = value.method(field)
-                _raise_wrong_arity(value, method) if method.arity > 0
+                _raise_wrong_arity(value, method) if method.arity.positive?
                 value.instance_exec(value.send(field), &constraint)
               end
             end

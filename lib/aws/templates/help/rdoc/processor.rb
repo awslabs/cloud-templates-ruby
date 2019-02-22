@@ -104,7 +104,7 @@ module Aws
           def _formatter
             return @_formatter if @_formatter
 
-            @_formatter = if options && options.include?(:formatter)
+            @_formatter = if options&.include?(:formatter)
               Templates::Utils.lookup_module(options[:formatter]).new
             else
               RDoc::Markup::ToAnsi.new

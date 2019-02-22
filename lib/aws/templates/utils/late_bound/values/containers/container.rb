@@ -61,7 +61,7 @@ module Aws
               end
 
               def concept_for(parameter)
-                parameter && parameter.concept
+                parameter&.concept
               end
 
               private

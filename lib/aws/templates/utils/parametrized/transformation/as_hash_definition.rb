@@ -80,7 +80,7 @@ module Aws
             end
 
             def _compatible?(a_param, b_param)
-              (b_param && b_param.concept).processable_by?(a_param && a_param.concept)
+              (b_param&.concept).processable_by?(a_param&.concept)
             end
           end
         end
