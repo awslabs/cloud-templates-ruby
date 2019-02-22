@@ -103,7 +103,9 @@ module Aws
           private
 
           def _with_links(result, input)
-            input.dependency? ? result.as_a_dependency.to(input) : result
+            return result if result.equal?(input) || !input.dependency? || input.links.empty?
+
+            result.as_a_dependency.to(input)
           end
         end
       end

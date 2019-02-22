@@ -1,7 +1,5 @@
 require 'aws/templates/utils'
 
-using Aws::Templates::Utils::Dependency::Refinements
-
 module Aws
   module Templates
     module Utils
@@ -11,7 +9,7 @@ module Aws
         #
         # Adds flags and transformation methods to the standard classes.
         module Refinements
-          refine ::Object do
+          refine ::BasicObject do
             def boxable_expression?
               false
             end
@@ -58,12 +56,14 @@ module Aws
           end
 
           refine Utils::Dependency::Wrapper do
+            using Aws::Templates::Utils::Dependency::Refinements
+
             def boxable_expression?
-              delegate.boxable_expression?
+              object.boxable_expression?
             end
 
             def to_boxed_expression
-              delegate.to_boxed_expression.as_a_dependency.to(self)
+              object.to_boxed_expression.as_a_dependency.to(self)
             end
           end
 
