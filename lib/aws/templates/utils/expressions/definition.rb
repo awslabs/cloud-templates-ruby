@@ -31,12 +31,19 @@ module Aws
             @definitions[func.function_name] = func
           end
 
+          def macro(name, &body)
+            raise 'Macros must have name' unless name
+            raise 'Macros must have body' unless body
+
+            @definitions[name] = body
+          end
+
           def instantiate(name, *args)
-            return DEFAULTS[name].new(name, *args) if DEFAULTS.include?(name)
+            return _instantiate(DEFAULTS[name], name, args) if DEFAULTS.include?(name)
             return context.send(name, *args) if context.respond_to?(name)
             raise "#{name} is not defined" unless @definitions.include?(name)
 
-            @definitions[name].new(name, *args)
+            _instantiate(@definitions[name], name, args)
           end
 
           def defined?(name)
@@ -68,6 +75,16 @@ module Aws
           end
 
           private
+
+          def _instantiate(obj, name, args)
+            if obj.is_a?(Module)
+              obj.instantiate(name, *args)
+            elsif obj.respond_to?(:to_proc)
+              instance_exec(*args, &obj)
+            else
+              raise "Not a supported definition #{obj.inspect}"
+            end
+          end
 
           def _transform_to_function_class(spec, &blk)
             return spec if spec.is_a?(::Class)
