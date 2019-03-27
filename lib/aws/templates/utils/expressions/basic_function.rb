@@ -15,15 +15,12 @@ module Aws
           #
           # Transforms values into their respective boxed representation in the framework.
           class AsBoxedExpression < Utils::Parametrized::Transformation
-            using Utils::Expressions::Refinements
             extend Utils::Singleton
 
             protected
 
-            def transform(value, _)
-              raise "#{value.inspect} is not an expression" unless value.boxable_expression?
-
-              value.to_boxed_expression
+            def transform(value, instance)
+              instance.scope.cast_for(value)
             end
           end
 
@@ -45,8 +42,12 @@ module Aws
             @arguments_list ||= Hash[list_all_parameter_names.each_with_index.to_a]
           end
 
+          def self.arity
+            arguments_list.size
+          end
+
           def equal_to?(other)
-            parameters_map == other.parameters_map
+            parameters_map.eql?(other.parameters_map)
           end
 
           def dependency?
@@ -57,9 +58,24 @@ module Aws
             dependencies
           end
 
-          def initialize(*args)
+          def initialize(scope, *args)
+            super(scope)
+            _check_arguments_number(args)
             @arguments = args
             validate
+          end
+
+          private
+
+          def _check_arguments_number(args)
+            expected = self.class.arity
+            given = args.size
+
+            return if expected == given
+
+            raise ArgumentError.new(
+              "wrong number of arguments (given #{given}, expected #{expected})"
+            )
           end
         end
       end

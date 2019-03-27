@@ -13,7 +13,7 @@ module Aws
             include Features::Comparable
 
             def -@
-              Expressions::Functions::Operations::Arithmetic::Negative.new(self)
+              Expressions::Functions::Operations::Arithmetic::Negative.new(scope, self)
             end
 
             def +@
@@ -21,19 +21,19 @@ module Aws
             end
 
             def +(other)
-              Expressions::Functions::Operations::Arithmetic::Addition.new(self, other)
+              Expressions::Functions::Operations::Arithmetic::Addition.new(scope, self, other)
             end
 
             def -(other)
-              Expressions::Functions::Operations::Arithmetic::Subtraction.new(self, other)
+              Expressions::Functions::Operations::Arithmetic::Subtraction.new(scope, self, other)
             end
 
             def *(other)
-              Expressions::Functions::Operations::Arithmetic::Multiplication.new(self, other)
+              Expressions::Functions::Operations::Arithmetic::Multiplication.new(scope, self, other)
             end
 
             def /(other)
-              Expressions::Functions::Operations::Arithmetic::Division.new(self, other)
+              Expressions::Functions::Operations::Arithmetic::Division.new(scope, self, other)
             end
           end
         end

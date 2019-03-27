@@ -38,13 +38,6 @@ module Aws
             include feature if feature
             self
           end
-
-          def self.instantiate(name, *args)
-            raise 'You can\'t instantiate anonymous function' if function_name.nil?
-            raise "#{name} is not #{function_name}" if name != function_name
-
-            new(*args)
-          end
         end
       end
     end

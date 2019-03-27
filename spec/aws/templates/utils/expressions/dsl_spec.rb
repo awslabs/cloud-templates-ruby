@@ -4,8 +4,10 @@ describe Aws::Templates::Utils::Expressions::Dsl do
   let(:dsl) do
     described_class.new(
       Aws::Templates::Utils::Expressions::Definition.new do
-        variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
-        function(PrettyFunction)
+        cast(::Float, &:to_i)
+
+        var x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+        func(PrettyFunction)
 
         macro :inc do |x|
           x + 1
@@ -22,8 +24,9 @@ describe Aws::Templates::Utils::Expressions::Dsl do
 
       let(:expected) do
         Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          PrettyFunction.new(:pretty, 2)
+          dsl.definition,
+          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(dsl.definition, :x),
+          PrettyFunction.new(dsl.definition, 2)
         )
       end
 
@@ -43,8 +46,10 @@ describe Aws::Templates::Utils::Expressions::Dsl do
 
       let(:expected) do
         Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
+          dsl.definition,
           Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+            dsl.definition,
+            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(dsl.definition, :x),
             1
           ),
           1

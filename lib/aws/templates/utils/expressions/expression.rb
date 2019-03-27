@@ -10,18 +10,22 @@ module Aws
         # Contains functionality common to all boxed expressions. It provides flag methods and
         # type coercion.
         module Expression
-          using Refinements
+          attr_accessor :scope
 
-          def boxable_expression?
-            true
-          end
-
-          def to_boxed_expression
+          def to_expression_by(_)
             self
           end
 
+          def boxed_expression?
+            true
+          end
+
           def coerce(other)
-            [other.to_boxed_expression, self]
+            [scope.cast_for(other), self]
+          end
+
+          def initialize(scope)
+            @scope = scope
           end
         end
       end

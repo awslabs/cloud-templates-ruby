@@ -53,10 +53,6 @@ module Aws
               def unbox
                 value.unbox
               end
-
-              def initialize(value)
-                super(value)
-              end
             end
 
             parameter :lower,
@@ -71,10 +67,6 @@ module Aws
                         is?(Border),
                         satisfies('upper is bigger than lower') { |v| v.unbox > lower.unbox }
                       )
-
-            def initialize(lower, upper)
-              super(lower, upper)
-            end
           end
         end
       end

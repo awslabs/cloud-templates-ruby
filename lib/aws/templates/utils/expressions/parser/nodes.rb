@@ -68,23 +68,12 @@ module Aws
               end
 
               def to_dsl(definition)
-                Expressions::Functions::Operations::Logical::Not.new(argument.to_dsl(definition))
+                !argument.to_dsl(definition)
               end
             end
 
             # Comparison node
             class Comparison < Treetop::Runtime::SyntaxNode
-              COMPARISONS = {
-                '>' => Expressions::Functions::Operations::Comparisons::Greater,
-                '<' => Expressions::Functions::Operations::Comparisons::Less,
-                '>=' => Expressions::Functions::Operations::Comparisons::GreaterOrEqual,
-                '<=' => Expressions::Functions::Operations::Comparisons::LessOrEqual,
-                '==' => Expressions::Functions::Operations::Comparisons::Equal,
-                '!=' => Expressions::Functions::Operations::Comparisons::NotEqual,
-                '!~' => Expressions::Functions::Operations::Range::Outside,
-                '=~' => Expressions::Functions::Operations::Range::Inside
-              }.freeze
-
               def clean
                 return left if _right.empty?
 
@@ -104,21 +93,12 @@ module Aws
               end
 
               def to_dsl(definition)
-                COMPARISONS[op].new(left.to_dsl(definition), right.to_dsl(definition))
+                left.to_dsl(definition).send(op, right.to_dsl(definition))
               end
             end
 
             # General operation node
             class Operation < Treetop::Runtime::SyntaxNode
-              OPERATIONS = {
-                '|' => Expressions::Functions::Operations::Logical::Or,
-                '&' => Expressions::Functions::Operations::Logical::And,
-                '+' => Expressions::Functions::Operations::Arithmetic::Addition,
-                '-' => Expressions::Functions::Operations::Arithmetic::Subtraction,
-                '*' => Expressions::Functions::Operations::Arithmetic::Multiplication,
-                '/' => Expressions::Functions::Operations::Arithmetic::Division
-              }.freeze
-
               def clean
                 return _left.clean if _rest.empty?
 
@@ -127,16 +107,12 @@ module Aws
 
               def get_first(definition)
                 right = _rest.elements.first
-
-                OPERATIONS[right.op].new(
-                  _left.clean.to_dsl(definition),
-                  right.argument.to_dsl(definition)
-                )
+                _left.clean.to_dsl(definition).send(right.op, right.argument.to_dsl(definition))
               end
 
               def to_dsl(definition)
                 _rest.elements[1..-1].inject(get_first(definition)) do |op, element|
-                  OPERATIONS[element.op].new(op, element.argument.to_dsl(definition))
+                  op.send(element.op, element.argument.to_dsl(definition))
                 end
               end
             end

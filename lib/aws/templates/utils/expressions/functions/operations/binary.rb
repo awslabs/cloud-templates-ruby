@@ -11,10 +11,6 @@ module Aws
             #
             # It defines two-values initializer and string formatting
             class Binary < Functions::Operation
-              def initialize(left, right)
-                super(left, right)
-              end
-
               def to_s
                 "#{wrap(left)}#{self.class.op_sign}#{wrap(right)}"
               end

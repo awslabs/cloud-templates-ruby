@@ -3,11 +3,14 @@ require 'spec_helper'
 describe Aws::Templates::Utils::Expressions::Definition do
   let(:definition) do
     described_class.new do
-      variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+      cast(::Float, &:to_i)
 
-      function(:b) { parameter :a }
-      function(PrettyFunction)
-      function(c: PrettyFunction) { parameter :z }
+      var x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+
+      func(:b) { parameter :a }
+      func(PrettyFunction)
+      func(c: PrettyFunction) { parameter :z }
+
       macro :two do |x|
         x + 2
       end
@@ -29,13 +32,13 @@ describe Aws::Templates::Utils::Expressions::Definition do
 
   describe 'expected definitions' do
     it 'contains variable x' do
-      expect(definition.definitions[:x])
+      expect(definition.identifiers.lookup(:x).definition)
         .to be == Aws::Templates::Utils::Expressions::Variables::Arithmetic
     end
 
     describe 'function b' do
       let(:function) do
-        definition.definitions[:b]
+        definition.identifiers.lookup(:b).definition
       end
 
       it 'is a simple function' do
@@ -49,7 +52,7 @@ describe Aws::Templates::Utils::Expressions::Definition do
 
     describe 'pretty function' do
       let(:function) do
-        definition.definitions[:pretty]
+        definition.identifiers.lookup(:pretty).definition
       end
 
       it 'is the PrettyFunction' do
@@ -63,7 +66,7 @@ describe Aws::Templates::Utils::Expressions::Definition do
 
     describe 'function c' do
       let(:function) do
-        definition.definitions[:c]
+        definition.identifiers.lookup(:c).definition
       end
 
       it 'is the PrettyFunction' do
@@ -77,7 +80,7 @@ describe Aws::Templates::Utils::Expressions::Definition do
 
     describe 'macro two' do
       let(:macro) do
-        definition.definitions[:two]
+        definition.identifiers.lookup(:two).definition
       end
 
       it 'is the PrettyFunction' do
@@ -86,6 +89,16 @@ describe Aws::Templates::Utils::Expressions::Definition do
 
       it 'contains parameter c' do
         expect(macro.arity).to be == 1
+      end
+    end
+
+    describe 'float cast' do
+      let(:cast) do
+        definition.casts.lookup(::Float)
+      end
+
+      it 'is the PrettyFunction' do
+        expect(cast).to be_a Proc
       end
     end
   end

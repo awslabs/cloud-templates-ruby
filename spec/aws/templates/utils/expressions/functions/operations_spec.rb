@@ -1,24 +1,28 @@
 require 'spec_helper'
 
 describe Aws::Templates::Utils::Expressions::Functions::Operations do
-  let(:definition) do
-    Aws::Templates::Utils::Expressions::Definition.new do
-      variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
-                y: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
-                z: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+  let(:expressions) do
+    Aws::Templates::Utils::Expressions
+  end
 
-      variables a: Aws::Templates::Utils::Expressions::Variables::Logical,
-                b: Aws::Templates::Utils::Expressions::Variables::Logical,
-                c: Aws::Templates::Utils::Expressions::Variables::Logical
+  let(:definition) do
+    expressions::Definition.new do
+      var x: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
+          y: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
+          z: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+
+      var a: Aws::Templates::Utils::Expressions::Variables::Logical,
+          b: Aws::Templates::Utils::Expressions::Variables::Logical,
+          c: Aws::Templates::Utils::Expressions::Variables::Logical
     end
   end
 
   let(:dsl) do
-    Aws::Templates::Utils::Expressions::Dsl.new(definition)
+    expressions::Dsl.new(definition)
   end
 
   let(:parser) do
-    Aws::Templates::Utils::Expressions::Parser.with(definition)
+    expressions::Parser.with(definition)
   end
 
   shared_examples 'operation' do
@@ -42,10 +46,12 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Logical::And.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Logical::And.new(
-            Aws::Templates::Utils::Expressions::Variables::Logical.new(:a),
-            Aws::Templates::Utils::Expressions::Variables::Logical.new(:b)
+        expressions::Functions::Operations::Logical::And.new(
+          definition,
+          expressions::Functions::Operations::Logical::And.new(
+            definition,
+            expressions::Variables::Logical.new(definition, :a),
+            expressions::Variables::Logical.new(definition, :b)
           ),
           true
         )
@@ -64,8 +70,9 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Not.new(
-          Aws::Templates::Utils::Expressions::Variables::Logical.new(:a)
+        expressions::Functions::Operations::Logical::Not.new(
+          definition,
+          expressions::Variables::Logical.new(definition, :a)
         )
       end
 
@@ -82,10 +89,12 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Or.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Or.new(
-            Aws::Templates::Utils::Expressions::Variables::Logical.new(:a),
-            Aws::Templates::Utils::Expressions::Variables::Logical.new(:b)
+        expressions::Functions::Operations::Logical::Or.new(
+          definition,
+          expressions::Functions::Operations::Logical::Or.new(
+            definition,
+            expressions::Variables::Logical.new(definition, :a),
+            expressions::Variables::Logical.new(definition, :b)
           ),
           true
         )
@@ -104,21 +113,27 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Or.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Or.new(
-            Aws::Templates::Utils::Expressions::Variables::Logical.new(:a),
-            Aws::Templates::Utils::Expressions::Variables::Logical.new(:b)
+        expressions::Functions::Operations::Logical::Or.new(
+          definition,
+          expressions::Functions::Operations::Logical::Or.new(
+            definition,
+            expressions::Variables::Logical.new(definition, :a),
+            expressions::Variables::Logical.new(definition, :b)
           ),
-          Aws::Templates::Utils::Expressions::Functions::Operations::Logical::And.new(
-            Aws::Templates::Utils::Expressions::Functions::Operations::Logical::And.new(
-              Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Not.new(
-                Aws::Templates::Utils::Expressions::Variables::Logical.new(:c)
+          expressions::Functions::Operations::Logical::And.new(
+            definition,
+            expressions::Functions::Operations::Logical::And.new(
+              definition,
+              expressions::Functions::Operations::Logical::Not.new(
+                definition,
+                expressions::Variables::Logical.new(definition, :c)
               ),
-              Aws::Templates::Utils::Expressions::Variables::Logical.new(:a)
+              expressions::Variables::Logical.new(definition, :a)
             ),
-            Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Or.new(
-              Aws::Templates::Utils::Expressions::Variables::Logical.new(:b),
-              Aws::Templates::Utils::Expressions::Variables::Logical.new(:c)
+            expressions::Functions::Operations::Logical::Or.new(
+              definition,
+              expressions::Variables::Logical.new(definition, :b),
+              expressions::Variables::Logical.new(definition, :c)
             )
           )
         )
@@ -139,9 +154,10 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::Greater.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Number.new(1)
+        expressions::Functions::Operations::Comparisons::Greater.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Number.new(definition, 1)
         )
       end
 
@@ -158,9 +174,10 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::Less.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Number.new(1)
+        expressions::Functions::Operations::Comparisons::Less.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Number.new(definition, 1)
         )
       end
 
@@ -177,9 +194,10 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::GreaterOrEqual.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Number.new(1)
+        expressions::Functions::Operations::Comparisons::GreaterOrEqual.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Number.new(definition, 1)
         )
       end
 
@@ -196,9 +214,10 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::LessOrEqual.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Number.new(1)
+        expressions::Functions::Operations::Comparisons::LessOrEqual.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Number.new(definition, 1)
         )
       end
 
@@ -215,9 +234,10 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::NotEqual.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Number.new(1)
+        expressions::Functions::Operations::Comparisons::NotEqual.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Number.new(definition, 1)
         )
       end
 
@@ -234,11 +254,17 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Range::Outside.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Functions::Range.new(
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(1),
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(2)
+        expressions::Functions::Operations::Range::Outside.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Functions::Range.new(
+            definition,
+            expressions::Functions::Range::Border::Inclusive.new(
+              definition, 1
+            ),
+            expressions::Functions::Range::Border::Exclusive.new(
+              definition, 2
+            )
           )
         )
       end
@@ -256,11 +282,18 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Range::Inside.new(
-          Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-          Aws::Templates::Utils::Expressions::Functions::Range.new(
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(1),
-            Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(2)
+        expressions::Functions::Operations::Range::Inside.new(
+          definition,
+          expressions::Variables::Arithmetic.new(definition, :x),
+          expressions::Functions::Range.new(
+            definition,
+            expressions::Functions::Range::Border::Inclusive.new(
+              definition, 1
+            ),
+            expressions::Functions::Range::Border::Exclusive.new(
+              definition,
+              2
+            )
           )
         )
       end
@@ -278,17 +311,25 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Logical::Or.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Range::Inside.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-            Aws::Templates::Utils::Expressions::Functions::Range.new(
-              Aws::Templates::Utils::Expressions::Functions::Range::Border::Inclusive.new(1),
-              Aws::Templates::Utils::Expressions::Functions::Range::Border::Exclusive.new(2)
+        expressions::Functions::Operations::Logical::Or.new(
+          definition,
+          expressions::Functions::Operations::Range::Inside.new(
+            definition,
+            expressions::Variables::Arithmetic.new(definition, :x),
+            expressions::Functions::Range.new(
+              definition,
+              expressions::Functions::Range::Border::Inclusive.new(
+                definition, 1
+              ),
+              expressions::Functions::Range::Border::Exclusive.new(
+                definition, 2
+              )
             )
           ),
-          Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::Greater.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:y),
-            Aws::Templates::Utils::Expressions::Number.new(1)
+          expressions::Functions::Operations::Comparisons::Greater.new(
+            definition,
+            expressions::Variables::Arithmetic.new(definition, :y),
+            expressions::Number.new(definition, 1)
           )
         )
       end
@@ -308,10 +349,12 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:y)
+        expressions::Functions::Operations::Arithmetic::Addition.new(
+          definition,
+          expressions::Functions::Operations::Arithmetic::Addition.new(
+            definition,
+            expressions::Variables::Arithmetic.new(definition, :x),
+            expressions::Variables::Arithmetic.new(definition, :y)
           ),
           1
         )
@@ -330,10 +373,12 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Subtraction.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Subtraction.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:y)
+        expressions::Functions::Operations::Arithmetic::Subtraction.new(
+          definition,
+          expressions::Functions::Operations::Arithmetic::Subtraction.new(
+            definition,
+            expressions::Variables::Arithmetic.new(definition, :x),
+            expressions::Variables::Arithmetic.new(definition, :y)
           ),
           1
         )
@@ -352,10 +397,12 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Multiplication.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Multiplication.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:y)
+        expressions::Functions::Operations::Arithmetic::Multiplication.new(
+          definition,
+          expressions::Functions::Operations::Arithmetic::Multiplication.new(
+            definition,
+            expressions::Variables::Arithmetic.new(definition, :x),
+            expressions::Variables::Arithmetic.new(definition, :y)
           ),
           2
         )
@@ -374,10 +421,12 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Division.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Division.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:y)
+        expressions::Functions::Operations::Arithmetic::Division.new(
+          definition,
+          expressions::Functions::Operations::Arithmetic::Division.new(
+            definition,
+            expressions::Variables::Arithmetic.new(definition, :x),
+            expressions::Variables::Arithmetic.new(definition, :y)
           ),
           2
         )
@@ -396,28 +445,39 @@ describe Aws::Templates::Utils::Expressions::Functions::Operations do
       end
 
       let(:expected) do
-        left = Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Multiplication.new(
-            Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Division.new(
-              Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
-              Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:y)
+        left = expressions::Functions::Operations::Arithmetic::Addition.new(
+          definition,
+          expressions::Functions::Operations::Arithmetic::Multiplication.new(
+            definition,
+            expressions::Functions::Operations::Arithmetic::Division.new(
+              definition,
+              expressions::Variables::Arithmetic.new(definition, :x),
+              expressions::Variables::Arithmetic.new(definition, :y)
             ),
             2
           ),
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Division.new(
+          expressions::Functions::Operations::Arithmetic::Division.new(
+            definition,
             1,
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:z)
+            expressions::Variables::Arithmetic.new(definition, :z)
           )
         )
 
-        Aws::Templates::Utils::Expressions::Functions::Operations::Comparisons::Greater.new(
+        expressions::Functions::Operations::Comparisons::Greater.new(
+          definition,
           left,
-          Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Multiplication.new(
-            Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Division.new(
-              Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:z),
-              3
-            ),
-            100
+          expressions::Functions::Operations::Arithmetic::Addition.new(
+            definition,
+            5,
+            expressions::Functions::Operations::Arithmetic::Multiplication.new(
+              definition,
+              expressions::Functions::Operations::Arithmetic::Division.new(
+                definition,
+                expressions::Variables::Arithmetic.new(definition, :z),
+                3
+              ),
+              100
+            )
           )
         )
       end

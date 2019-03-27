@@ -3,14 +3,16 @@ require 'spec_helper'
 describe Aws::Templates::Utils::Expressions::Parser do
   let(:definition) do
     Aws::Templates::Utils::Expressions::Definition.new do
-      variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+      cast(::Float) { |v| Aws::Templates::Utils::Expressions::Number.new(self, v.to_i) }
 
-      function(f: Aws::Templates::Utils::Expressions::Features::Arithmetic) { parameter :a }
-      function(fg: Aws::Templates::Utils::Expressions::Features::Arithmetic) do
+      var x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+
+      func(f: Aws::Templates::Utils::Expressions::Features::Arithmetic) { parameter :a }
+      func(fg: Aws::Templates::Utils::Expressions::Features::Arithmetic) do
         parameter :a
         parameter :b
       end
-      function(gh: Aws::Templates::Utils::Expressions::Features::Arithmetic) { parameter :a }
+      func(gh: Aws::Templates::Utils::Expressions::Features::Arithmetic) { parameter :a }
 
       macro :inc do |x|
         x + 1
@@ -27,7 +29,7 @@ describe Aws::Templates::Utils::Expressions::Parser do
   end
 
   let(:expression) do
-    parser.parse('(x + f([inc(1), 2, "3", 4])) * fg(45, 34) + gh(45)')
+    parser.parse('(x + f([inc(1), 2.7, "3", 4])) * fg(45, 34) + gh(45) + 67.8')
   end
 
   it 'parses without exception' do
@@ -36,7 +38,7 @@ describe Aws::Templates::Utils::Expressions::Parser do
 
   it 'parses the text into a correct representation' do
     expect(expression).to be_eql(
-      dsl.expression { (x + f([2, 2, '3', 4])) * fg(45, 34) + gh(45) }
+      dsl.expression { (x + f([2, 2.7, '3', 4])) * fg(45, 34) + gh(45) + 67 }
     )
   end
 end

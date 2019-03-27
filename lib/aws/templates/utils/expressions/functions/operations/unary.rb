@@ -11,10 +11,6 @@ module Aws
             #
             # Defines initializer with single argument and default string formatting.
             class Unary < Functions::Operation
-              def initialize(arg)
-                super(arg)
-              end
-
               def to_s
                 "#{self.class.op_sign}#{wrap(argument)}"
               end
@@ -22,7 +18,7 @@ module Aws
               protected
 
               def wrap(arg)
-                arg.is_a?(Operations::Operation) ? "(#{arg})" : arg
+                arg.is_a?(Functions::Operation) ? "(#{arg})" : arg
               end
             end
           end

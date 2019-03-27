@@ -11,35 +11,37 @@ module Aws
           # The mixin provides operations appropriate for ordered entities which can be compared.
           module Comparable
             def >(other)
-              Expressions::Functions::Operations::Comparisons::Greater.new(self, other)
+              Expressions::Functions::Operations::Comparisons::Greater.new(scope, self, other)
             end
 
             def <(other)
-              Expressions::Functions::Operations::Comparisons::Less.new(self, other)
+              Expressions::Functions::Operations::Comparisons::Less.new(scope, self, other)
             end
 
             def >=(other)
-              Expressions::Functions::Operations::Comparisons::GreaterOrEqual.new(self, other)
+              Expressions::Functions::Operations::Comparisons::GreaterOrEqual.new(
+                scope, self, other
+              )
             end
 
             def <=(other)
-              Expressions::Functions::Operations::Comparisons::LessOrEqual.new(self, other)
+              Expressions::Functions::Operations::Comparisons::LessOrEqual.new(scope, self, other)
             end
 
             def ==(other)
-              Expressions::Functions::Operations::Comparisons::Equal.new(self, other)
+              Expressions::Functions::Operations::Comparisons::Equal.new(scope, self, other)
             end
 
             def !=(other)
-              Expressions::Functions::Operations::Comparisons::NotEqual.new(self, other)
+              Expressions::Functions::Operations::Comparisons::NotEqual.new(scope, self, other)
             end
 
             def =~(other)
-              Expressions::Functions::Operations::Range::Inside.new(self, other)
+              Expressions::Functions::Operations::Range::Inside.new(scope, self, other)
             end
 
             def !~(other)
-              Expressions::Functions::Operations::Range::Outside.new(self, other)
+              Expressions::Functions::Operations::Range::Outside.new(scope, self, other)
             end
           end
         end

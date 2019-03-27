@@ -23,7 +23,7 @@ module Aws
               result = parser.parse(str)
               raise parser.failure_reason if result.nil?
 
-              result.clean.to_dsl(definition)
+              definition.cast_for(result.clean.to_dsl(definition))
             end
           end
         end

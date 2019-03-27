@@ -37,7 +37,7 @@ module Aws
                           )
 
                 def to_s
-                  str = if value.is_a?(Operations::Operation)
+                  str = if value.is_a?(Functions::Operation)
                     "(#{value})"
                   else
                     value

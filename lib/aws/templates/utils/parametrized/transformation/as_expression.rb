@@ -50,7 +50,7 @@ module Aws
             private
 
             def _definition_within(instance)
-              definition.extend(nil, instance, &extender)
+              definition.extend(context: instance, &extender)
             end
           end
         end

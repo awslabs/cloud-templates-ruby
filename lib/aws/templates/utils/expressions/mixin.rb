@@ -27,7 +27,7 @@ module Aws
           # of Proc objects is already reserved and hence the need to wrap the code blocks with DSL
           # expresions so they are not misinterpreted. It's not visible to the end user.
           class Wrapper
-            using Utils::Expressions::Refinements
+            using Expressions::Refinements
 
             attr_reader :target
 

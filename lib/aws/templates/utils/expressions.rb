@@ -14,13 +14,13 @@ module Aws
       # Example:
       #
       #    definition = Aws::Templates::Utils::Expressions::Definition.new do
-      #      variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
-      #                y: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
-      #                z: Aws::Templates::Utils::Expressions::Variables::Arithmetic
+      #      var x: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
+      #          y: Aws::Templates::Utils::Expressions::Variables::Arithmetic,
+      #          z: Aws::Templates::Utils::Expressions::Variables::Arithmetic
       #
-      #      variables a: Aws::Templates::Utils::Expressions::Variables::Logical,
-      #                b: Aws::Templates::Utils::Expressions::Variables::Logical,
-      #                c: Aws::Templates::Utils::Expressions::Variables::Logical
+      #      var a: Aws::Templates::Utils::Expressions::Variables::Logical,
+      #          b: Aws::Templates::Utils::Expressions::Variables::Logical,
+      #          c: Aws::Templates::Utils::Expressions::Variables::Logical
       #    end
       #
       #    dsl = Aws::Templates::Utils::Expressions::Dsl.new(definition)

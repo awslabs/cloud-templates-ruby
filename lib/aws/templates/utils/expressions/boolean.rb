@@ -9,9 +9,9 @@ module Aws
         #
         # Since it's not possible to modify singletons of numbers, we are using the Proxy technique
         # to add additional methods to numerical values.
-        class Number < Utils::Proxy
+        class Boolean < Utils::Proxy
           include Expressions::Expression
-          include Expressions::Features::Arithmetic
+          include Expressions::Features::Logical
 
           alias unbox delegate
 

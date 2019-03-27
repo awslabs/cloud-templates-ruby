@@ -13,15 +13,15 @@ module Aws
             include Expressions::Flags::Logical
 
             def |(other)
-              Expressions::Functions::Operations::Logical::Or.new(self, other)
+              Expressions::Functions::Operations::Logical::Or.new(scope, self, other)
             end
 
             def &(other)
-              Expressions::Functions::Operations::Logical::And.new(self, other)
+              Expressions::Functions::Operations::Logical::And.new(scope, self, other)
             end
 
             def !
-              Expressions::Functions::Operations::Logical::Not.new(self)
+              Expressions::Functions::Operations::Logical::Not.new(scope, self)
             end
           end
         end

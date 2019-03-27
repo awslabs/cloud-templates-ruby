@@ -16,18 +16,15 @@ module Aws
           attr_reader :definition
 
           def equal_to?(other)
-            definition == other.definition
+            definition.eql?(other.definition)
           end
 
           def to_s
             definition.to_s
           end
 
-          def self.instantiate(name)
-            new(name)
-          end
-
-          def initialize(definition)
+          def initialize(scope, definition)
+            super(scope)
             @definition = definition
           end
         end

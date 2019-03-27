@@ -795,28 +795,41 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
   describe 'as_expression' do
     context 'without context-dependent block' do
-      let(:test_class) do
-        Class.new(parametrized_class) do
-          include Aws::Templates::Utils::Expressions::Mixin
-
-          definition = Aws::Templates::Utils::Expressions::Definition.new do
-            variables x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
-          end
-
-          parameter :something,
-                    transform: as_expression(definition)
+      let(:definition) do
+        Aws::Templates::Utils::Expressions::Definition.new do
+          var x: Aws::Templates::Utils::Expressions::Variables::Arithmetic
         end
+      end
+
+      let(:test_class) do
+        klass = Class.new(parametrized_class) do
+          include Aws::Templates::Utils::Expressions::Mixin
+        end
+
+        klass.parameter(
+          :something,
+          transform: klass.as_expression(definition)
+        )
+
+        klass
       end
 
       it 'works with boxable expressions' do
         i = test_class.new(something: 1)
-        expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(1)
+        expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(
+          definition,
+          1
+        )
       end
 
       context 'with operations' do
         let(:expected) do
           Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+            definition,
+            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(
+              definition,
+              :x
+            ),
             1
           )
         end
@@ -844,7 +857,7 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
 
           parameter :something,
                     transform: as_expression { |i|
-                      variables Hash[
+                      var Hash[
                         i.variables.map do |name|
                           [name, Aws::Templates::Utils::Expressions::Variables::Arithmetic]
                         end
@@ -853,15 +866,26 @@ describe Aws::Templates::Utils::Parametrized::Transformation do
         end
       end
 
+      let(:definition) do
+        Aws::Templates::Utils::Expressions::Definition.new
+      end
+
       it 'works with boxable expressions' do
         i = test_class.new(variables: [:x], something: 1)
-        expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(1)
+        expect(i.something).to be_eql Aws::Templates::Utils::Expressions::Number.new(
+          definition,
+          1
+        )
       end
 
       context 'with operations' do
         let(:expected) do
           Aws::Templates::Utils::Expressions::Functions::Operations::Arithmetic::Addition.new(
-            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(:x),
+            definition,
+            Aws::Templates::Utils::Expressions::Variables::Arithmetic.new(
+              definition,
+              :x
+            ),
             1
           )
         end

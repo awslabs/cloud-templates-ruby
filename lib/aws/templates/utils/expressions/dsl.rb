@@ -17,15 +17,15 @@ module Aws
           attr_reader :definition
 
           def method_missing(name, *args)
-            definition.defined?(name) ? definition.instantiate(name, *args) : super
+            definition.present?(name) ? definition.instantiate(name, *args) : super
           end
 
           def respond_to_missing?(name, include_private = false)
-            definition.defined?(name) || super
+            definition.present?(name) || super
           end
 
           def expression(&blk)
-            instance_eval(&blk)
+            definition.cast_for(instance_eval(&blk))
           end
 
           def initialize(definition)
