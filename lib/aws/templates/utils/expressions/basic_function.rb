@@ -39,7 +39,7 @@ module Aws
           end
 
           def self.arguments_list
-            @arguments_list ||= Hash[list_all_parameter_names.each_with_index.to_a]
+            @arguments_list ||= Hash[parameters.keys.each_with_index.to_a]
           end
 
           def self.arity

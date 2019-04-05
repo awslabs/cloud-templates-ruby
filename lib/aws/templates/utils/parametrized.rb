@@ -122,7 +122,7 @@ module Aws
           ##
           # Defined hash keys
           def keys
-            target.parameter_names.merge(target.options.keys)
+            target.parameter_names.to_set.merge(target.options.keys)
           end
 
           ##
@@ -132,13 +132,17 @@ module Aws
           # returns it wrapping into Definition instance with the same context if needed
           # (if value is a map)
           def [](key)
-            target.parameter_names.include?(key) ? target.send(key) : target.options[key]
+            target.parameter?(key) ? target.send(key) : target.options[key]
           end
 
           ##
           # Check if the key is present in the hash
           def include?(key)
-            target.parameter_names.include?(key) || target.options.include?(key)
+            target.parameter?(key) || target.options.include?(key)
+          end
+
+          def deleted?(_key)
+            false
           end
 
           def initialize(target)
@@ -155,13 +159,13 @@ module Aws
         #
         # It's a DSL extension to declaratively define parameters.
         class_scope do
-          ##
-          # List all defined parameter names
-          #
-          # The list includes both the class parameters and all ancestor
-          # parameters.
-          def list_all_parameter_names
-            Set.new(all_parameters.keys)
+          def when_inherited(base)
+            base.parameters.merge!(parameters)
+            children << base
+          end
+
+          def children
+            @children ||= []
           end
 
           ##
@@ -173,12 +177,6 @@ module Aws
             @parameters ||= {}
           end
 
-          def all_parameters
-            @all_parameters ||=
-              ancestors_with(Parametrized)
-              .inject(Utils::Options.new) { |collection, mod| collection.merge!(mod.parameters) }
-          end
-
           ##
           # Get parameter object by name
           #
@@ -186,7 +184,7 @@ module Aws
           # inheritance hierarchy.
           # * +parameter_alias+ - parameter name
           def get_parameter(parameter_alias)
-            all_parameters[parameter_alias]
+            parameters[parameter_alias]
           end
 
           ##
@@ -213,8 +211,9 @@ module Aws
 
             parameter_object.scope = self
             parameters[name] = parameter_object
+            children.each { |child| child.parameters[name] = parameter_object }
 
-            define_method(name) { guarded_get(self, parameter_object) }
+            define_method(name) { _parameter_value_for(name, parameter_object) }
 
             parameter_object
           end
@@ -236,51 +235,77 @@ module Aws
           include Constraint::Dsl
         end
 
-        instance_scope do
-          def guarded_get(instance, parameter_object)
-            guarded_for(instance, parameter_object) { parameter_object.get(self) }
+        def guarded_get(instance, parameter_object)
+          guarded_for(instance, parameter_object) { parameter_object.get(self) }
+        end
+
+        ##
+        # Lazy initializer
+        def dependencies
+          if @dependencies.nil?
+            @dependencies = ::Set.new
+            depends_on(parameters_map.values)
           end
 
-          ##
-          # Lazy initializer
-          def dependencies
-            if @dependencies.nil?
-              @dependencies = ::Set.new
-              depends_on(parameter_names.map { |name| send(name) })
-            end
+          @dependencies
+        end
 
-            @dependencies
-          end
+        ##
+        # Parameter names list
+        #
+        # Instance-level alias for list_all_parameter_names
+        def parameter_names
+          self.class.parameters.keys
+        end
 
-          ##
-          # Parameter names list
-          #
-          # Instance-level alias for list_all_parameter_names
-          def parameter_names
-            self.class.list_all_parameter_names
-          end
+        ##
+        # Evaluate all parameters
+        #
+        # Return parameters as a hash
+        def parameters_map
+          @parameters_map ||= {}
 
-          ##
-          # Validate all parameters
-          #
-          # Performs calculation of all specified parameters to check options validity
-          def validate
-            parameter_names.each { |name| send(name) }
-          end
+          return @parameters_map if parameter_names.size == @parameters_map.size
 
-          ##
-          # Evaluate all parameters
-          #
-          # Return parameters as a hash
-          def parameters_map
-            parameter_names.each_with_object({}) { |name, obj| obj[name] = send(name) }
-          end
+          parameter_names.each_with_object(@parameters_map) do |name, obj|
+            next if @parameters_map.key?(name)
 
-          ##
-          # Transforms parametrized into an instance of recursive concept
-          def to_recursive
-            RecursiveAdapter.new(self)
+            obj[name] = _calculate_parameter_by_name(name)
           end
+        end
+
+        ##
+        # Validate all parameters
+        #
+        # Performs calculation of all specified parameters to check options validity
+        alias validate parameters_map
+
+        def parameter?(name)
+          self.class.parameters.key?(name)
+        end
+
+        ##
+        # Transforms parametrized into an instance of recursive concept
+        def to_recursive
+          RecursiveAdapter.new(self)
+        end
+
+        private
+
+        def _calculate_parameter_by_name(name)
+          _calculate_parameter(self.class.parameters[name])
+        end
+
+        def _calculate_parameter(parameter_object)
+          guarded_get(self, parameter_object)
+        end
+
+        def _parameter_value_for(name, parameter_object)
+          @parameters_map ||= {}
+
+          return @parameters_map[name] if @parameters_map.key?(name)
+
+          @parameters_map[name] = _calculate_parameter(parameter_object)
         end
 
         include Utils::Dependency::Dependent

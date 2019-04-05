@@ -18,6 +18,7 @@ module Aws
       class Options
         using Utils::Contextualized::Refinements
         using Utils::Dependency::Refinements
+        using Utils::Recursive
 
         include Utils::Memoized
         include Templates::Exception
@@ -164,14 +165,22 @@ module Aws
         # Produces a list of top-level keys from all layers. Deleted branches are not included.
         def keys
           memoize(:keys) do
-            structures
-              .each_with_object(::Set.new) do |container, keyset|
-                container.keys.each do |k|
-                  container[k].equal?(Utils::DeletedMarker) ? keyset.delete(k) : keyset.add(k)
-                end
+            reversed = structures.reverse_each
+
+            final_keyset = reversed.each_with_object({}) do |container, keyset|
+              not_deleted = container.keys.reject { |k| keyset.deleted?(k) }
+              not_deleted.each do |k|
+                keyset[k] = container.deleted?(k) ? Utils::DeletedMarker : true
               end
-              .to_a
+            end
+
+            final_keyset.keys.reject { |key| final_keyset[key].equal?(Utils::DeletedMarker) }
           end
+        end
+
+        def deleted?(key)
+          where = structures.find { |struct| struct.key?(key) }
+          where.nil? || where.deleted?(key)
         end
 
         ##

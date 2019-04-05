@@ -19,6 +19,11 @@ module Aws
             super(base)
             base.extend(ClassMethods)
             base.class_scope(_class_scope)
+            when_inherited(base)
+          end
+
+          def inherited(subclass)
+            when_inherited(subclass)
           end
 
           def instance_scope(&blk)
@@ -40,6 +45,8 @@ module Aws
 
             @_class_scope = ::Module.new
           end
+
+          def when_inherited(_base); end
         end
 
         extend ClassMethods

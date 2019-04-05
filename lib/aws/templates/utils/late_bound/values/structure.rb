@@ -1,4 +1,5 @@
 require 'aws/templates/utils'
+require 'set'
 
 module Aws
   module Templates
@@ -40,6 +41,10 @@ module Aws
                 target.respond_to?(key)
               end
 
+              def deleted?(_key)
+                false
+              end
+
               def initialize(target)
                 @target = target
               end
@@ -70,7 +75,7 @@ module Aws
             end
 
             def parameter_names
-              @parameter_names ||= klass.list_all_parameter_names
+              @parameter_names ||= klass.parameters.keys.to_set
             end
 
             def to_recursive

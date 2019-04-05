@@ -9,20 +9,18 @@ module Aws
           # Parametrized documentation aspect provider
           #
           # Composes documentation blocks of all parameters assigned to the class or its' parents.
-          class Provider < Rdoc::Inheritable
+          class Provider < Rdoc::Provider
             for_entity Templates::Utils::Parametrized
 
-            header 'Parameters'
+            def to_processed
+              return if context.parameters.empty?
 
-            protected
-
-            def description_for(mod)
-              return if mod.parameters.empty?
-
-              list do |l|
-                mod.parameters
-                   .each_value { |parameter| l << processed_for(parameter) }
-              end
+              sub(
+                text('_Parameters_'),
+                list(:BULLET) do |l|
+                  context.parameters.each_value { |parameter| l << processed_for(parameter) }
+                end
+              )
             end
           end
         end

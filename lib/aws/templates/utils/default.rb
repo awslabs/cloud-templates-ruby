@@ -37,6 +37,7 @@ module Aws
         end
 
         using Refinements
+        using Utils::Recursive
 
         ##
         # Abstract defaults definition
@@ -278,6 +279,10 @@ module Aws
           # Check if the key is present in the hash
           def include?(key)
             value.include?(key)
+          end
+
+          def deleted?(key)
+            value.deleted?(key)
           end
 
           # The class already supports recursive concept so return self

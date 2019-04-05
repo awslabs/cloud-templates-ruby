@@ -15,6 +15,10 @@ module Aws
           def to_recursive
             self
           end
+
+          def deleted?(key)
+            self[key].equal?(Utils::DeletedMarker)
+          end
         end
       end
     end
