@@ -1,5 +1,5 @@
 require 'aws/templates/utils/autoload'
-require 'facets/string/modulize'
+require 'facets/module/pathize'
 
 ##
 # Utility methods for Module class
@@ -238,16 +238,8 @@ module Aws
         end
       end
 
-      PATH_REGEXP = Regexp.compile('::|[.]|/')
-
-      def self.lookup_module(str)
-        target = str.split(PATH_REGEXP)
-                    .inject(::Object.lazy) { |acc, elem| acc.const_get(elem.modulize) }
-                    .reduce
-
-        raise "#{str} == #{target} which is not a module" unless target.is_a?(Module)
-
-        target
+      def self.lookup_module(*strs)
+        ::Object.lookup_module(*strs)
       end
     end
   end

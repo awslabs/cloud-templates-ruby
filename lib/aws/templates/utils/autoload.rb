@@ -1,7 +1,8 @@
 require 'facets/string/pathize'
 require 'facets/module/pathize'
-require 'set'
+require 'facets/string/modulize'
 require 'concurrent/map'
+require 'set'
 
 module Aws
   module Templates
@@ -220,6 +221,19 @@ end
 # It allows to skip 'require' definitions and load all classes and modules by convention.
 class Module
   prepend Aws::Templates::Utils::Autoload
+
+  PATH_REGEXP = Regexp.compile('::|[.]|/')
+
+  def lookup_module(*strs)
+    target = strs.map { |str| str.split(PATH_REGEXP) }
+                 .flatten
+                 .inject(lazy) { |acc, elem| acc.const_get(elem.modulize) }
+                 .reduce
+
+    raise "#{str} == #{target} which is not a module" unless target.is_a?(Module)
+
+    target
+  end
 end
 
 Aws::Templates::Utils::Autoload::Trace.enable

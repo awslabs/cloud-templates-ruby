@@ -23,6 +23,7 @@ module Aws
           end
 
           def inherited(subclass)
+            super(subclass)
             when_inherited(subclass)
           end
 

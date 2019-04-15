@@ -1,5 +1,6 @@
 require 'aws/templates/utils'
 require 'concurrent/map'
+require 'facets/module/enclosures'
 require 'set'
 
 module Aws
@@ -55,6 +56,11 @@ module Aws
           def inherited(klass)
             super(klass)
             klass.routing(self)
+            klass.look_for_routing
+          end
+
+          def look_for_routing
+            Templates::Utils::Extender.create_for(enclosure).each { |ext| routing ext }
           end
         end
 
