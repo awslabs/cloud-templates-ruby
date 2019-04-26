@@ -38,6 +38,15 @@ module Aws
           alias define_view define_handler
         end
 
+        def self.format(instance, params = nil)
+          obj = params.nil? ? new : new(params)
+          obj.format(instance)
+        end
+
+        def format(entity, params = nil)
+          process(entity, params)
+        end
+
         protected
 
         def handler_class_for(instance)

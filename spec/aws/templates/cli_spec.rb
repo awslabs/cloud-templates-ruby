@@ -1,11 +1,16 @@
 require 'spec_helper'
 require 'aws/templates/utils'
+require 'json'
 
 class DummyRender < Aws::Templates::Rendering::Render
   define_view(Aws::Templates::Artifact) do
     def to_processed
       instance.options.to_hash.to_a
     end
+  end
+
+  def format(*args)
+    super(*args).to_json
   end
 end
 

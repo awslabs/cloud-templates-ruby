@@ -18,13 +18,6 @@ module Aws
       class Interface < ::Thor
         desc 'render ARTIFACT', 'Render ARTIFACT with RENDER and print result'
 
-        method_option :format,
-                      desc: 'Formatter used for final output',
-                      aliases: :f,
-                      required: false,
-                      default: 'Json',
-                      type: :string
-
         method_option :options,
                       desc: 'JSON-formatted options to pass to the artifact',
                       aliases: :o,
@@ -46,7 +39,6 @@ module Aws
           say _format(
             Templates::Utils.lookup_module(artifact_path),
             Templates::Utils.lookup_module(options[:render]),
-            Aws::Templates::Cli::Formatter.format_as(options[:format]),
             _artifact_options,
             _render_parameters
           )
@@ -76,13 +68,8 @@ module Aws
 
         private
 
-        def _format(artifact, render_class, format, artifact_options, render_parameters)
-          format.format(
-            render_class.process(
-              artifact.new(artifact_options),
-              render_parameters
-            )
-          )
+        def _format(artifact, render_class, artifact_options, render_parameters)
+          render_class.format(artifact.new(artifact_options), render_parameters)
         end
 
         def _as_string(obj)
