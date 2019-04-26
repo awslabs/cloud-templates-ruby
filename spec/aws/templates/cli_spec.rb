@@ -9,8 +9,10 @@ class DummyRender < Aws::Templates::Rendering::Render
     end
   end
 
-  def format(*args)
-    super(*args).to_json
+  protected
+
+  def formatted_for(processed)
+    processed.to_json
   end
 end
 

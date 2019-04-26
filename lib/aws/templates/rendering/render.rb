@@ -44,10 +44,14 @@ module Aws
         end
 
         def format(entity, params = nil)
-          process(entity, params)
+          formatted_for(process(entity, params))
         end
 
         protected
+
+        def formatted_for(processed)
+          processed
+        end
 
         def handler_class_for(instance)
           ancestor = instance.class.ancestors.find { |mod| self.class.handler?(mod) }
