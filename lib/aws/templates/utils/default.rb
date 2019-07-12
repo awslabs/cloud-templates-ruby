@@ -19,7 +19,7 @@ module Aws
         ##
         # Functionality-specific refinements
         module Refinements
-          refine ::Object do
+          refine ::BasicObject do
             ##
             # If the object can be considered a defaults override
             #
