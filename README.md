@@ -130,6 +130,11 @@ independently. Namely:
   objects without explicit specification of it. Also, explicit dependency
   tracking handles are provided through usage of special methods.
 
+## Extentions
+
+* [Cloud Templates GraphViz](https://github.com/awslabs/cloud-templates-ruby-graphviz)
+  Model-agnostic HTML/JS/SVG render
+
 ## Roadmap
 
 * Optimization of internal logic
@@ -145,7 +150,6 @@ independently. Namely:
 * Internationalization
   * Help messages should support pluggable content
   * Exceptions should support regionalized messages
-* Model-agnostic HTML/JS/SVG render
 * Integrated IDE for constructing object schemas (Ruby interactive interpreter combined with
   GUI)
 * Assessment of the need of deep processing speed optimization:
