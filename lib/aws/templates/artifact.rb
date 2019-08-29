@@ -48,8 +48,7 @@ module Aws
     # any auto-generated parameter with input hash if they have the same
     # name/path.
     class Artifact < BasicArtifact
-      include Templates::Utils::Default
-      include Templates::Utils::Parametrized
+      include Templates::Utils::Structure
 
       def self.getter
         as_is

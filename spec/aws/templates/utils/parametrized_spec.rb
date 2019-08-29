@@ -53,11 +53,7 @@ describe Aws::Templates::Utils::Parametrized do
 
   context 'when class is inherited and the module is included' do
     let(:parametrized_class) do
-      INCLUDING_MODULE = including_module
-
-      Class.new(including_class) do
-        include INCLUDING_MODULE
-      end
+      Class.new(including_class).send(:include, including_module)
     end
 
     let(:create_parameters) { { mixed_parameter: 5 } }
